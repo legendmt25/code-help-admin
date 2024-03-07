@@ -1,0 +1,935 @@
+openapi: 3.0.1
+info:
+  description: Forum application api
+  title: Forum application
+  version: 0.1.0
+servers:
+- url: http://localhost:3001/api/v1
+paths:
+  /community:
+    get:
+      description: Get communities by parameters
+      operationId: getAllCommunities
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortCommunities'
+          description: OK
+      tags:
+      - community
+    post:
+      description: Create a new community
+      operationId: createCommunity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+          description: OK
+      tags:
+      - community
+  /community/{name}:
+    delete:
+      description: Delete the community
+      operationId: deleteCommunity
+      parameters:
+      - description: Community name
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+      tags:
+      - community
+    get:
+      description: Find a specific community by id
+      operationId: getCommunityByUid
+      parameters:
+      - description: Community Id
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+          description: OK
+      tags:
+      - community
+    put:
+      description: Update community
+      operationId: updateCommunity
+      parameters:
+      - description: Community name
+        explode: false
+        in: path
+        name: name
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunityRequest'
+        description: Community update request body
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Community'
+          description: OK
+      tags:
+      - community
+  /community/moderator:
+    delete:
+      operationId: removeModerator
+      parameters:
+      - description: Community name
+        explode: true
+        in: query
+        name: community
+        required: true
+        schema:
+          type: string
+        style: form
+      - description: moderator to remove
+        explode: true
+        in: query
+        name: username
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+      tags:
+      - community
+    get:
+      description: Get moderators for a community
+      operationId: getCommunityModerators
+      parameters:
+      - description: Community uid
+        explode: true
+        in: query
+        name: name
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users'
+          description: OK
+      tags:
+      - community
+    patch:
+      description: Add a new moderator to the
+      operationId: Add a new moderator to the community
+      parameters:
+      - description: Community name
+        explode: true
+        in: query
+        name: community
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModeratorRequest'
+      responses:
+        "200":
+          description: OK
+      tags:
+      - community
+  /community/member:
+    delete:
+      description: Leave a community
+      operationId: leaveCommunity
+      parameters:
+      - description: Community uid
+        explode: true
+        in: query
+        name: community
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      tags:
+      - community
+    patch:
+      description: Join a community
+      operationId: joinCommunity
+      parameters:
+      - description: Community name
+        explode: true
+        in: query
+        name: community
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      tags:
+      - community
+  /post:
+    get:
+      description: Get certain posts
+      operationId: getPosts
+      parameters:
+      - description: Community name
+        explode: true
+        in: query
+        name: community
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ShortPosts'
+          description: OK
+      tags:
+      - post
+    post:
+      description: Create a post inside a community
+      operationId: createCommunityPost
+      parameters:
+      - explode: true
+        in: query
+        name: community
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+        description: Post request body
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: OK
+      tags:
+      - post
+  /post/{uid}:
+    delete:
+      description: Delete a post
+      operationId: deletePost
+      parameters:
+      - description: Post uid
+        explode: false
+        in: path
+        name: uid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      tags:
+      - post
+    get:
+      description: Get a single post
+      operationId: getPost
+      parameters:
+      - description: Post uid
+        explode: false
+        in: path
+        name: uid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: OK
+      tags:
+      - post
+    put:
+      description: Update content or title of a post
+      operationId: updatePost
+      parameters:
+      - description: Post uid
+        explode: false
+        in: path
+        name: uid
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+        description: Post update request
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+          description: OK
+        "304":
+          description: Not Modified
+        "400":
+          description: Bad Request
+      tags:
+      - post
+  /comment:
+    get:
+      description: Get all comments for a post
+      operationId: getCommentsForPost
+      parameters:
+      - description: Post uid
+        explode: true
+        in: query
+        name: post
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comments'
+          description: OK
+      tags:
+      - comment
+    post:
+      description: Write a comment on a post
+      operationId: commentOnPost
+      parameters:
+      - description: Post uid
+        explode: true
+        in: query
+        name: post
+        required: true
+        schema:
+          type: string
+        style: form
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+        description: Comment request body
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: OK
+        "400":
+          description: Bad Request
+      tags:
+      - comment
+  /comment/{uid}:
+    delete:
+      operationId: deleteComment
+      parameters:
+      - description: Comment uid
+        explode: false
+        in: path
+        name: uid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+      tags:
+      - comment
+    get:
+      description: Get all comment replies
+      operationId: getCommentReplies
+      parameters:
+      - description: Comment uid
+        explode: false
+        in: path
+        name: uid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comments'
+          description: OK
+      tags:
+      - comment
+    post:
+      description: Reply to a comment
+      operationId: replyToComment
+      parameters:
+      - description: Comment uid
+        explode: false
+        in: path
+        name: uid
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: OK
+      tags:
+      - comment
+    put:
+      operationId: updateComment
+      parameters:
+      - description: Comment uid
+        explode: false
+        in: path
+        name: uid
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Comment'
+          description: OK
+        "304":
+          description: Not Modified
+        "400":
+          description: Bad Request
+      tags:
+      - comment
+  /category:
+    get:
+      description: Get all categories
+      operationId: getAllCategories
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Categories'
+          description: OK
+      tags:
+      - category
+    post:
+      description: Create a new category
+      operationId: createCategory
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreate'
+        description: Category creation body
+        required: true
+      responses:
+        "200":
+          description: OK
+      tags:
+      - category
+components:
+  schemas:
+    Community:
+      allOf:
+      - $ref: '#/components/schemas/ShortCommunity'
+      - properties:
+          admin:
+            $ref: '#/components/schemas/User'
+          categories:
+            items:
+              $ref: '#/components/schemas/Category'
+            type: array
+          posts:
+            items:
+              $ref: '#/components/schemas/ShortPost'
+            type: array
+          joined:
+            type: boolean
+          moderators:
+            items:
+              $ref: '#/components/schemas/User'
+            type: array
+          created:
+            format: date-time
+            type: string
+        required:
+        - admin
+        - categories
+        - created
+        - joined
+        - moderators
+        - posts
+        type: object
+      example:
+        image: image
+        joined: true
+        created: 2000-01-23T04:56:07.000+00:00
+        name: name
+        description: description
+        admin:
+          username: username
+        categories:
+        - uid: uid
+          name: name
+        - uid: uid
+          name: name
+        posts:
+        - uid: uid
+          created: 2000-01-23T04:56:07.000+00:00
+          title: title
+          user:
+            username: username
+        - uid: uid
+          created: 2000-01-23T04:56:07.000+00:00
+          title: title
+          user:
+            username: username
+        moderators:
+        - username: username
+        - username: username
+    Communities:
+      properties:
+        communities:
+          items:
+            $ref: '#/components/schemas/Community'
+          type: array
+      required:
+      - communities
+      type: object
+    ShortCommunity:
+      example:
+        image: image
+        name: name
+        description: description
+        categories:
+        - uid: uid
+          name: name
+        - uid: uid
+          name: name
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        categories:
+          items:
+            $ref: '#/components/schemas/Category'
+          type: array
+      required:
+      - description
+      - name
+      type: object
+    ShortCommunities:
+      example:
+        communities:
+        - image: image
+          name: name
+          description: description
+          categories:
+          - uid: uid
+            name: name
+          - uid: uid
+            name: name
+        - image: image
+          name: name
+          description: description
+          categories:
+          - uid: uid
+            name: name
+          - uid: uid
+            name: name
+      properties:
+        communities:
+          items:
+            $ref: '#/components/schemas/ShortCommunity'
+          type: array
+      required:
+      - communities
+      type: object
+    CommunityRequest:
+      example:
+        image: image
+        name: name
+        description: description
+        categories:
+          uids:
+          - uids
+          - uids
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        image:
+          type: string
+        categories:
+          $ref: '#/components/schemas/CommunityRequest_categories'
+      required:
+      - description
+      - name
+      type: object
+    ShortPost:
+      example:
+        uid: uid
+        created: 2000-01-23T04:56:07.000+00:00
+        title: title
+        user:
+          username: username
+      properties:
+        uid:
+          type: string
+        title:
+          type: string
+        created:
+          format: date-time
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - created
+      - title
+      - uid
+      - user
+      type: object
+    ShortPosts:
+      example:
+        posts:
+        - uid: uid
+          created: 2000-01-23T04:56:07.000+00:00
+          title: title
+          user:
+            username: username
+        - uid: uid
+          created: 2000-01-23T04:56:07.000+00:00
+          title: title
+          user:
+            username: username
+      properties:
+        posts:
+          items:
+            $ref: '#/components/schemas/ShortPost'
+          type: array
+      type: object
+    Post:
+      allOf:
+      - $ref: '#/components/schemas/ShortPost'
+      - properties:
+          content:
+            type: string
+          comments:
+            items:
+              $ref: '#/components/schemas/Comment'
+            type: array
+          modified:
+            format: date-time
+            type: string
+        required:
+        - comments
+        - content
+        - modified
+        type: object
+      example:
+        uid: uid
+        comments:
+        - uid: uid
+          replies:
+            replies:
+            - null
+            - null
+            count: 0
+          created: 2000-01-23T04:56:07.000+00:00
+          modified: 2000-01-23T04:56:07.000+00:00
+          user:
+            username: username
+          content: content
+        - uid: uid
+          replies:
+            replies:
+            - null
+            - null
+            count: 0
+          created: 2000-01-23T04:56:07.000+00:00
+          modified: 2000-01-23T04:56:07.000+00:00
+          user:
+            username: username
+          content: content
+        created: 2000-01-23T04:56:07.000+00:00
+        modified: 2000-01-23T04:56:07.000+00:00
+        title: title
+        user:
+          username: username
+        content: content
+      type: object
+    Posts:
+      properties:
+        posts:
+          items:
+            $ref: '#/components/schemas/Post'
+          type: array
+      type: object
+    Comment:
+      example:
+        uid: uid
+        replies:
+          replies:
+          - null
+          - null
+          count: 0
+        created: 2000-01-23T04:56:07.000+00:00
+        modified: 2000-01-23T04:56:07.000+00:00
+        user:
+          username: username
+        content: content
+      properties:
+        uid:
+          type: string
+        content:
+          type: string
+        created:
+          format: date-time
+          type: string
+        replies:
+          $ref: '#/components/schemas/Comment_replies'
+        modified:
+          format: date-time
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - content
+      - created
+      - modified
+      - uid
+      - user
+      type: object
+    Comments:
+      example:
+        comments:
+        - uid: uid
+          replies:
+            replies:
+            - null
+            - null
+            count: 0
+          created: 2000-01-23T04:56:07.000+00:00
+          modified: 2000-01-23T04:56:07.000+00:00
+          user:
+            username: username
+          content: content
+        - uid: uid
+          replies:
+            replies:
+            - null
+            - null
+            count: 0
+          created: 2000-01-23T04:56:07.000+00:00
+          modified: 2000-01-23T04:56:07.000+00:00
+          user:
+            username: username
+          content: content
+      properties:
+        comments:
+          items:
+            $ref: '#/components/schemas/Comment'
+          type: array
+      type: object
+    User:
+      example:
+        username: username
+      properties:
+        username:
+          type: string
+      required:
+      - username
+      type: object
+    Users:
+      example:
+        users:
+        - username: username
+        - username: username
+      properties:
+        users:
+          items:
+            $ref: '#/components/schemas/User'
+          type: array
+      required:
+      - users
+      type: object
+    Category:
+      example:
+        uid: uid
+        name: name
+      properties:
+        uid:
+          type: string
+        name:
+          type: string
+      required:
+      - name
+      - uid
+      type: object
+    Categories:
+      example:
+        categories:
+        - uid: uid
+          name: name
+        - uid: uid
+          name: name
+      properties:
+        categories:
+          items:
+            $ref: '#/components/schemas/Category'
+          type: array
+      required:
+      - categories
+      type: object
+    CommentRequest:
+      example:
+        content: content
+      properties:
+        content:
+          type: string
+      required:
+      - content
+      type: object
+    PostRequest:
+      example:
+        title: title
+        content: content
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+      required:
+      - content
+      - title
+      type: object
+    ModeratorRequest:
+      example:
+        username: username
+      properties:
+        username:
+          type: string
+      required:
+      - username
+      type: object
+    CategoryCreate:
+      example:
+        name: name
+      properties:
+        name:
+          type: string
+      required:
+      - name
+      type: object
+    CommunityRequest_categories:
+      example:
+        uids:
+        - uids
+        - uids
+      properties:
+        uids:
+          items:
+            type: string
+          type: array
+      type: object
+    Comment_replies:
+      example:
+        replies:
+        - null
+        - null
+        count: 0
+      properties:
+        count:
+          type: integer
+        replies:
+          items:
+            $ref: '#/components/schemas/Comment'
+          type: array
+      required:
+      - count
+      type: object
