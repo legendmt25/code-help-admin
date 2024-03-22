@@ -1,14 +1,18 @@
 import { type RouteDefinition } from "svelte-spa-router";
 import { wrap } from "svelte-spa-router/wrap";
-import { Route } from "./route-utils";
-import Counter from "./lib/Counter.svelte";
-import Other from "./lib/Other.svelte";
+import ProblemsEdit from "./lib/ProblemsEdit.svelte";
+import ProblemsOverview from "./lib/ProblemsOverview.svelte";
+
+export const Route = {
+  problems_overview: "/",
+  problems_edit: "/problems/edit/:id"
+} as const;
 
 export const routes: RouteDefinition = {
-  [Route.counter]: wrap({
-    component: Counter,
+  [Route.problems_overview]: wrap({
+    component: ProblemsOverview
   }),
-  [Route.other]: wrap({
-    component: Other
+  [Route.problems_edit]: wrap({
+    component: ProblemsEdit
   })
 };
