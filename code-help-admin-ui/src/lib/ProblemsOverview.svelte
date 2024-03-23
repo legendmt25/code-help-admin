@@ -5,6 +5,7 @@
   import { link } from "svelte-spa-router";
   import Spinner from "../components/Spinner.svelte";
   import { Route } from "../routes";
+  import Button from "../components/Button.svelte";
 
   let loading: boolean = false;
   let problems: ProblemEntry[] = [];
@@ -26,12 +27,16 @@
   table,
   th,
   td {
-    border: 1px solid;
+    border: 1px solid #eee;
     padding: 10px;
   }
 
   section {
     padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
   }
 
   .no-entries {
@@ -44,6 +49,7 @@
   <Spinner />
 {:else}
   <section>
+    <Button>Create</Button>
     <table>
       <thead>
         <tr>
@@ -62,7 +68,9 @@
             <td>{problemEntry.id}</td>
             <td>{problemEntry.title}</td>
             <td>
-              <a href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined} use:link>Edit</a>
+              <a
+                href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
+                use:link>Edit</a>
               /
               <a>Delete</a>
             </td>

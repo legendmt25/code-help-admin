@@ -17,6 +17,7 @@
     gap: 0.2rem;
     box-shadow: rgba(0, 0, 0, 0.05) 1.95px 1px 2px 0px;
   }
+
   main {
     width: 100%;
   }
@@ -40,12 +41,12 @@
 </style>
 
 <header>
-  <Button label="Login" />
+  <Button>Login</Button>
 </header>
 <div class="container">
   <nav>
     <a href={Route.problems_overview} use:link>
-      <Button fullwidth label="Problems" />
+      <Button fullwidth>Problems</Button>
     </a>
   </nav>
   <main class="content">

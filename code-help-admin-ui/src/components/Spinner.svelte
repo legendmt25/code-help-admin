@@ -1,3 +1,7 @@
+<script lang="ts">
+  export let wrapper: boolean = true;
+</script>
+
 <style>
   .loader {
     margin: auto;
@@ -19,6 +23,19 @@
       transform: rotate(360deg);
     }
   }
+
+  .spinner-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
 </style>
 
-<span class="loader"></span>
+{#if wrapper}
+  <div class="spinner-wrapper">
+    <span class="loader"></span>
+  </div>
+{:else}
+  <span class="loader"></span>
+{/if}
