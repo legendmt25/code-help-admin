@@ -4,8 +4,17 @@
   import { onMount } from "svelte";
   import { getAllCategories, getProblemById } from "../services/ProblemsService";
   import Spinner from "../components/Spinner.svelte";
+  import Button from "../components/Button.svelte";
+  import type { FormEventHandler } from "svelte/elements";
 
   export let params: { id?: string } = {};
+
+  let testCaseSelected: number | undefined = undefined;
+
+  let testCases: {
+    in?: string;
+    out?: string;
+  }[] = [];
 
   let activeTab = "markdown";
   const tabs = [
@@ -54,6 +63,13 @@
 
     Promise.all(promiseArray).finally(() => (loading = false));
   });
+
+  const handleEditCreate: FormEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+
+    const trimmedTestCases = testCases.filter((testCase) => !!testCase.in && !!testCase.out);
+    console.log(value, trimmedTestCases);
+  };
 </script>
 
 <style>
@@ -110,8 +126,8 @@
   }
 
   .editor {
-    height: 100%;
     width: 50%;
+    height: 98%;
   }
 
   .preview {
@@ -122,14 +138,56 @@
     display: flex;
     gap: 1rem;
     width: 100%;
+    height: 97%;
+  }
+
+  .markdown-tab-section,
+  .tests-tab-section,
+  .solution-tab-section {
+    width: 100%;
     height: 100%;
   }
 
-  .editor-preview-section {
+  .tests-tab-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    width: 100%;
+    max-width: 250px;
+    max-height: 84.5vh;
+    overflow-y: auto;
+  }
+
+  .tests-tab-container {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .tests-tab-container .input-container {
+    height: 300px;
+    resize: vertical;
+  }
+
+  .input-container #testcase-output,
+  .input-container #testcase-input {
+    height: 100%;
+    width: 100%;
+  }
+
+  .tests-editor-container {
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    width: 100%;
+    padding: 1rem;
+  }
+
+  :global(.testcase-save-btn) {
+    display: block;
+    margin-left: auto;
+    margin-top: auto;
   }
 </style>
 
@@ -146,20 +204,20 @@
         {/each}
       </div>
 
-      <form>
+      <form on:submit={handleEditCreate}>
         <div class="input-container">
           <label for="name">Name</label>
           <input id="name" bind:value={value.title} />
         </div>
-        <div>
+        <div class="input-container">
           <label for="difficulty">Difficulty</label>
-          <select id="difficulty" class="input-container" bind:value={value.difficulty}>
+          <select id="difficulty" bind:value={value.difficulty}>
             {#each Object.values(Difficulty) as difficultyValue}
               <option value={difficultyValue}>{difficultyValue}</option>
             {/each}
           </select>
         </div>
-        <div>
+        <div class="input-container">
           <label for="category">Category</label>
           <select id="category" class="input-container" bind:value={value.category}>
             {#each categories as category}
@@ -167,14 +225,47 @@
             {/each}
           </select>
         </div>
+        <Button>Create/Edit</Button>
       </form>
     </div>
-    <section class="editor-preview-section">
-      <h2>Editor - Preview</h2>
-      <div class="editor-preview-container">
-        <textarea class="editor" style="resize: none;" name="markdown" bind:value={value.markdown}></textarea>
-        <div class="preview">{@html marked(value.markdown ?? "")}</div>
-      </div>
-    </section>
+
+    {#if activeTab === "markdown"}
+      <section class="markdown-tab-section">
+        <h2>Markdown Editor - Preview</h2>
+        <div class="editor-preview-container">
+          <textarea class="editor" style="resize: none;" name="markdown" bind:value={value.markdown}></textarea>
+          <div class="preview">{@html marked(value.markdown ?? "")}</div>
+        </div>
+      </section>
+    {:else if activeTab === "tests"}
+      <section class="tests-tab-section">
+        <h2>Tests Editor</h2>
+        <div class="tests-tab-container">
+          <div class="tests-tab-sidebar">
+            <Button fullwidth onClick={() => (testCases = [{}, ...testCases])}>+</Button>
+            {#each testCases as _, index}
+              <Button fullwidth onClick={() => (testCaseSelected = index)}>Test case {index}</Button>
+            {/each}
+          </div>
+          {#if testCaseSelected != undefined}
+            <div class="tests-editor-container">
+              <div class="input-container">
+                <label for="testcase-input">INPUT:</label>
+                <textarea id="testcase-input" name="testcase-input" bind:value={testCases[testCaseSelected].in}
+                ></textarea>
+              </div>
+              <div class="input-container">
+                <label for="testcase-output">OUTPUT:</label>
+                <textarea id="testcase-output" name="testcase-input" bind:value={testCases[testCaseSelected].out}
+                ></textarea>
+              </div>
+            </div>
+          {/if}
+        </div>
+        <div></div>
+      </section>
+    {:else if activeTab === "solution"}
+      <section class="solution-tab-section"></section>
+    {/if}
   </div>
 {/if}

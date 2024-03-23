@@ -6,8 +6,10 @@
 
 <style>
   .container {
-    height: 100vh;
     display: flex;
+    height: 100%;
+
+    flex: 1 0 100%;
   }
 
   nav {

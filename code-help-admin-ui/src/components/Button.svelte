@@ -1,6 +1,9 @@
 <script lang="ts">
   export let onClick: (() => void) | undefined = undefined;
   export let fullwidth: boolean | undefined = undefined;
+
+  export let clazz: string = "";
+  export { clazz as class };
 </script>
 
 <style>
@@ -33,6 +36,6 @@
   }
 </style>
 
-<button on:click={onClick} class={fullwidth ? "btn-fullwidth" : ""}>
+<button on:click={onClick} class:btn-fullwidth={fullwidth} class={clazz}>
   <slot />
 </button>
