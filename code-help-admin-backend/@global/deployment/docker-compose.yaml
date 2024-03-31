@@ -1,0 +1,6 @@
+services:
+  hello:
+    container_name: hello-container
+    image: hello:latest
+    ports:
+      - "5080:8080"
