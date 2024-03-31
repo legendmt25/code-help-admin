@@ -1,0 +1,11 @@
+FROM golang:1.22.1-alpine3.19 as builder
+
+ARG SOURCE_DIRECTORY
+
+COPY . /app
+
+WORKDIR /app/$SOURCE_DIRECTORY
+
+EXPOSE 8080
+
+ENTRYPOINT go run .
