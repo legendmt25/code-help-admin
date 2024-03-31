@@ -1,11 +1,14 @@
 <script lang="ts">
-  import { getAllProblems } from "../services/ProblemsService";
-  import { link } from "svelte-spa-router";
+  import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
   import { Route } from "../routes";
-  import Button from "../components/Button.svelte";
+  import { deleteCommunity, getAllCommunities } from "../services/ForumService";
 
-  const getAllProblemsPromise = getAllProblems().then((x) => x.problems);
+  const getAllCommunitiesPromise = getAllCommunities().then((data) => data.communities);
+
+  const handleDeleteCommunity = (communityName: string) => {
+    deleteCommunity(communityName);
+  };
 </script>
 
 <style>
@@ -35,34 +38,28 @@
   }
 </style>
 
-{#await getAllProblemsPromise}
+{#await getAllCommunitiesPromise}
   <Spinner />
-{:then problems}
+{:then communities}
   <section>
-    <Button>Create</Button>
     <table>
       <thead>
         <tr>
-          <th>#</th>
           <th>Name</th>
           <th>Language</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {#if problems.length === 0}
+        {#if communities.length === 0}
           <div class="no-entries">No entries!</div>
         {/if}
-        {#each problems as problemEntry}
+        {#each communities as communityEntry}
           <tr>
-            <td>{problemEntry.id}</td>
-            <td>{problemEntry.title}</td>
+            <td>{communityEntry.name}</td>
+            <td>{JSON.stringify(communityEntry.categories)}</td>
             <td>
-              <a
-                href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
-                use:link>Edit</a>
-              /
-              <a>Delete</a>
+              <Button on:click={() => handleDeleteCommunity(communityEntry.name)}>Delete</Button>
             </td>
           </tr>
         {/each}
@@ -70,5 +67,5 @@
     </table>
   </section>
 {:catch err}
-  <div>An error occured!</div>
+  <div>An error occured! ({err})</div>
 {/await}

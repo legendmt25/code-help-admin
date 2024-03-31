@@ -50,6 +50,12 @@
     <a href={Route.problems_overview} use:link>
       <Button fullwidth>Problems</Button>
     </a>
+    <a href={Route.contests_overview} use:link>
+      <Button fullwidth>Contests</Button>
+    </a>
+    <a href={Route.communities_overview} use:link>
+      <Button fullwidth>Communities</Button>
+    </a>
   </nav>
   <main class="content">
     <Router {routes} />

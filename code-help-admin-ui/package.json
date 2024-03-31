@@ -9,8 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "generate-types:forum-api": "openapi-generator-cli generate -i docs/code-help-core-api.yaml -g typescript-fetch -o src/generated/core-api --additional-properties=withInterfaces=true",
-    "generate-types:core-api": "openapi-generator-cli generate -i docs/forum-api.yaml -g typescript-fetch -o src/generated/forum-api --additional-properties=withInterfaces=true",
+    "generate-types:admin-api": "openapi-generator-cli generate -i docs/code-help-admin-api.yaml -g typescript-fetch -o src/generated/admin-api --additional-properties=withInterfaces=true --skip-validate-spec",
     "generate-types": "rimraf -rf /src/generated && run-p generate-types:*"
   },
   "devDependencies": {
@@ -36,6 +35,8 @@
     "vite": "^5.1.4"
   },
   "dependencies": {
-    "marked": "^12.0.1"
+    "@codemirror/lang-javascript": "^6.2.2",
+    "marked": "^12.0.1",
+    "svelte-codemirror-editor": "^1.3.0"
   }
 }

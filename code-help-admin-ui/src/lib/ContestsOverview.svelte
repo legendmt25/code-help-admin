@@ -1,11 +1,9 @@
 <script lang="ts">
-  import { getAllProblems } from "../services/ProblemsService";
-  import { link } from "svelte-spa-router";
   import Spinner from "../components/Spinner.svelte";
   import { Route } from "../routes";
-  import Button from "../components/Button.svelte";
+  import { getAllContests } from "../services/ContestService";
 
-  const getAllProblemsPromise = getAllProblems().then((x) => x.problems);
+  const getAllContestsPromise = getAllContests().then((data) => data.contests);
 </script>
 
 <style>
@@ -35,11 +33,10 @@
   }
 </style>
 
-{#await getAllProblemsPromise}
+{#await getAllContestsPromise}
   <Spinner />
-{:then problems}
+{:then contests}
   <section>
-    <Button>Create</Button>
     <table>
       <thead>
         <tr>
@@ -50,19 +47,19 @@
         </tr>
       </thead>
       <tbody>
-        {#if problems.length === 0}
+        {#if contests.length === 0}
           <div class="no-entries">No entries!</div>
         {/if}
-        {#each problems as problemEntry}
+        {#each contests as contestEntry}
           <tr>
-            <td>{problemEntry.id}</td>
-            <td>{problemEntry.title}</td>
+            <td>{contestEntry.id}</td>
+            <td>{contestEntry.name}</td>
+            <td>{contestEntry.name}</td>
             <td>
               <a
-                href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
+                href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}
                 use:link>Edit</a>
               /
-              <a>Delete</a>
             </td>
           </tr>
         {/each}

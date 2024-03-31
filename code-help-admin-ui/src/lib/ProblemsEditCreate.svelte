@@ -1,12 +1,13 @@
 <script lang="ts">
+  import { javascript } from "@codemirror/lang-javascript";
   import { marked } from "marked";
-  import { Difficulty, type EditProblemEntryRequest, type Category } from "../generated/core-api";
   import { onMount } from "svelte";
-  import { getAllCategories, getProblemById } from "../services/ProblemsService";
-  import Spinner from "../components/Spinner.svelte";
-  import Button from "../components/Button.svelte";
+  import CodeMirror from "svelte-codemirror-editor";
   import type { FormEventHandler } from "svelte/elements";
-
+  import Button from "../components/Button.svelte";
+  import Spinner from "../components/Spinner.svelte";
+  import { Difficulty, type Category, type ProblemRequest } from "../generated/admin-api";
+  import { createProblem, getAllCategories, getProblemById, updateProblem } from "../services/ProblemsService";
   export let params: { id?: string } = {};
 
   let testCaseSelected: number | undefined = undefined;
@@ -15,6 +16,9 @@
     in?: string;
     out?: string;
   }[] = [];
+
+  let starterCode: string = "";
+  let runnerCode: string = "";
 
   let activeTab = "markdown";
   const tabs = [
@@ -33,7 +37,7 @@
   ];
 
   let loading = false;
-  let value: Partial<EditProblemEntryRequest> = {};
+  let formValue: Partial<ProblemRequest> = {};
   let categories: Category[] = [];
   onMount(() => {
     loading = true;
@@ -49,13 +53,14 @@
     if (!Number.isNaN(Number(params.id))) {
       promiseArray.push(
         getProblemById(Number(params.id)).then((problem) => {
-          value = {
+          formValue = {
             category: problem.category,
             difficulty: problem.difficulty,
             markdown: problem.markdown,
-            id: problem.id,
             title: problem.title,
-            starterCode: new Blob([problem.starterCode], { type: "plain/text" })
+            starterCode: problem.starterCode,
+            runnerCode: problem.runnerCode,
+            testCases: problem.testCases
           };
         })
       );
@@ -67,8 +72,14 @@
   const handleEditCreate: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
-    const trimmedTestCases = testCases.filter((testCase) => !!testCase.in && !!testCase.out);
-    console.log(value, trimmedTestCases);
+    const body = formValue as ProblemRequest;
+
+    const id = Number(params.id);
+    if (!Number.isNaN(id)) {
+      updateProblem(id, body);
+    } else {
+      createProblem(body);
+    }
   };
 </script>
 
@@ -189,6 +200,11 @@
     margin-left: auto;
     margin-top: auto;
   }
+
+  :global(.test-case-btn) {
+    display: flex;
+    justify-content: space-between;
+  }
 </style>
 
 {#if loading}
@@ -198,7 +214,13 @@
     <div class="form-editor-preview-wrapper">
       <div class="tab-group">
         {#each tabs as tabItem}
-          <div class="tab" class:active-tab={activeTab === tabItem.key} on:click={() => (activeTab = tabItem.key)}>
+          <div
+            class="tab"
+            class:active-tab={activeTab === tabItem.key}
+            tabindex="-1"
+            role="button"
+            on:keypress={undefined}
+            on:click={() => (activeTab = tabItem.key)}>
             {tabItem.label}
           </div>
         {/each}
@@ -206,12 +228,12 @@
 
       <form on:submit={handleEditCreate}>
         <div class="input-container">
-          <label for="name">Name</label>
-          <input id="name" bind:value={value.title} />
+          <label for="title">Title</label>
+          <input id="title" name="title" bind:value={formValue.title} />
         </div>
         <div class="input-container">
           <label for="difficulty">Difficulty</label>
-          <select id="difficulty" bind:value={value.difficulty}>
+          <select id="difficulty" name="difficulty" bind:value={formValue.difficulty}>
             {#each Object.values(Difficulty) as difficultyValue}
               <option value={difficultyValue}>{difficultyValue}</option>
             {/each}
@@ -219,13 +241,13 @@
         </div>
         <div class="input-container">
           <label for="category">Category</label>
-          <select id="category" class="input-container" bind:value={value.category}>
+          <select id="category" name="category" class="input-container" bind:value={formValue.category}>
             {#each categories as category}
               <option value={category}>{category.name}</option>
             {/each}
           </select>
         </div>
-        <Button>Create/Edit</Button>
+        <Button fullwidth>Create/Edit</Button>
       </form>
     </div>
 
@@ -233,8 +255,8 @@
       <section class="markdown-tab-section">
         <h2>Markdown Editor - Preview</h2>
         <div class="editor-preview-container">
-          <textarea class="editor" style="resize: none;" name="markdown" bind:value={value.markdown}></textarea>
-          <div class="preview">{@html marked(value.markdown ?? "")}</div>
+          <textarea class="editor" style:resize="none" name="markdown" bind:value={formValue.markdown} />
+          <div class="preview">{@html marked(formValue.markdown ?? "")}</div>
         </div>
       </section>
     {:else if activeTab === "tests"}
@@ -242,22 +264,32 @@
         <h2>Tests Editor</h2>
         <div class="tests-tab-container">
           <div class="tests-tab-sidebar">
-            <Button fullwidth onClick={() => (testCases = [{}, ...testCases])}>+</Button>
+            <Button fullwidth on:click={() => (testCases = [{}, ...testCases])}>+</Button>
             {#each testCases as _, index}
-              <Button fullwidth onClick={() => (testCaseSelected = index)}>Test case {index}</Button>
+              <Button fullwidth on:click={() => (testCaseSelected = index)} class="test-case-btn"
+                ><div>Test case {index}</div>
+                <div
+                  role="button"
+                  on:keydown={undefined}
+                  on:click={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    testCaseSelected = undefined;
+                    testCases = [...testCases.filter((_, arrIndex) => arrIndex !== index)];
+                  }}>
+                  x
+                </div></Button>
             {/each}
           </div>
           {#if testCaseSelected != undefined}
             <div class="tests-editor-container">
               <div class="input-container">
                 <label for="testcase-input">INPUT:</label>
-                <textarea id="testcase-input" name="testcase-input" bind:value={testCases[testCaseSelected].in}
-                ></textarea>
+                <textarea id="testcase-input" name="testcase-input" bind:value={testCases[testCaseSelected].in} />
               </div>
               <div class="input-container">
                 <label for="testcase-output">OUTPUT:</label>
-                <textarea id="testcase-output" name="testcase-input" bind:value={testCases[testCaseSelected].out}
-                ></textarea>
+                <textarea id="testcase-output" name="testcase-input" bind:value={testCases[testCaseSelected].out} />
               </div>
             </div>
           {/if}
@@ -265,7 +297,12 @@
         <div></div>
       </section>
     {:else if activeTab === "solution"}
-      <section class="solution-tab-section"></section>
+      <section class="solution-tab-section">
+        <h2>Starter code</h2>
+        <CodeMirror bind:value={starterCode} lang={javascript()} />
+        <h2>Runner code</h2>
+        <CodeMirror bind:value={runnerCode} lang={javascript()} />
+      </section>
     {/if}
   </div>
 {/if}
