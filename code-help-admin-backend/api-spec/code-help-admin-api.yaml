@@ -237,17 +237,7 @@ components:
             runnerCode:
               $ref: '#/components/schemas/Code'
             testCases:
-              type: array
-              items:
-                type: object
-                properties:
-                  id:
-                    type: integer
-                    format: int64
-                  in:
-                    $ref: '#/components/schemas/TestCase'
-                  out:
-                    $ref: '#/components/schemas/TestCase'
+              $ref: '#/components/schemas/TestCases'
     TestCase:
       type: string
       example: |
@@ -278,17 +268,7 @@ components:
         runnerCode:
           $ref: "#/components/schemas/Code"
         testCases:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                format: int64
-              in:
-                $ref: '#/components/schemas/TestCase'
-              out:
-                $ref: '#/components/schemas/TestCase'
+          $ref: '#/components/schemas/TestCases'
     ContestResponse:
       type: object
       required: [ contests ]
@@ -397,3 +377,15 @@ components:
       type: string
       format: date
       example: '2022-05-16'
+    TestCases:
+      type: array
+      items:
+        type: object
+        properties:
+          id:
+            type: integer
+            format: int64
+          in:
+            $ref: '#/components/schemas/TestCase'
+          out:
+            $ref: '#/components/schemas/TestCase'

@@ -19,6 +19,7 @@ type ProblemCoreService interface {
 
 	DeleteProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId) bool
 }
+
 type ProblemServiceContext struct {
 }
 

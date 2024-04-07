@@ -18,7 +18,6 @@ type AuthCtx struct {
 }
 
 func (a AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	//request.Header.Add("Authorization", "Bearer token")
 	ctx := context.WithValue(request.Context(), "", AuthCtx{})
 	a.handler.ServeHTTP(writer, request.WithContext(ctx))
 }
