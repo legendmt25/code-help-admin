@@ -4,11 +4,14 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:4000/api/v1
+  - url: http://localhost:3000/api
     description: Open API specification
 
+security:
+  - Authorization_JWT: [ ]
+
 paths:
-  /categories:
+  /admin/categories:
     get:
       tags: [ category ]
       operationId: getAllCategories
@@ -19,6 +22,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CategoryResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
     post:
       tags: [ category ]
       operationId: createCategory
@@ -28,9 +35,13 @@ paths:
             schema:
               $ref: '#/components/schemas/Category'
       responses:
-        203:
+        201:
           description: Created.
-  /categories/{name}:
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+  /admin/categories/{name}:
     put:
       tags: [ category ]
       operationId: updateCategory
@@ -43,12 +54,28 @@ paths:
               $ref: '#/components/schemas/Category'
       responses:
         204:
-          description: No content.
+          $ref: '#/components/responses/NoContentResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
         404:
-          description: Not found.
-        400:
-          description:  Bad request.
-  /problems:
+          $ref: '#/components/responses/NotFoundResponse'
+    delete:
+      tags: [ category ]
+      operationId: deleteCategory
+      parameters:
+        - $ref: '#/components/parameters/CategoryName'
+      responses:
+        204:
+          $ref: '#/components/responses/NoContentResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+  /admin/problems:
     get:
       tags: [ problem ]
       operationId: getAllProblems
@@ -59,6 +86,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
     post:
       tags: [ problem ]
       operationId: createProblem
@@ -68,21 +99,26 @@ paths:
           required: false
           schema:
             type: integer
+            format: int64
             example: 2
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/ProblemRequest'
       description: Create a problem in the backend
       responses:
         201:
-          description: Created
+          description: Created.
           content:
             application/json:
               schema:
                 type: string
-  /problems/{id}:
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+  /admin/problems/{id}:
     get:
       tags: [ problem ]
       operationId: getProblem
@@ -95,10 +131,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
         404:
-          description: Not Found
-        500:
-          description: Internal server error
+          $ref: '#/components/responses/NotFoundResponse'
     put:
       tags: [ problem ]
       operationId: updateProblem
@@ -106,7 +146,7 @@ paths:
         - $ref: '#/components/parameters/ProblemId'
       requestBody:
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: '#/components/schemas/ProblemRequest'
       responses:
@@ -116,6 +156,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetail'
+        400:
+          $ref: '#/components/responses/BadRequestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
     delete:
       tags: [ problem ]
       operationId: deleteProblem
@@ -123,8 +171,14 @@ paths:
         - $ref: '#/components/parameters/ProblemId'
       responses:
         204:
-          description: No Content
-  /contests:
+          $ref: '#/components/responses/NoContentResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+  /admin/contests:
     get:
       tags: [ contest ]
       operationId: getAllContests
@@ -135,6 +189,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContestResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
     post:
       tags: [ contest ]
       operationId: createContest
@@ -144,9 +202,13 @@ paths:
             schema:
               $ref: '#/components/schemas/ContestRequest'
       responses:
-        203:
-          description: No content
-  /contests/{id}:
+        201:
+          description: Created.
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+  /admin/contests/{id}:
     get:
       tags: [ contest ]
       operationId: getContest
@@ -159,6 +221,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContestDetail'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
     put:
       tags: [ contest ]
       operationId: updateContest
@@ -170,8 +238,14 @@ paths:
             schema:
               $ref: '#/components/schemas/ContestEditRequest'
       responses:
-        200:
-          description: No content
+        204:
+          $ref: '#/components/responses/NoContentResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
     delete:
       tags: [ contest ]
       operationId: deleteContest
@@ -179,8 +253,51 @@ paths:
         - $ref: '#/components/parameters/ContestId'
       responses:
         204:
-          description: No content
+          $ref: '#/components/responses/NoContentResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+  /admin/contests/{id}/start:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/ContestId'
+      operationId: startContest
+      tags: [ contest ]
+      description: Starts contest happening in coding helper
+      responses:
+        204:
+          $ref: '#/components/responses/NoContentResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
+  /admin/contests/{id}/close:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/ContestId'
+      operationId: closeContest
+      tags: [ contest ]
+      description: Closes contest happening in coding helper
+      responses:
+        204:
+          $ref: '#/components/responses/NoContentResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedResponse'
+        403:
+          $ref: '#/components/responses/ForbiddenResponse'
+        404:
+          $ref: '#/components/responses/NotFoundResponse'
 components:
+  securitySchemes:
+    Authorization_JWT: # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   parameters:
     CategoryName:
       in: path
@@ -202,6 +319,13 @@ components:
       schema:
         type: integer
         format: int64
+#    Authorization:
+#      description: Authorization header
+#      name: Authorization
+#      in: header
+#      schema:
+#        type: string
+#        example: "Bearer {token}"
   schemas:
     ProblemResponse:
       type: object
@@ -274,21 +398,13 @@ components:
           type: string
           example: '## Two Sum... problem description'
         starterCode:
-          $ref: "#/components/schemas/Code"
+          $ref: '#/components/schemas/File'
         runnerCode:
-          $ref: "#/components/schemas/Code"
+          $ref: '#/components/schemas/File'
         testCases:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: integer
-                format: int64
-              in:
-                $ref: '#/components/schemas/TestCase'
-              out:
-                $ref: '#/components/schemas/TestCase'
+            $ref: '#/components/schemas/File'
     ContestResponse:
       type: object
       required: [ contests ]
@@ -397,3 +513,15 @@ components:
       type: string
       format: date
       example: '2022-05-16'
+
+  responses:
+    NotFoundResponse:
+      description: Not found.
+    BadRequestResponse:
+      description: Bad request.
+    ForbiddenResponse:
+      description: Forbidden.
+    UnauthorizedResponse:
+      description: Unauthorized.
+    NoContentResponse:
+      description: No content.

@@ -349,7 +349,7 @@ paths:
     post:
       requestBody:
         content:
-          multipart/form-data:
+          "multipart/form-data":
             schema:
               $ref: '#/components/schemas/ProblemReqBody'
       operationId: createProblemEntry

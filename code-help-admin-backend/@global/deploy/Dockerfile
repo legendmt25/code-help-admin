@@ -8,7 +8,7 @@ WORKDIR /build/$SOURCE_DIRECTORY
 
 RUN go mod download
 
-RUN CGO_ENABLED=0 go build -o ./main
+RUN CGO_ENABLED=0 go build ./cmd/main.go -o ./main
 
 
 FROM scratch
