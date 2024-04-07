@@ -36,7 +36,8 @@ func (s *ServerInterfaceImpl) GetAllProblems(w http.ResponseWriter, r *http.Requ
 	_ = json.NewEncoder(w).Encode(problems)
 }
 
-func (s *ServerInterfaceImpl) CreateProblem(w http.ResponseWriter, r *http.Request) {
+func (s *ServerInterfaceImpl) CreateProblem(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.CreateProblemParams) {
+	//TODO implement me
 	panic("implement me")
 }
 
@@ -65,5 +66,20 @@ func (s *ServerInterfaceImpl) GetContest(w http.ResponseWriter, r *http.Request,
 }
 
 func (s *ServerInterfaceImpl) UpdateContest(w http.ResponseWriter, r *http.Request, id codeHelpAdminGen.ContestId) {
+	panic("implement me")
+}
+
+func (s *ServerInterfaceImpl) GetAllCategories(w http.ResponseWriter, r *http.Request) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *ServerInterfaceImpl) CreateCategory(w http.ResponseWriter, r *http.Request) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *ServerInterfaceImpl) UpdateCategory(w http.ResponseWriter, r *http.Request, name codeHelpAdminGen.CategoryName) {
+	//TODO implement me
 	panic("implement me")
 }
