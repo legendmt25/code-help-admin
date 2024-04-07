@@ -85,12 +85,12 @@ type ContestEditRequest struct {
 
 // ContestProblem defines model for ContestProblem.
 type ContestProblem struct {
-	Category         *Category   `json:"category,omitempty"`
-	ContestProblemId int64       `json:"contestProblemId"`
-	Difficulty       *Difficulty `json:"difficulty,omitempty"`
-	Id               *int64      `json:"id,omitempty"`
-	Score            int         `json:"score"`
-	Title            *string     `json:"title,omitempty"`
+	Category         *Category  `json:"category,omitempty"`
+	ContestProblemId int64      `json:"contestProblemId"`
+	Difficulty       Difficulty `json:"difficulty"`
+	Id               int64      `json:"id"`
+	Score            int        `json:"score"`
+	Title            string     `json:"title"`
 }
 
 // ContestRequest defines model for ContestRequest.
@@ -120,26 +120,26 @@ type File = openapi_types.File
 
 // Problem defines model for Problem.
 type Problem struct {
-	Category   *Category   `json:"category,omitempty"`
-	Difficulty *Difficulty `json:"difficulty,omitempty"`
-	Id         *int64      `json:"id,omitempty"`
-	Title      *string     `json:"title,omitempty"`
+	Category   *Category  `json:"category,omitempty"`
+	Difficulty Difficulty `json:"difficulty"`
+	Id         int64      `json:"id"`
+	Title      string     `json:"title"`
 }
 
 // ProblemDetail defines model for ProblemDetail.
 type ProblemDetail struct {
-	Category    *Category   `json:"category,omitempty"`
-	Difficulty  *Difficulty `json:"difficulty,omitempty"`
-	Id          *int64      `json:"id,omitempty"`
-	Markdown    string      `json:"markdown"`
-	RunnerCode  Code        `json:"runnerCode"`
-	StarterCode Code        `json:"starterCode"`
+	Category    *Category  `json:"category,omitempty"`
+	Difficulty  Difficulty `json:"difficulty"`
+	Id          int64      `json:"id"`
+	Markdown    string     `json:"markdown"`
+	RunnerCode  Code       `json:"runnerCode"`
+	StarterCode Code       `json:"starterCode"`
 	TestCases   []struct {
 		Id  *int64    `json:"id,omitempty"`
 		In  *TestCase `json:"in,omitempty"`
 		Out *TestCase `json:"out,omitempty"`
 	} `json:"testCases"`
-	Title *string `json:"title,omitempty"`
+	Title string `json:"title"`
 }
 
 // ProblemRequest defines model for ProblemRequest.
@@ -2103,21 +2103,21 @@ var swaggerSpec = []string{
 	"ARfg9BGX5Wsxq+GzGYc1qp0xKMLwCJ6VCKa6/Fq1Nc5OjPdOEz9G9Vtbdqz3liZiBHau3+0dZL1wi1nT",
 	"HBBgWay0Lq9OL7CHpzej65vTCfbw+LfL6enEWaSAX8NaCthR/+joZf//LwevS0FXck36dDajQRbJpWvB",
 	"6Wj6B/bwu9PJ+ft32MNvR9d6+2IXK1Fb74xGUKqSe30QaBJ16rSxpy93aeRhyY/WRCwkd+mLksoImk+9",
-	"tchaz3ZtMJt5KCbiU8i/Vir7xQt085WjaRb3ej1kiRq5B7oG1EXGGIj12aU9yUPIK3w3FZXXY5JCW9fo",
-	"jDzdyi03djslzTPZXbxTp3ELOg9EGZYSrK77zURuA72RyB+zAL5LammW2C211irNqdVJsxRYp6ILt5XP",
-	"aRZvvbAY1RLo3h5yw8mMTa1q56PmHs6YHs4rpoTW6GQ8QWfnFxP05vKWjccnzq9GCFMIMkHlcqpsM/6M",
-	"7HVTN/I/f/n9Rj28ByJAnK2pQT21F1G1oPlrscFCysTc2ymbcU3RJrL6hobeQpSgURhTZdMXEKm56Q56",
-	"/V5fE0YCjCQUD/Fxr98bYE8PFLRxPlFqfvmOOQddsSoo2mh1KsRvQI6iaFwIVoYIR/1+ftBg5nieJBEN",
-	"9Ar+x9Qc2ooxRZeqz5NE+16+x1/+qlx71R9sWiy3zm8cDGjl4+3K9UGH5lQyT50L9BIr0kt42gDcWACR",
-	"kBOZyUlI5QkPl3tHTCG1qkVmUB+DGKvM4OQJgbjy6inpP6jT8Mr4EIE5DZYxnujnDsbuKHDDmaQQ8Uuj",
-	"wtVdDb9X2z2sj7e+F7BKs5PBlena5rTOGrL6fRKS/SL+2EXxbw6qU2bOxbCN99dih2T9yiW2kfR7aBRF",
-	"KLf6KbCXvSlv7QBW7kC5Xply/YhtIAeynp7+Aw27dIAc4x3pKH+r88z+5YzexAkHQXrvXGLnExuYxJlx",
-	"/RSxamvUewrXwYjLHe0/t+tOdOgHETcXVlukFWpXf03XrRItSJIAo2yOKEMBD9X/FhAl+p5Z6VdK85lK",
-	"HyeIepCyMYhTPfX/liBqzecgHiqI7pSq5dx8tRY7YK+rTtSe7LDEYlY6KTcdRxHJ57GUIbkAdE+CT8DC",
-	"OlNp+fUAsJbl+uOZzxnoC6r9eibIU9v9aCYf+R15HT6gaW2FcRZJmhAhfbXQy5BI8g2x3HaM75w51Rll",
-	"LTee0hWgyJB6pXW8AmxMhi2UV7yifqa8cqluoreDIL13Wmy7Ahis+tuxavhC7meJbsulYV8B/m5M+YjJ",
-	"ZBALnzPKfQumk6Xh/deHO5UYKYgv64yqVGYCDI2uzlGaQEBnNmTYw5mI7Ouwoe9HPCDRgqdyeNzv932S",
-	"ULy6W/0TAAD//16XZJIVLAAA",
+	"tcZkZEtGNSWABWDXPrSZrmIiPoX8a4UAXrxAN185mmZxr9dDls+Re+5rCI7IGAOxPuK010IIORHspqLS",
+	"f0xSaGsunQNEt1LQjd1OSfNMdhfv1JDcLMgDUYalBKvrfjPf20Bv5PvHrJPvklqaTHZLrbVKc2p10iwF",
+	"1in8wm3lc5rFW+81DTzg7SE3nMzY1NF2PpHu4Sjq4bxiSmiNTsYTdHZ+MUFvLm/ZeHzi/GqEMIUgE1Qu",
+	"p8o248/I3kp1v//zl99v1MN7IALE2Zoa1FN7X1ULmr8WGyykTMz1nrIZ10xuIqsvcugtRAkahTFVNn0B",
+	"kZoL8aDX7/U1YSTASELxEB/3+r0B9vTcQRvnE6Xml6+ic9AVq4KijVaHR/wG5CiKxoVgZdZw1O/n5xFm",
+	"TvFJEtFAr+B/TM3ZrphmdKn6PEm07+Xr/uWvyrVX/cGmxXLr/Mb5gVY+3q5cn4doTiXz1LlnL7EivYSn",
+	"DcCNBRAJOZGZnIRUnvBwuXfEFFKrWmQG9WmJscrMV54QiCuvnpL+gzo0r4wPEZhDYxnjiX7uYOxODDec",
+	"SQoRvzRRXN3V8Hu13cP6FOx7Aas0OxlcGcJtTuusIavfJyHZL+KPXRT/5qA6ZebcH9t4fy12SNav3HUb",
+	"Sb+HRlGEcqufAnvZC/XWDmDlDpTrlWHYj9gGciDr6ek/0LBLB8gx3pGO8pc/z+xfzuhNnHAQpPfOJXY+",
+	"sYFJnFHYTxGrtka9p3AdjLjcNwDP7boTHfpBxM2F1RZphdrVX9N1q0QLkiTAKJsjylDAQ/W/BUSJvmdW",
+	"+pXSfKbSxwmiHqRsDOJUvxz4liBqzecgHiqI7pSq5dx8tRY7YK+rTtSe7LDEYlY6KTcdRxHJ57GUIbkA",
+	"dE+CT8DCOlNp+fUAsJbl+hubzxnoC6r9yCbIU9v9tiYf+R15Hb6zaW2FcRZJmhAhfbXQy5BI8g2x3HaM",
+	"75w51RllLTee0hWgyJB6pXW8AmxMhi2UV7zJfqa8cqluoreDIL13Wmy7Ahis+tuxaviQ7meJbsulYV8B",
+	"/m5M+YjJZBALnzPKfQumk6Xh/deHO5UYKYgv64yqVGYCDI2uzlGaQEBnNmTYw5mI7Ouwoe9HPCDRgqdy",
+	"eNzv932SULy6W/0TAAD//wJraAM8LAAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

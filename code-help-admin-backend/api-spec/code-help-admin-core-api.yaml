@@ -319,13 +319,6 @@ components:
       schema:
         type: integer
         format: int64
-#    Authorization:
-#      description: Authorization header
-#      name: Authorization
-#      in: header
-#      schema:
-#        type: string
-#        example: "Bearer {token}"
   schemas:
     ProblemResponse:
       type: object
@@ -337,6 +330,7 @@ components:
             $ref: '#/components/schemas/Problem'
     Problem:
       type: object
+      required: [ id, title, difficulty ]
       properties:
         id:
           type: integer
