@@ -15,7 +15,7 @@ type ProblemCoreService interface {
 
 	CreateProblem(ctx context.Context, req codeHelpAdminCoreGen.CreateProblemMultipartRequestBody) *codeHelpAdminCoreGen.ProblemDetail
 
-	UpdateProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId, req codeHelpAdminCoreGen.CreateProblemMultipartRequestBody) *codeHelpAdminCoreGen.ProblemDetail
+	UpdateProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId, req codeHelpAdminCoreGen.UpdateProblemMultipartRequestBody) *codeHelpAdminCoreGen.ProblemDetail
 
 	DeleteProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId) bool
 }
