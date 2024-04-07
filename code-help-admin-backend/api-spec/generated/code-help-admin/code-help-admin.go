@@ -36,7 +36,12 @@ const (
 
 // Category defines model for Category.
 type Category struct {
-	Name *string `json:"name,omitempty"`
+	Name string `json:"name"`
+}
+
+// CategoryResponse defines model for CategoryResponse.
+type CategoryResponse struct {
+	Categories []Category `json:"categories"`
 }
 
 // Code defines model for Code.
@@ -44,24 +49,56 @@ type Code = string
 
 // Contest defines model for Contest.
 type Contest struct {
-	Duration *string        `json:"duration,omitempty"`
-	Id       *int64         `json:"id,omitempty"`
-	Name     *string        `json:"name,omitempty"`
-	StartsOn *Date          `json:"startsOn,omitempty"`
+	Duration string        `json:"duration"`
+	Id       int64         `json:"id"`
+	Name     string        `json:"name"`
+	StartsOn Date          `json:"startsOn"`
+	Status   ContestStatus `json:"status"`
+}
+
+// ContestDetail defines model for ContestDetail.
+type ContestDetail struct {
+	Duration string           `json:"duration"`
+	Id       int64            `json:"id"`
+	Name     string           `json:"name"`
+	Problems []ContestProblem `json:"problems"`
+	StartsOn Date             `json:"startsOn"`
+	Status   ContestStatus    `json:"status"`
+}
+
+// ContestEditRequest defines model for ContestEditRequest.
+type ContestEditRequest struct {
+	Duration string `json:"duration"`
+	Name     string `json:"name"`
+	Problems *[]struct {
+		ContestProblemId *int64 `json:"contestProblemId,omitempty"`
+		Score            *int   `json:"score,omitempty"`
+	} `json:"problems,omitempty"`
+	StartsOn Date           `json:"startsOn"`
 	Status   *ContestStatus `json:"status,omitempty"`
+}
+
+// ContestProblem defines model for ContestProblem.
+type ContestProblem struct {
+	Category         *Category   `json:"category,omitempty"`
+	ContestProblemId int64       `json:"contestProblemId"`
+	Difficulty       *Difficulty `json:"difficulty,omitempty"`
+	Id               *int64      `json:"id,omitempty"`
+	Score            int         `json:"score"`
+	Title            *string     `json:"title,omitempty"`
 }
 
 // ContestRequest defines model for ContestRequest.
 type ContestRequest struct {
-	Duration *string        `json:"duration,omitempty"`
-	Name     *string        `json:"name,omitempty"`
-	StartsOn *Date          `json:"startsOn,omitempty"`
+	Duration string         `json:"duration"`
+	Name     string         `json:"name"`
+	StartsOn Date           `json:"startsOn"`
 	Status   *ContestStatus `json:"status,omitempty"`
 }
 
 // ContestResponse defines model for ContestResponse.
 type ContestResponse struct {
-	Contests *[]Contest `json:"contests,omitempty"`
+	Contests []Contest `json:"contests"`
 }
 
 // ContestStatus defines model for ContestStatus.
@@ -72,9 +109,6 @@ type Date = openapi_types.Date
 
 // Difficulty defines model for Difficulty.
 type Difficulty string
-
-// File defines model for File.
-type File = openapi_types.File
 
 // Problem defines model for Problem.
 type Problem struct {
@@ -92,12 +126,8 @@ type ProblemDetail struct {
 	Markdown    string      `json:"markdown"`
 	RunnerCode  Code        `json:"runnerCode"`
 	StarterCode Code        `json:"starterCode"`
-	TestCases   []struct {
-		Id  *int64    `json:"id,omitempty"`
-		In  *TestCase `json:"in,omitempty"`
-		Out *TestCase `json:"out,omitempty"`
-	} `json:"testCases"`
-	Title *string `json:"title,omitempty"`
+	TestCases   TestCases   `json:"testCases"`
+	Title       *string     `json:"title,omitempty"`
 }
 
 // ProblemRequest defines model for ProblemRequest.
@@ -105,19 +135,29 @@ type ProblemRequest struct {
 	Category    *Category  `json:"category,omitempty"`
 	Difficulty  Difficulty `json:"difficulty"`
 	Markdown    string     `json:"markdown"`
-	RunnerCode  File       `json:"runnerCode"`
-	StarterCode File       `json:"starterCode"`
-	TestCases   []File     `json:"testCases"`
+	RunnerCode  Code       `json:"runnerCode"`
+	StarterCode Code       `json:"starterCode"`
+	TestCases   TestCases  `json:"testCases"`
 	Title       string     `json:"title"`
 }
 
 // ProblemResponse defines model for ProblemResponse.
 type ProblemResponse struct {
-	Problems *[]Problem `json:"problems,omitempty"`
+	Problems []Problem `json:"problems"`
 }
 
 // TestCase defines model for TestCase.
 type TestCase = string
+
+// TestCases defines model for TestCases.
+type TestCases = []struct {
+	Id  *int64    `json:"id,omitempty"`
+	In  *TestCase `json:"in,omitempty"`
+	Out *TestCase `json:"out,omitempty"`
+}
+
+// CategoryName defines model for CategoryName.
+type CategoryName = string
 
 // ContestId defines model for ContestId.
 type ContestId = int64
@@ -125,17 +165,40 @@ type ContestId = int64
 // ProblemId defines model for ProblemId.
 type ProblemId = int64
 
+// CreateProblemParams defines parameters for CreateProblem.
+type CreateProblemParams struct {
+	ContestId *int `form:"contestId,omitempty" json:"contestId,omitempty"`
+}
+
+// CreateCategoryJSONRequestBody defines body for CreateCategory for application/json ContentType.
+type CreateCategoryJSONRequestBody = Category
+
+// UpdateCategoryJSONRequestBody defines body for UpdateCategory for application/json ContentType.
+type UpdateCategoryJSONRequestBody = Category
+
 // CreateContestJSONRequestBody defines body for CreateContest for application/json ContentType.
 type CreateContestJSONRequestBody = ContestRequest
 
 // UpdateContestJSONRequestBody defines body for UpdateContest for application/json ContentType.
-type UpdateContestJSONRequestBody = ContestRequest
+type UpdateContestJSONRequestBody = ContestEditRequest
 
-// CreateProblemMultipartRequestBody defines body for CreateProblem for multipart/form-data ContentType.
-type CreateProblemMultipartRequestBody = ProblemRequest
+// CreateProblemJSONRequestBody defines body for CreateProblem for application/json ContentType.
+type CreateProblemJSONRequestBody = ProblemRequest
+
+// UpdateProblemJSONRequestBody defines body for UpdateProblem for application/json ContentType.
+type UpdateProblemJSONRequestBody = ProblemRequest
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (GET /categories)
+	GetAllCategories(w http.ResponseWriter, r *http.Request)
+
+	// (POST /categories)
+	CreateCategory(w http.ResponseWriter, r *http.Request)
+
+	// (PUT /categories/{name})
+	UpdateCategory(w http.ResponseWriter, r *http.Request, name CategoryName)
 
 	// (GET /contests)
 	GetAllContests(w http.ResponseWriter, r *http.Request)
@@ -156,7 +219,7 @@ type ServerInterface interface {
 	GetAllProblems(w http.ResponseWriter, r *http.Request)
 
 	// (POST /problems)
-	CreateProblem(w http.ResponseWriter, r *http.Request)
+	CreateProblem(w http.ResponseWriter, r *http.Request, params CreateProblemParams)
 
 	// (DELETE /problems/{id})
 	DeleteProblem(w http.ResponseWriter, r *http.Request, id ProblemId)
@@ -176,6 +239,62 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// GetAllCategories operation middleware
+func (siw *ServerInterfaceWrapper) GetAllCategories(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetAllCategories(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreateCategory operation middleware
+func (siw *ServerInterfaceWrapper) CreateCategory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateCategory(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// UpdateCategory operation middleware
+func (siw *ServerInterfaceWrapper) UpdateCategory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "name" -------------
+	var name CategoryName
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", r.PathValue("name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateCategory(w, r, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
 
 // GetAllContests operation middleware
 func (siw *ServerInterfaceWrapper) GetAllContests(w http.ResponseWriter, r *http.Request) {
@@ -216,7 +335,7 @@ func (siw *ServerInterfaceWrapper) DeleteContest(w http.ResponseWriter, r *http.
 	// ------------- Path parameter "id" -------------
 	var id ContestId
 
-	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: false})
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
 		return
@@ -242,7 +361,7 @@ func (siw *ServerInterfaceWrapper) GetContest(w http.ResponseWriter, r *http.Req
 	// ------------- Path parameter "id" -------------
 	var id ContestId
 
-	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: false})
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
 		return
@@ -268,7 +387,7 @@ func (siw *ServerInterfaceWrapper) UpdateContest(w http.ResponseWriter, r *http.
 	// ------------- Path parameter "id" -------------
 	var id ContestId
 
-	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: false})
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
 		return
@@ -304,8 +423,21 @@ func (siw *ServerInterfaceWrapper) GetAllProblems(w http.ResponseWriter, r *http
 func (siw *ServerInterfaceWrapper) CreateProblem(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateProblemParams
+
+	// ------------- Optional query parameter "contestId" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "contestId", r.URL.Query(), &params.ContestId)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "contestId", Err: err})
+		return
+	}
+
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.CreateProblem(w, r)
+		siw.Handler.CreateProblem(w, r, params)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -324,7 +456,7 @@ func (siw *ServerInterfaceWrapper) DeleteProblem(w http.ResponseWriter, r *http.
 	// ------------- Path parameter "id" -------------
 	var id ProblemId
 
-	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: false})
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
 		return
@@ -350,7 +482,7 @@ func (siw *ServerInterfaceWrapper) GetProblem(w http.ResponseWriter, r *http.Req
 	// ------------- Path parameter "id" -------------
 	var id ProblemId
 
-	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: false})
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
 		return
@@ -376,7 +508,7 @@ func (siw *ServerInterfaceWrapper) UpdateProblem(w http.ResponseWriter, r *http.
 	// ------------- Path parameter "id" -------------
 	var id ProblemId
 
-	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: false})
+	err = runtime.BindStyledParameterWithOptions("simple", "id", r.PathValue("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
 	if err != nil {
 		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "id", Err: err})
 		return
@@ -507,6 +639,9 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 		ErrorHandlerFunc:   options.ErrorHandlerFunc,
 	}
 
+	m.HandleFunc("GET "+options.BaseURL+"/categories", wrapper.GetAllCategories)
+	m.HandleFunc("POST "+options.BaseURL+"/categories", wrapper.CreateCategory)
+	m.HandleFunc("PUT "+options.BaseURL+"/categories/{name}", wrapper.UpdateCategory)
 	m.HandleFunc("GET "+options.BaseURL+"/contests", wrapper.GetAllContests)
 	m.HandleFunc("POST "+options.BaseURL+"/contests", wrapper.CreateContest)
 	m.HandleFunc("DELETE "+options.BaseURL+"/contests/{id}", wrapper.DeleteContest)
@@ -524,25 +659,29 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"7vMQZw/Z3wEAAP//sODFGnIdAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
