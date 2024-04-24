@@ -1,7 +1,11 @@
 <script lang="ts">
   import Router, { link } from "svelte-spa-router";
   import { Route, routes } from "./routes";
-  import Button from "./components/Button.svelte";
+  import { AiFillHome, AiFillQuestionCircle, AiOutlineBarChart, AiOutlineMenu } from "svelte-icons-pack/ai";
+  import { RiCommunicationChat1Fill } from "svelte-icons-pack/ri";
+  import { Icon } from "svelte-icons-pack";
+
+  let menuOpened: boolean = false;
 </script>
 
 <style>
@@ -13,11 +17,13 @@
   }
 
   nav {
-    min-width: 300px;
+    min-width: 250px;
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
     box-shadow: rgba(0, 0, 0, 0.05) 1.95px 1px 2px 0px;
+    background-color: #18283b;
+    transition: all 200ms;
   }
 
   main {
@@ -26,36 +32,74 @@
 
   a {
     font-weight: 500;
-    color: #646cff;
+    color: #8392a5;
     text-decoration: inherit;
-  }
-  a:hover {
-    color: #535bf2;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 1rem;
+
+    transition: all 200ms;
   }
 
-  header {
-    padding: 1rem;
-    display: flex;
-    justify-content: flex-end;
-    box-shadow: rgba(0, 0, 0, 0.05) 300px 1px 2px 0px;
-    border: 1px solid #eee;
+  a:hover {
+    color: #000;
+  }
+
+  .nav-head {
+    justify-content: space-between;
+    user-select: none;
+  }
+
+  span {
+    overflow: hidden;
+    max-width: 100%;
+    transition: all 200ms;
+    white-space: nowrap;
+  }
+
+  .hide {
+    max-width: 0;
+    min-width: 0;
+  }
+
+  .hide-nav {
+    max-width: 60px;
+    min-width: 0;
   }
 </style>
 
-<header>
-  <Button>Login</Button>
-</header>
 <div class="container">
-  <nav>
-    <a href={Route.problems_overview} use:link>
-      <Button fullwidth>Problems</Button>
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <nav class:hide-nav={!menuOpened}>
+    <!-- svelte-ignore a11y-click-events-have-key-events -->
+    <!-- svelte-ignore a11y-missing-attribute -->
+    <a
+      class="nav-head"
+      on:click={(event) => {
+        menuOpened = !menuOpened;
+      }}>
+      <span class:hide={!menuOpened}>CODE HELP ADMIN</span>
+      <Icon src={AiOutlineMenu} size="32" />
     </a>
-    <a href={Route.contests_overview} use:link>
-      <Button fullwidth>Contests</Button>
-    </a>
-    <a href={Route.communities_overview} use:link>
-      <Button fullwidth>Communities</Button>
-    </a>
+    <div>
+      <a href={Route.index} use:link>
+        <Icon src={AiFillHome} size="32" />
+        <span class:hide={!menuOpened}>Home</span>
+      </a>
+      <a href={Route.problems_overview} use:link>
+        <Icon src={AiFillQuestionCircle} size="32" />
+        <span class:hide={!menuOpened}>Problems</span>
+      </a>
+      <a href={Route.contests_overview} use:link>
+        <Icon src={AiOutlineBarChart} size="32" />
+        <span class:hide={!menuOpened}>Contests</span>
+      </a>
+      <a href={Route.communities_overview} use:link>
+        <Icon src={RiCommunicationChat1Fill} size="32" />
+        <span class:hide={!menuOpened}>Communities</span>
+      </a>
+    </div>
   </nav>
   <main class="content">
     <Router {routes} />

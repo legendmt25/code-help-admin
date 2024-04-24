@@ -8,36 +8,20 @@
   import Spinner from "../components/Spinner.svelte";
   import { Difficulty, type Category, type ProblemRequest } from "../generated/admin-api";
   import { createProblem, getAllCategories, getProblemById, updateProblem } from "../services/ProblemsService";
+  import { Icon } from "svelte-icons-pack";
+  import { BiSave } from "svelte-icons-pack/bi";
+  import { VscPreview } from "svelte-icons-pack/vsc";
   export let params: { id?: string } = {};
 
+  let previewEnabled: boolean = false;
   let testCaseSelected: number | undefined = undefined;
-
-  let testCases: {
-    in?: string;
-    out?: string;
-  }[] = [];
-
-  let starterCode: string = "";
-  let runnerCode: string = "";
-
-  let activeTab = "markdown";
-  const tabs = [
-    {
-      key: "markdown",
-      label: "Markdown"
-    },
-    {
-      key: "tests",
-      label: "Tests"
-    },
-    {
-      key: "solution",
-      label: "Solution"
-    }
-  ];
+  let editCode: "starter-code" | "runner-code" = "starter-code";
 
   let loading = false;
-  let formValue: Partial<ProblemRequest> = {};
+  let formValue: Partial<ProblemRequest> = {
+    testCases: []
+  };
+
   let categories: Category[] = [];
   onMount(() => {
     loading = true;
@@ -72,7 +56,7 @@
   const handleEditCreate: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
-    const body = formValue as ProblemRequest;
+    const body: ProblemRequest = formValue as ProblemRequest;
 
     const id = Number(params.id);
     if (!Number.isNaN(id)) {
@@ -80,39 +64,47 @@
     } else {
       createProblem(body);
     }
+    console.log(body);
   };
 </script>
 
 <style>
-  .tab-group {
+  .column {
     display: flex;
-  }
-
-  .tab {
-    border-bottom: 3px solid transparent;
-    padding: 0.5rem 0.8rem;
-    text-align: center;
-    min-width: 90px;
-    user-select: none;
-
-    transition: all 200ms;
-
-    cursor: pointer;
-  }
-
-  .tab:hover:not(.active-tab) {
-    border-bottom-color: #ccc;
-  }
-
-  .active-tab {
-    border-bottom-color: black;
-  }
-
-  .container {
-    display: flex;
-    padding: 1rem;
-    gap: 1rem;
+    flex-direction: column;
     height: 100%;
+  }
+
+  .row {
+    display: flex;
+  }
+
+  .p-1 {
+    padding: 1rem;
+  }
+
+  .h-100 {
+    height: 100%;
+  }
+
+  .w-100 {
+    width: 100%;
+  }
+
+  .w-50 {
+    width: 50%;
+  }
+
+  .gap-1 {
+    gap: 1rem;
+  }
+
+  /* Extra small devices (phones, 600px and down) */
+  @media only screen and (max-width: 600px) {
+    .sm-column, .sm-column * {
+      flex-direction: column;
+      width: 100% !important;
+    }
   }
 
   input,
@@ -136,63 +128,11 @@
     gap: 0.5rem;
   }
 
-  .editor {
-    width: 50%;
-    height: 98%;
-  }
-
-  .preview {
-    width: 50%;
-  }
-
-  .editor-preview-container {
-    display: flex;
-    gap: 1rem;
-    width: 100%;
-    height: 97%;
-  }
-
-  .markdown-tab-section,
-  .tests-tab-section,
-  .solution-tab-section {
-    width: 100%;
-    height: 100%;
-  }
-
   .tests-tab-sidebar {
-    display: flex;
-    flex-direction: column;
     gap: 0.3rem;
-    width: 100%;
     max-width: 250px;
-    max-height: 84.5vh;
+    max-height: 300px;
     overflow-y: auto;
-  }
-
-  .tests-tab-container {
-    width: 100%;
-    display: flex;
-    gap: 1rem;
-  }
-
-  .tests-tab-container .input-container {
-    height: 300px;
-    resize: vertical;
-  }
-
-  .input-container #testcase-output,
-  .input-container #testcase-input {
-    height: 100%;
-    width: 100%;
-  }
-
-  .tests-editor-container {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem;
   }
 
   :global(.testcase-save-btn) {
@@ -205,104 +145,175 @@
     display: flex;
     justify-content: space-between;
   }
+
+  :global(.test-case-add-btn) {
+    position: sticky;
+    bottom: 0;
+  }
+
+  :global(.side-btn:nth-of-type(2)) {
+    top: 150px;
+  }
+
+  :global(.side-btn) {
+    position: absolute;
+    right: 0;
+    top: 80px;
+    display: flex;
+    align-items: center;
+
+    overflow: hidden;
+    transition: all 200ms;
+    max-width: 70px !important;
+    opacity: 0.5;
+  }
+
+  :global(.side-btn:hover) {
+    max-width: 200px !important;
+    opacity: 1;
+  }
+
+  :global(.side-btn > span) {
+    max-width: 0;
+    overflow: hidden;
+  }
+
+  :global(.side-btn:hover > span) {
+    max-width: 100px;
+  }
 </style>
 
 {#if loading}
   <Spinner />
 {:else}
-  <div class="container">
-    <div class="form-editor-preview-wrapper">
-      <div class="tab-group">
-        {#each tabs as tabItem}
-          <div
-            class="tab"
-            class:active-tab={activeTab === tabItem.key}
-            tabindex="-1"
-            role="button"
-            on:keypress={undefined}
-            on:click={() => (activeTab = tabItem.key)}>
-            {tabItem.label}
+  <div class="column h-100 p-1 gap-1">
+    <div class="row sm-column h-100 gap-1">
+      <div class="column h-100 w-50 gap-1">
+        <form id="edit-problem-form" class="form" on:submit={handleEditCreate}>
+          <div class="input-container">
+            {#if previewEnabled}
+              {formValue.title}
+            {:else}
+              <input id="title" name="title" placeholder="Title" bind:value={formValue.title} />
+            {/if}
           </div>
-        {/each}
-      </div>
-
-      <form on:submit={handleEditCreate}>
-        <div class="input-container">
-          <label for="title">Title</label>
-          <input id="title" name="title" bind:value={formValue.title} />
-        </div>
-        <div class="input-container">
-          <label for="difficulty">Difficulty</label>
-          <select id="difficulty" name="difficulty" bind:value={formValue.difficulty}>
-            {#each Object.values(Difficulty) as difficultyValue}
-              <option value={difficultyValue}>{difficultyValue}</option>
-            {/each}
-          </select>
-        </div>
-        <div class="input-container">
-          <label for="category">Category</label>
-          <select id="category" name="category" class="input-container" bind:value={formValue.category}>
-            {#each categories as category}
-              <option value={category}>{category.name}</option>
-            {/each}
-          </select>
-        </div>
-        <Button fullwidth>Create/Edit</Button>
-      </form>
-    </div>
-
-    {#if activeTab === "markdown"}
-      <section class="markdown-tab-section">
-        <h2>Markdown Editor - Preview</h2>
-        <div class="editor-preview-container">
-          <textarea class="editor" style:resize="none" name="markdown" bind:value={formValue.markdown} />
-          <div class="preview">{@html marked(formValue.markdown ?? "")}</div>
-        </div>
-      </section>
-    {:else if activeTab === "tests"}
-      <section class="tests-tab-section">
-        <h2>Tests Editor</h2>
-        <div class="tests-tab-container">
-          <div class="tests-tab-sidebar">
-            <Button fullwidth on:click={() => (testCases = [{}, ...testCases])}>+</Button>
-            {#each testCases as _, index}
-              <Button fullwidth on:click={() => (testCaseSelected = index)} class="test-case-btn"
-                ><div>Test case {index}</div>
-                <div
-                  role="button"
-                  on:keydown={undefined}
-                  on:click={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    testCaseSelected = undefined;
-                    testCases = [...testCases.filter((_, arrIndex) => arrIndex !== index)];
-                  }}>
-                  x
-                </div></Button>
-            {/each}
-          </div>
-          {#if testCaseSelected != undefined}
-            <div class="tests-editor-container">
-              <div class="input-container">
-                <label for="testcase-input">INPUT:</label>
-                <textarea id="testcase-input" name="testcase-input" bind:value={testCases[testCaseSelected].in} />
-              </div>
-              <div class="input-container">
-                <label for="testcase-output">OUTPUT:</label>
-                <textarea id="testcase-output" name="testcase-input" bind:value={testCases[testCaseSelected].out} />
-              </div>
+          <div class="row gap-1">
+            <div class="input-container">
+              {#if previewEnabled}
+                {formValue.difficulty}
+              {:else}
+                <label for="difficulty">Difficulty</label>
+                <select id="difficulty" name="difficulty" bind:value={formValue.difficulty}>
+                  {#each Object.values(Difficulty) as difficultyValue}
+                    <option value={difficultyValue}>{difficultyValue}</option>
+                  {/each}
+                </select>
+              {/if}
             </div>
+            <div class="input-container">
+              {#if previewEnabled}
+                {formValue.category}
+              {:else}
+                <label for="category">Category</label>
+                <select id="category" name="category" class="input-container" bind:value={formValue.category}>
+                  {#each categories as category}
+                    <option value={category}>{category.name}</option>
+                  {/each}
+                </select>
+              {/if}
+            </div>
+          </div>
+        </form>
+
+        <section class="h-100 w-100">
+          {#if previewEnabled}
+            <div class="h-100 w-100">{@html marked(formValue.markdown ?? "")}</div>
+          {:else}
+            <textarea
+              class="h-100 w-100"
+              style:resize="none"
+              name="markdown"
+              placeholder="Markdown"
+              bind:value={formValue.markdown} />
           {/if}
-        </div>
-        <div></div>
-      </section>
-    {:else if activeTab === "solution"}
-      <section class="solution-tab-section">
-        <h2>Starter code</h2>
-        <CodeMirror bind:value={starterCode} lang={javascript()} />
-        <h2>Runner code</h2>
-        <CodeMirror bind:value={runnerCode} lang={javascript()} />
-      </section>
-    {/if}
+        </section>
+      </div>
+      <hr />
+      <div class="w-50 column">
+        <section class="column gap-1 h-50">
+          {#if !previewEnabled}
+            <Button fullwidth on:click={() => (editCode = editCode === "runner-code" ? "starter-code" : "runner-code")}
+              >Edit {editCode === "runner-code" ? "Runner code" : "Starter code"}</Button>
+          {/if}
+          {#if editCode === "runner-code" || previewEnabled}
+            <CodeMirror
+              bind:value={formValue.starterCode}
+              readonly={previewEnabled}
+              placeholder="Starter code"
+              lang={javascript()} />
+          {:else}
+            <CodeMirror bind:value={formValue.runnerCode} placeholder="Runner code" lang={javascript()} />
+          {/if}
+        </section>
+        {#if !previewEnabled}
+          <section>
+            <h2>Tests Editor</h2>
+            <div class="row gap-1 w-100 h-50">
+              <div class="tests-tab-sidebar column w-100">
+                {#each formValue.testCases ?? [] as _, index}
+                  <Button
+                    fullwidth
+                    on:click={() => (testCaseSelected = index)}
+                    class="test-case-btn"
+                    active={testCaseSelected === index}
+                    ><div>Test case {index}</div>
+                    <!-- svelte-ignore a11y-interactive-supports-focus -->
+                    <div
+                      role="button"
+                      on:keydown={undefined}
+                      on:click={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        testCaseSelected = undefined;
+                        formValue.testCases = [
+                          ...(formValue.testCases ?? []).filter((_, arrIndex) => arrIndex !== index)
+                        ];
+                      }}>
+                      x
+                    </div></Button>
+                {/each}
+                <Button
+                  class="test-case-add-btn"
+                  fullwidth
+                  on:click={() => (formValue.testCases = [...(formValue.testCases ?? []), {}])}>+</Button>
+              </div>
+              {#if testCaseSelected != undefined && formValue.testCases}
+                <div class="input-container w-100 h-100">
+                  <label for="testcase-input">INPUT:</label>
+                  <textarea
+                    class="h-100"
+                    id="testcase-input"
+                    name="testcase-input"
+                    placeholder="INPUT"
+                    bind:value={formValue.testCases[testCaseSelected]._in} />
+                </div>
+                <div class="input-container w-100 h-100">
+                  <label for="testcase-output">OUTPUT:</label>
+                  <textarea
+                    class="h-100"
+                    id="testcase-output"
+                    name="testcase-input"
+                    placeholder="OUTPUT"
+                    bind:value={formValue.testCases[testCaseSelected].out} />
+                </div>
+              {/if}
+            </div>
+          </section>
+        {/if}
+      </div>
+    </div>
+    <Button class="side-btn" form="edit-problem-form"><Icon src={BiSave} size={24} /> <span>Save</span></Button>
+    <Button class="side-btn" on:click={() => (previewEnabled = !previewEnabled)}
+      ><Icon src={VscPreview} size={24} /> <span>Preview</span></Button>
   </div>
 {/if}

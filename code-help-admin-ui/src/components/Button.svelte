@@ -1,5 +1,6 @@
 <script lang="ts">
   export let fullwidth: boolean | undefined = undefined;
+  export let active: boolean | undefined = undefined;
 
   export let clazz: string = "";
   export { clazz as class };
@@ -14,15 +15,20 @@
     font-weight: 500;
     font-family: inherit;
     color: white;
-    background-color: #1a1a1a;
+    background-color: #18283b;
     cursor: pointer;
     transition: border-color 0.25s;
     width: 100%;
     max-width: 200px;
+    transition: all 200ms;
   }
 
   button:hover {
-    border-color: #646cff;
+    background-color: #314257;
+  }
+
+  button:active {
+    background-color: #354457;
   }
 
   button:focus,
@@ -33,8 +39,12 @@
   .btn-fullwidth {
     max-width: 100%;
   }
+
+  .active {
+    background-color: #314257;
+  }
 </style>
 
-<button on:click class:btn-fullwidth={fullwidth} class={clazz}>
+<button {...$$restProps} on:click class:btn-fullwidth={fullwidth} class={clazz} class:active>
   <slot />
 </button>

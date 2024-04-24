@@ -41,7 +41,6 @@
     } else {
       createContest(value as ContestRequest);
     }
-
     console.log(value);
   };
 </script>
