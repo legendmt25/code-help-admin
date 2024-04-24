@@ -9,13 +9,13 @@ import (
 )
 
 type ProblemCoreService interface {
-	GetProblem(ctx context.Context, id codeHelpAdminCoreGen.ProblemId) (*codeHelpAdminCoreGen.Problem, error)
+	GetProblem(ctx context.Context, id codeHelpAdminCoreGen.ProblemId) (*codeHelpAdminCoreGen.ProblemDetail, error)
 
 	GetProblems(ctx context.Context) ([]codeHelpAdminCoreGen.Problem, error)
 
 	CreateProblem(ctx context.Context, req codeHelpAdminCoreGen.CreateProblemMultipartRequestBody) *codeHelpAdminCoreGen.ProblemDetail
 
-	UpdateProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId, req codeHelpAdminCoreGen.CreateProblemMultipartRequestBody) *codeHelpAdminCoreGen.ProblemDetail
+	UpdateProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId, req codeHelpAdminCoreGen.UpdateProblemMultipartRequestBody) *codeHelpAdminCoreGen.ProblemDetail
 
 	DeleteProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId) bool
 }
@@ -39,14 +39,14 @@ func NewCoreService(client codeHelpAdminCoreGen.ClientInterface, decoder Problem
 	}
 }
 
-func (it *problemCoreServiceImpl) GetProblem(ctx context.Context, id codeHelpAdminCoreGen.ProblemId) (*codeHelpAdminCoreGen.Problem, error) {
+func (it *problemCoreServiceImpl) GetProblem(ctx context.Context, id codeHelpAdminCoreGen.ProblemId) (*codeHelpAdminCoreGen.ProblemDetail, error) {
 	response, err := it.client.GetProblem(ctx, id)
 	if err != nil {
 		log.Errorf("Request Failed %s\n", err.Error())
 		return nil, err
 	}
 
-	return it.decoder.Decode(response), nil
+	return it.decoder.DecodeDetail(response), nil
 }
 
 func (it *problemCoreServiceImpl) GetProblems(ctx context.Context) ([]codeHelpAdminCoreGen.Problem, error) {

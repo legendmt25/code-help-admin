@@ -80,12 +80,12 @@ type ContestEditRequest struct {
 
 // ContestProblem defines model for ContestProblem.
 type ContestProblem struct {
-	Category         *Category   `json:"category,omitempty"`
-	ContestProblemId int64       `json:"contestProblemId"`
-	Difficulty       *Difficulty `json:"difficulty,omitempty"`
-	Id               *int64      `json:"id,omitempty"`
-	Score            int         `json:"score"`
-	Title            *string     `json:"title,omitempty"`
+	Category         *Category  `json:"category,omitempty"`
+	ContestProblemId int64      `json:"contestProblemId"`
+	Difficulty       Difficulty `json:"difficulty"`
+	Id               int64      `json:"id"`
+	Score            int        `json:"score"`
+	Title            string     `json:"title"`
 }
 
 // ContestRequest defines model for ContestRequest.
@@ -112,22 +112,22 @@ type Difficulty string
 
 // Problem defines model for Problem.
 type Problem struct {
-	Category   *Category   `json:"category,omitempty"`
-	Difficulty *Difficulty `json:"difficulty,omitempty"`
-	Id         *int64      `json:"id,omitempty"`
-	Title      *string     `json:"title,omitempty"`
+	Category   *Category  `json:"category,omitempty"`
+	Difficulty Difficulty `json:"difficulty"`
+	Id         int64      `json:"id"`
+	Title      string     `json:"title"`
 }
 
 // ProblemDetail defines model for ProblemDetail.
 type ProblemDetail struct {
-	Category    *Category   `json:"category,omitempty"`
-	Difficulty  *Difficulty `json:"difficulty,omitempty"`
-	Id          *int64      `json:"id,omitempty"`
-	Markdown    string      `json:"markdown"`
-	RunnerCode  Code        `json:"runnerCode"`
-	StarterCode Code        `json:"starterCode"`
-	TestCases   TestCases   `json:"testCases"`
-	Title       *string     `json:"title,omitempty"`
+	Category    *Category  `json:"category,omitempty"`
+	Difficulty  Difficulty `json:"difficulty"`
+	Id          int64      `json:"id"`
+	Markdown    string     `json:"markdown"`
+	RunnerCode  Code       `json:"runnerCode"`
+	StarterCode Code       `json:"starterCode"`
+	TestCases   TestCases  `json:"testCases"`
+	Title       string     `json:"title"`
 }
 
 // ProblemRequest defines model for ProblemRequest.
@@ -659,29 +659,29 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+RYT2/buBP9KgT7O/wWUC05TXvwzbHd1thtHMTpYdHkwEhjm61EKhSVrhHouy9E0hL1",
-	"z5YXdorFnlo5w+HMvPeGQ75gn0cxZ8BkgkcvOCaCRCBBqK8JkbDmYntNIsi/KcMjHBO5wQ5m6jf9j4MF",
-	"PKVUQIBHUqTg4MTfQETyNXIb53aJFJStcZY5eMKZhETOgw6XNNjrcMVFRGRux+SHS+zsdqBMwhqE2uJG",
-	"8McQovNtke3MK3VSFRQ8BiEpqL8wUzn4i0RxmPu4ooyILZICICk9W+Upw/qmlz8UVvzxO/gS5zU0O95C",
-	"EnOWQHNnX1uYLyohUv/5n4AVHuE3bom7azJxizSyYkciBNk2wrJ8twbHg1rSq5T5knKG/k/Eevgberln",
-	"CLku8nkAaM0hQRsQcM+ye9asScGYZpJBKkjut7rbcPPOi7BTwliYtfimQS/EnRYoTVjIaKDhOpFEyGTB",
-	"DtV9SiQYe5keRknvutTGdWgUs01Axp9j51/E1A6ccj0FSWiYx0HCcLHCo2+9IsKZU8cn1jo8goLaldHv",
-	"QSIW/pvZPJT5zAIqb+EpNRQ6Kqndup651TRYyWbel2mJzwVYvdPubA3MGvXprsOuqr1rUMLwCplVGkzd",
-	"/W7pXpwtjE/eJv4d6jexHKn3PYeINjhav4dPkJ3jPWEti4IAS6N81eJmdo0dvLwb397NptjBkz8Wy9nU",
-	"clKWX5W1AtiFd3Hx1nv/dvihAnpu17aerlbUT0O5tSOYjZd/Ygd/mU3nX79gB38e36rty12MRcOfJb7W",
-	"g3p7zOkcVILby67S8pjDTlIZQvv41oDLZHbsqdHdXCIifgT8Z02ub96gu58cLdNoMBgg031RAIkvaNwl",
-	"W5EyBmI3kOxnbgCFbI9bkpN1QhI4qI67wrCuhyLlagCVBOyN2vugKWlnH3xNqv0XQLR0UqaY55ek0cHZ",
-	"Xi+tFNg5AQ8sFnR19aOnshOMYw7e1a1arfHVZIo+zq+n6NPink0mV9ZXGxfubJg6xq7eXY6yvmDn1jyV",
-	"/c17jGoqgBVXXVbTSN2c0GcIYzQOIpoX4BlEoiYXPBx4A0/FEQMjMcUj/G7gDYbYUZdblblbvfWtQUWc",
-	"10bNA/mchj+BHIfhpDTMMdRUUYsuPK84+pkemOM4pL7y4H5P9BhVXpb7NJKCiyprW+4jvPhdV4usE+tu",
-	"ucV5Q4t50pLBRACRUDQpzUFI5BUPticPPQ85a5TonRorK3noqIJBVzaZY8PjvuSzWqbIm7bk+DUOqjna",
-	"LzMdJ2tp4lZebrKHX1Giy2aJrjkyGw9yIl9qplVtrkiATLDGqNWRRCuesgPVtqbXfVLYmZ1TCLVJu1UH",
-	"AzQOQ1REXcnMzNUHRWHszgR47U7cUxkl7B052WC5LzTItI8Q9AhfTXSqfi8TPVIYxeOjVkV/ynbi0UWt",
-	"s4R4ckqasb2DkMV9rouLe3rXidI/G43tZ6FWKnv/kMr2fLWn79zszM4Icn0WPHz+muArnabtoEOkGN8p",
-	"Q3ID6JH4P4AF2GntTLsZskEH9Tz/lII65cz7vF9wwH6WL6bGi5YX+TNxpXalauXJ8Kjd6reCBiBmkOhA",
-	"xSZYz17ZWfoDSiyf33r3ykmLOGxGdcnhLCGeXEb7euXeWeVjPqvkFu/bmsqcSRCMhCgB8QwCgRBcdIuy",
-	"u+Weqoq/RkavCJcuV6fEMgdrKHT1alDHwND4Zo6SGHy6MhFiB6cixCO8kTIeuW7IfRJueCJHl57nuSSm",
-	"7vMQZw/Z3wEAAP//sODFGnIdAAA=",
+	"H4sIAAAAAAAC/+RYT2/buBP9KgT7O/wWUC05TXvwzbHd1thtHMTpYdHkwEhjm61EKhSVrhHouy9I0RL1",
+	"z5YXdorFnlo5w+HMe2+GQ75gn0cxZ8BkgkcvOCaCRCBB6K8JkbDmYntNIlDflOERjoncYAcz/Vv+j4MF",
+	"PKVUQIBHUqTg4MTfQETUGrmNlV0iBWVrnGUOnnAmIZHzoMMlDfY6XHEREansmPxwiZ3dDpRJWIPQW9wI",
+	"/hhCdL4tsp15BSeNoOAxCElB/4UZ5OAvEsWh8nFFGRFbJAVAUnq24CnD+pYvfyis+ON38CVWGJodbyGJ",
+	"OUugubOfW5gvKiHS//mfgBUe4TduybtrMnGLNLJiRyIE2TbCsny3BseDWtKrlPmScob+T8R6+Bt6uWcI",
+	"uS7yeQBozSFBGxBwz7J71sSkUEwzySAVRPmt7jbcvPMi7JQ0FmYtvmnQi3GnhUoTFjI10HCdSCJksmCH",
+	"cJ8SCcZepodZyndd5sZ1arSyTUDGn2PnX8TUTpx2PQVJaKjiIGG4WOHRt14R4cyp8xPndXiEBHNXpn4P",
+	"CrHw38zmocxnFlB5C0+pkdBRSe3W9cytVoOVbOZ9lZb4XIDVO+3O1uCsgU83DjtUe2NQ0vAKmVUaTN39",
+	"buleni2OT94m/h3Vb2I5st73HCK5wdH1e/gE2TneE9ayAARYGqlVi5vZNXbw8m58ezebYgdP/lgsZ1PL",
+	"SQm/hrVC2IV3cfHWe/92+KFCurJrW09XK+qnodzaEczGyz+xg7/MpvOvX7CDP49v9fblLsai4c8qvtaD",
+	"envM6RxUgturrtLymMNOUhlC+/jWOG1y20pQbawaAI49XLp7UETEj4D/rFX1mzfo7idHyzQaDAbINGkU",
+	"QOILGndVt0gZA7GbW/YLPICiuo9bojQ9IQkcLKK7wrCOd5FyNYBKAvZG7e3SQNrZLl9Tkf8FEq1yKlNU",
+	"+SVpdPAK0FJdzgl0YKmgq/kfPbydYGpz8A63Klrjq8kUfZxfT9GnxT2bTK6srzYt3Nk0dUxnvZshZX3J",
+	"VtY8lf3Ne0x0OoAV1804l5G+YKHPEMZoHERUAfAMItEDDh4OvIGn44iBkZjiEX438AZD7Og7sM7crV4O",
+	"16AjVtjosUGNc/gTyHEYTkpDxWEuFb3owvOKCYHlc3Uch9TXHtzvST5tlXfqPo2k0KLO2i73EV78nqNF",
+	"1ol1Bd1i1dBinrRkMBFAJBRNKtcgJPKKB9uTh65CzhoQvdPTZyWPPKpg0JVN5tj0uC9qpMu0eNOWHL/G",
+	"QTVH+wGn42QtTdzKA0/28CsgumxCdM2R2XighHyZK61qc0UCZII1Rq2OJFrxlB1A2xpy95XCzuychVAb",
+	"yFvrYIDGYYiKqCuZmfH7YFEYuzMRXrs696yMkvaOnGyy3BcaZLmPEPJJv5roVP9eJnpkYRRvlHlV9Jds",
+	"Jx9d0jpLiCeXpBnbOwRZXPu6tLind50o/bPJ2H49apWy9w+lbM9Xe/rOzc7sjCTXZ8HD568JvtJp2g46",
+	"RIrxnTIkN4Aeif8DmLo4tnWm3QzZkIN+xX9KQZ9y5hnfLzRgv94XU+NFy8P9mbRSu1K16mTYOQx0IGuL",
+	"pGe/64TvQDWVL229+92kReC2KrokfZYQT14K+/rd3nnjo5o3lMX7tsYwZxIEIyFKQDyDQCAEF92F1d02",
+	"T4XirymFV6Qrh6uzxDIH51Tk6NWojoGh8c0cJTH4dGUixA5ORYhHeCNlPHLdkPsk3PBEji49z3NJTN3n",
+	"Ic4esr8DAAD//+PFPFVdHQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
