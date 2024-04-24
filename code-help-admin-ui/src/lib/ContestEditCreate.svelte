@@ -46,6 +46,10 @@
 </script>
 
 <style>
+  .p-1 {
+    padding: 1rem;
+  }
+
   .input-container {
     display: flex;
     flex-direction: column;
@@ -69,45 +73,47 @@
 {#if loading}
   <Spinner />
 {:else}
-  <form on:submit={handleFormSubmit} class="form">
-    <div class="input-container">
-      <label for="name">Name</label>
-      <input id="name" name="name" bind:value={value.name} />
-    </div>
-    <div class="input-container">
-      <label for="duration">Duration</label>
-      <input id="duration" name="duration" bind:value={value.duration} />
-    </div>
-    <div class="input-container">
-      <label for="startsOn">Starts on</label>
-      <input id="startsOn" name="startsOn" bind:value={value.startsOn} />
-    </div>
-    <Button>Submit</Button>
-  </form>
+  <div class="p-1">
+    <form on:submit={handleFormSubmit} class="form">
+      <div class="input-container">
+        <label for="name">Name</label>
+        <input id="name" name="name" bind:value={value.name} />
+      </div>
+      <div class="input-container">
+        <label for="duration">Duration</label>
+        <input id="duration" name="duration" bind:value={value.duration} />
+      </div>
+      <div class="input-container">
+        <label for="startsOn">Starts on</label>
+        <input id="startsOn" name="startsOn" bind:value={value.startsOn} />
+      </div>
+      <Button>Submit</Button>
+    </form>
 
-  {#if contestEntry != undefined}
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Title</th>
-          <th>Score</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each contestEntry.problems as problem}
+    {#if contestEntry != undefined}
+      <table>
+        <thead>
           <tr>
-            <td>{problem.id}</td>
-            <td>{problem.title}</td>
-            <td>{problem.score}</td>
-            <td>
-              <a href={problem.id ? Route.problems_edit.replace(":id", problem.id.toString()) : undefined} use:link
-                >Edit</a>
-            </td>
+            <th>#</th>
+            <th>Title</th>
+            <th>Score</th>
+            <th>Actions</th>
           </tr>
-        {/each}
-      </tbody>
-    </table>
-  {/if}
+        </thead>
+        <tbody>
+          {#each contestEntry.problems as problem}
+            <tr>
+              <td>{problem.id}</td>
+              <td>{problem.title}</td>
+              <td>{problem.score}</td>
+              <td>
+                <a href={problem.id ? Route.problems_edit.replace(":id", problem.id.toString()) : undefined} use:link
+                  >Edit</a>
+              </td>
+            </tr>
+          {/each}
+        </tbody>
+      </table>
+    {/if}
+  </div>
 {/if}
