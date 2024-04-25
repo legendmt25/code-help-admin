@@ -50,10 +50,6 @@
       <Icon src={AiOutlineBarChart} size="32" />
       <span>Contests</span>
     </a>
-    <a class="tile" href={Route.communities_overview} use:link>
-      <Icon src={RiCommunicationChat1Fill} size="32" />
-      <span>Communities</span>
-    </a>
   </div>
   <h2>Forum</h2>
   <hr />

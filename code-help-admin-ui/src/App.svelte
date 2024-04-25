@@ -4,8 +4,17 @@
   import { AiFillHome, AiFillQuestionCircle, AiOutlineBarChart, AiOutlineMenu } from "svelte-icons-pack/ai";
   import { RiCommunicationChat1Fill } from "svelte-icons-pack/ri";
   import { Icon } from "svelte-icons-pack";
+  import Keycloak from "keycloak-js";
+  import env from "./env";
 
   let menuOpened: boolean = false;
+  const keycloak = new Keycloak({
+    url: env.KEYCLOAK_URL,
+    realm: env.KEYCLOAK_REALM,
+    clientId: env.KEYCLOAK_CLIENTID
+  });
+
+  keycloak.init({ onLoad: "login-required" });
 </script>
 
 <style>
@@ -97,11 +106,7 @@
   <nav class:hide-nav={!menuOpened}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-missing-attribute -->
-    <a
-      class="nav-head"
-      on:click={(event) => {
-        menuOpened = !menuOpened;
-      }}>
+    <a class="nav-head" on:click={() => (menuOpened = !menuOpened)}>
       <span class:hide={!menuOpened}>CODE HELP ADMIN</span>
       <Icon src={AiOutlineMenu} size="32" />
     </a>
