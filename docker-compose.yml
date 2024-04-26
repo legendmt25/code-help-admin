@@ -1,9 +1,29 @@
 version: '3'
 services:
+  code-help-admin-backend:
+    image: code-help-admin-backend
+    container_name: code-help-admin-backend
+    build:
+      context: code-help-admin-backend
+      dockerfile: /@global/deploy/Dockerfile
+    environment:
+      - CORE_ADMIN_API_SERVER_URL=http://code-help-core/api
+    ports:
+      - 4000:4000
+    depends_on:
+      - code-help-keycloak-iam
+
   code-help-ingress:
     image: code-help-ingress
     container_name: code-help-ingress
-    build: .
+    build:
+      context: .
+      args:
+      - VITE_ADMIN_API_URL=http://localhost/admin/api/v1
+      - VITE_KEYCLOAK_URL=http://localhost/iam
+      - VITE_KEYCLOAK_REALM=code-help
+      - VITE_KEYCLOAK_CLIENTID=code-help-flutter
+      - VITE_BASE_ROUTE=/admin-ui
     volumes:
       - ./nginx.conf/:/etc/nginx/nginx.conf
     ports:
@@ -11,6 +31,7 @@ services:
       - 433:433
     depends_on:
       - code-help-keycloak-iam
+      - code-help-admin-backend
 
   code-help-keycloak-iam:
     image: keycloak/keycloak:21.0
@@ -30,16 +51,6 @@ services:
       - --hostname-admin-url=http://localhost/iam
     volumes:
       - ./code-help-keycloak-iam/realms:/opt/keycloak/data/import
-  # code-help-admin-ui:
-  #   container_name: code-help-admin-ui
-  #   build: code-help-admin-ui
-  #   environment:
-  #    - VITE_ADMIN_API_URL=http://localhost:3000/api
-  #    - VITE_KEYCLOAK_URL=http://localhost
-  #    - VITE_KEYCLOAK_REALM=code-help
-  #    - VITE_KEYCLOAK_CLIENTID=code-help-client
-  #   ports:
-  #     - 5432:5432
 
 volumes:
   code-help-forum-postgres-data:

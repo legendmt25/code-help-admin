@@ -4,17 +4,14 @@
   import { AiFillHome, AiFillQuestionCircle, AiOutlineBarChart, AiOutlineMenu } from "svelte-icons-pack/ai";
   import { RiCommunicationChat1Fill } from "svelte-icons-pack/ri";
   import { Icon } from "svelte-icons-pack";
-  import Keycloak from "keycloak-js";
-  import env from "./env";
+  import { KEYCLOAK_KEY, initKeycloak } from "./services/KeycloakService";
+  import { onMount } from "svelte";
 
   let menuOpened: boolean = false;
-  const keycloak = new Keycloak({
-    url: env.KEYCLOAK_URL,
-    realm: env.KEYCLOAK_REALM,
-    clientId: env.KEYCLOAK_CLIENTID
-  });
 
-  keycloak.init({ onLoad: "login-required" });
+  onMount(() => {
+    initKeycloak().then((keycloak) => localStorage.setItem(KEYCLOAK_KEY, JSON.stringify(keycloak)));
+  });
 </script>
 
 <style>

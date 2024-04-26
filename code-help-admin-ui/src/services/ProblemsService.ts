@@ -1,7 +1,8 @@
 import { CategoryApi, ProblemApi, type ProblemRequest } from "../generated/admin-api";
+import { baseConfiguration } from "./api";
 
-const PROBLEM_API = new ProblemApi();
-const CATEGORIES_API = new CategoryApi();
+const PROBLEM_API = new ProblemApi(baseConfiguration);
+const CATEGORIES_API = new CategoryApi(baseConfiguration);
 
 export const getAllProblems = () => {
   return PROBLEM_API.getAllProblems();

@@ -4,10 +4,13 @@ import (
 	"admin-api/internal/admin"
 	"admin-api/internal/api"
 	"admin-api/internal/core"
+	"os"
 )
 
 func main() {
-	codeHelpAdminClient, _ := core.CreateClient("http://localhost:3000/api")
+	coreAdminApiServerUrl := os.Getenv("CORE_ADMIN_API_SERVER_URL")
+
+	codeHelpAdminClient, _ := core.CreateClient(coreAdminApiServerUrl)
 	coreService := admin.NewCoreService(codeHelpAdminClient, admin.NewProblemDecoder())
 	adminService := api.NewServiceInterfaceImpl(coreService)
 
