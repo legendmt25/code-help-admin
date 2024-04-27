@@ -47,9 +47,9 @@ func (a AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 	if err != nil {
 		fmt.Printf("oauth2: error when fetching token: %s,%s\n", err.Error(), token)
 		a.handler.ServeHTTP(writer, request.WithContext(ctx))
-	} else {
-		fmt.Print("\n Token verification success! \n")
+		return
 	}
 
+	fmt.Print("\n Token verification success! \n")
 	a.handler.ServeHTTP(writer, request.WithContext(ctx))
 }
