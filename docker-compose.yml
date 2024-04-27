@@ -8,6 +8,8 @@ services:
       dockerfile: /@global/deploy/Dockerfile
     environment:
       - CORE_ADMIN_API_SERVER_URL=http://code-help-core/api
+      - OAUTH2_RESOURCESERVER_JWT_ISSUERURI=http://localhost/iam/realms/code-help
+      - OAUTH2_RESOURCESERVER_JWT_JWKSETURI=http://localhost/iam/realms/code-help/protocol/openid-connect/certs
     ports:
       - 4000:4000
     depends_on:
