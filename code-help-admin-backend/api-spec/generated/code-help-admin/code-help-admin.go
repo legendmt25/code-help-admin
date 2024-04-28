@@ -167,7 +167,7 @@ type ProblemId = int64
 
 // CreateProblemParams defines parameters for CreateProblem.
 type CreateProblemParams struct {
-	ContestId *int `form:"contestId,omitempty" json:"contestId,omitempty"`
+	ContestId *int64 `form:"contestId,omitempty" json:"contestId,omitempty"`
 }
 
 // CreateCategoryJSONRequestBody defines body for CreateCategory for application/json ContentType.
@@ -678,10 +678,10 @@ var swaggerSpec = []string{
 	"QTVH+wGn42QtTdzKA0/28CsgumxCdM2R2XighHyZK61qc0UCZII1Rq2OJFrxlB1A2xpy95XCzuychVAb",
 	"yFvrYIDGYYiKqCuZmfH7YFEYuzMRXrs696yMkvaOnGyy3BcaZLmPEPJJv5roVP9eJnpkYRRvlHlV9Jds",
 	"Jx9d0jpLiCeXpBnbOwRZXPu6tLind50o/bPJ2H49apWy9w+lbM9Xe/rOzc7sjCTXZ8HD568JvtJp2g46",
-	"RIrxnTIkN4Aeif8DmLo4tnWm3QzZkIN+xX9KQZ9y5hnfLzRgv94XU+NFy8P9mbRSu1K16mTYOQx0IGuL",
-	"pGe/64TvQDWVL229+92kReC2KrokfZYQT14K+/rd3nnjo5o3lMX7tsYwZxIEIyFKQDyDQCAEF92F1d02",
-	"T4XirymFV6Qrh6uzxDIH51Tk6NWojoGh8c0cJTH4dGUixA5ORYhHeCNlPHLdkPsk3PBEji49z3NJTN3n",
-	"Ic4esr8DAAD//+PFPFVdHQAA",
+	"RIrxnTIkN4Aeif8DmLo4tnWm3QzZkIN+xX9KQZ9y5hnfLzRgv94XU+OF0+Ml/0ziqd2xWoUz7JwOOqC2",
+	"VdOzAXbieaC8yqe33g1w0qJ4WyZdGj9LiCevjX0NcO8A8lENIMrifVunmDMJgpEQJSCeQSAQgovuSuvu",
+	"o6dC8deUwivSlcPVWWKZg3MqcvRqVMfA0PhmjpIYfLoyEWIHpyLEI7yRMh65bsh9Em54IkeXnue5JKbu",
+	"8xBnD9nfAQAA//+AMX8+bh0AAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

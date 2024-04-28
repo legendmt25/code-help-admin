@@ -2,7 +2,6 @@ package admin
 
 import (
 	codeHelpAdminCoreGen "api-spec/generated/code-help-admin-core"
-	"encoding/json"
 	"net/http"
 )
 
@@ -14,18 +13,7 @@ type ProblemDecoder interface {
 	DecodeAll(response *http.Response) []codeHelpAdminCoreGen.Problem
 }
 
-type problemDecoderImpl struct {
-}
-
-func (it *problemDecoderImpl) DecodeAll(response *http.Response) []codeHelpAdminCoreGen.Problem {
-	var problems []codeHelpAdminCoreGen.Problem
-	err := decode(response, &problems)
-	if err != nil {
-		return []codeHelpAdminCoreGen.Problem{}
-	}
-
-	return problems
-}
+type problemDecoderImpl struct{}
 
 func NewProblemDecoder() ProblemDecoder {
 	return &problemDecoderImpl{}
@@ -49,12 +37,12 @@ func (it *problemDecoderImpl) DecodeDetail(response *http.Response) *codeHelpAdm
 	return &problemDetail
 }
 
-func decode[T any](response *http.Response, output *T) error {
-	defer func() { _ = response.Body.Close() }()
-	err := json.NewDecoder(response.Body).Decode(&output)
+func (it *problemDecoderImpl) DecodeAll(response *http.Response) []codeHelpAdminCoreGen.Problem {
+	var problems []codeHelpAdminCoreGen.Problem
+	err := decode(response, &problems)
 	if err != nil {
-		return err
+		return []codeHelpAdminCoreGen.Problem{}
 	}
 
-	return nil
+	return problems
 }
