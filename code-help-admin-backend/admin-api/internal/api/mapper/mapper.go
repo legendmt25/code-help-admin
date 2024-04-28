@@ -115,3 +115,76 @@ func toMultipart(cases codeHelpAdminGen.TestCases) []codeHelpAdminCoreGen.File {
 
 	return files
 }
+
+func MapClientContestDetailToResponse(clientContest codeHelpAdminCoreGen.ContestDetail) codeHelpAdminGen.ContestDetail {
+	return codeHelpAdminGen.ContestDetail{
+		Duration: clientContest.Duration,
+		Id:       clientContest.Id,
+		Name:     clientContest.Name,
+		Problems: mapContestProblemsToResponse(clientContest.Problems),
+		StartsOn: clientContest.StartsOn,
+		Status:   codeHelpAdminGen.ContestStatus(clientContest.Status),
+	}
+}
+
+func mapContestProblemsToResponse(clientProblem []codeHelpAdminCoreGen.ContestProblem) []codeHelpAdminGen.ContestProblem {
+	clientContestSize := len(clientProblem)
+	if clientContestSize == 0 {
+		return make([]codeHelpAdminGen.ContestProblem, 0)
+	}
+
+	problems := make([]codeHelpAdminGen.ContestProblem, clientContestSize)
+	for i, clientContest := range clientProblem {
+		problems[i] = mapContestProblemToResponse(clientContest)
+	}
+
+	return problems
+}
+func mapContestProblemToResponse(problem codeHelpAdminCoreGen.ContestProblem) codeHelpAdminGen.ContestProblem {
+	return codeHelpAdminGen.ContestProblem{
+		Id:               problem.Id,
+		Title:            problem.Title,
+		ContestProblemId: problem.ContestProblemId,
+		Category:         mapCategoryToResponse(problem.Category),
+		Difficulty:       codeHelpAdminGen.Difficulty(problem.Difficulty),
+		Score:            problem.Score,
+	}
+}
+
+func MapAllClientContestToResponse(clientContests []codeHelpAdminCoreGen.Contest) []codeHelpAdminGen.Contest {
+	clientContestSize := len(clientContests)
+	if clientContestSize == 0 {
+		return make([]codeHelpAdminGen.Contest, 0)
+	}
+
+	contests := make([]codeHelpAdminGen.Contest, clientContestSize)
+	for i, clientContest := range clientContests {
+		contests[i] = mapClientContestToResponse(clientContest)
+	}
+
+	return contests
+}
+
+func mapClientContestToResponse(clientContest codeHelpAdminCoreGen.Contest) codeHelpAdminGen.Contest {
+	return codeHelpAdminGen.Contest{
+		Id:       clientContest.Id,
+		Name:     clientContest.Name,
+		Duration: clientContest.Duration,
+		StartsOn: clientContest.StartsOn,
+		Status:   codeHelpAdminGen.ContestStatus(clientContest.Status),
+	}
+}
+
+func MapAllCategoryToResponse(clientCategories []codeHelpAdminCoreGen.Category) []codeHelpAdminGen.Category {
+	clientCategorySize := len(clientCategories)
+	if clientCategorySize == 0 {
+		return make([]codeHelpAdminGen.Category, 0)
+	}
+
+	categories := make([]codeHelpAdminGen.Category, clientCategorySize)
+	for i, clientCategory := range clientCategories {
+		categories[i] = *mapCategoryToResponse(&clientCategory)
+	}
+
+	return categories
+}

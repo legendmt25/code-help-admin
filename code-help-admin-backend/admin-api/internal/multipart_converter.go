@@ -18,10 +18,15 @@ type item struct {
 	isOmitEmpty bool
 }
 
-func EncodeMultipartFormData(data any) (io.Reader, string) {
+var (
+	use_array_index = false
+	use_flat_object = true
+)
+
+func EncodeMultipartFormData(data any, body *bytes.Buffer) (io.Reader, string) {
 	value := reflect.ValueOf(data)
 
-	var body = &bytes.Buffer{}
+	//var body = &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 
 	defer func() { _ = writer.Close() }()
@@ -46,8 +51,8 @@ func EncodeMultipartFormData(data any) (io.Reader, string) {
 		if it.value.Kind() == reflect.Struct {
 			switch it.value.Interface().(type) {
 			case openapi_types.File:
-				field, err := writer.CreateFormField(it.key)
 				file := it.value.Interface().(openapi_types.File)
+				field, err := writer.CreateFormFile(it.key, file.Filename())
 				if err != nil {
 					continue
 				}
@@ -91,8 +96,6 @@ func EncodeMultipartFormData(data any) (io.Reader, string) {
 
 	}
 
-	fmt.Println(body.String())
-
 	return body, writer.FormDataContentType()
 }
 
@@ -132,7 +135,7 @@ func getKey(parent string, field reflect.StructField) (string, bool) {
 		return fieldName, isOmitEmpty
 	}
 
-	return fmt.Sprintf("%s['%s']", parent, fieldName), isOmitEmpty
+	return springObjectValue(parent, fieldName), isOmitEmpty
 }
 
 func parseJsonTag(field reflect.StructField) (string, bool) {
@@ -148,11 +151,27 @@ func toValuesArray(it item) []item {
 		childValue := it.value.Index(i)
 
 		values = append(values, item{
-			fmt.Sprintf("%s[%d]", it.key, i),
+			sprintArrayValue(it, i),
 			childValue,
 			true,
 		})
 	}
 
 	return values
+}
+
+func sprintArrayValue(it item, i int) string {
+	if !use_array_index {
+		return fmt.Sprintf("%s", it.key)
+	}
+
+	return fmt.Sprintf("%s[%d]", it.key, i)
+}
+
+func springObjectValue(parent, fieldName string) string {
+	if use_flat_object {
+		return fmt.Sprintf("%s", parent)
+	}
+
+	return fmt.Sprintf("%s['%s']", parent, fieldName)
 }
