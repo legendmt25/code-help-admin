@@ -4,6 +4,7 @@
   import { RiCommunicationChat1Fill } from "svelte-icons-pack/ri";
   import { link } from "svelte-spa-router";
   import { Route } from "../routes";
+  import { BiCategory } from "svelte-icons-pack/bi";
 </script>
 
 <style>
@@ -42,6 +43,10 @@
   <h2>Core</h2>
   <hr />
   <div class="row gap-1">
+    <a class="tile" href={Route.categories_overview} use:link>
+      <Icon src={BiCategory} size="32" />
+      <span>Categories</span>
+    </a>
     <a class="tile" href={Route.problems_overview} use:link>
       <Icon src={AiFillQuestionCircle} size="32" />
       <span>Problems</span>

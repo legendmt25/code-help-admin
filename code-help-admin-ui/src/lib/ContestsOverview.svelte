@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { link } from "svelte-spa-router";
   import Spinner from "../components/Spinner.svelte";
   import { Route } from "../routes";
   import { getAllContests } from "../services/ContestService";

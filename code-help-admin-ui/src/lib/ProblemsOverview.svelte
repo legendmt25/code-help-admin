@@ -3,9 +3,11 @@
   import { link } from "svelte-spa-router";
   import Spinner from "../components/Spinner.svelte";
   import { Route } from "../routes";
-  import Button from "../components/Button.svelte";
+  import Link from "../components/Link.svelte";
 
-  const getAllProblemsPromise = getAllProblems().then((x) => x.problems);
+  const getAllProblemsPromise = getAllProblems()
+    .then((x) => x.problems)
+    .catch(() => []);
 </script>
 
 <style>
@@ -39,7 +41,7 @@
   <Spinner />
 {:then problems}
   <section>
-    <Button>Create</Button>
+    <Link href={Route.problems_create}>Create</Link>
     <table>
       <thead>
         <tr>

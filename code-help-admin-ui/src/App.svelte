@@ -2,16 +2,24 @@
   import Router, { link } from "svelte-spa-router";
   import { Route, routes } from "./routes";
   import { AiFillHome, AiFillQuestionCircle, AiOutlineBarChart, AiOutlineMenu } from "svelte-icons-pack/ai";
-  import { RiCommunicationChat1Fill } from "svelte-icons-pack/ri";
+  import { RiCommunicationChat1Fill, RiLogosCoreosFill } from "svelte-icons-pack/ri";
+  import { BiCategory } from "svelte-icons-pack/bi";
   import { Icon } from "svelte-icons-pack";
-  import { KEYCLOAK_KEY, initKeycloak } from "./services/KeycloakService";
+  import { KEYCLOAK_KEY, getInstance, initKeycloak } from "./services/KeycloakService";
   import { onMount } from "svelte";
+  import env from "./env";
+  import Accordion from "./components/Accordion.svelte";
+  import { FaBrandsForumbee } from "svelte-icons-pack/fa";
 
   let menuOpened: boolean = false;
 
   onMount(() => {
-    initKeycloak().then((keycloak) => localStorage.setItem(KEYCLOAK_KEY, JSON.stringify(keycloak)));
+    if (!env.DEV || !getInstance()?.isTokenExpired(0))
+      initKeycloak().then((keycloak) => localStorage.setItem(KEYCLOAK_KEY, JSON.stringify(keycloak)));
   });
+
+  const openMenu = () => (menuOpened = true);
+  const toggleMenu = () => (menuOpened = !menuOpened);
 </script>
 
 <style>
@@ -47,13 +55,21 @@
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    padding: 1rem;
     color: inherit;
     transition: all 200ms;
   }
 
   a:hover {
     color: #000;
+  }
+
+  .link-1 {
+    padding: 1rem;
+  }
+
+  .link-2 {
+    padding: 1rem;
+    background-color: #202e3f;
   }
 
   .nav-head {
@@ -96,6 +112,10 @@
     max-width: 60px;
     min-width: 0;
   }
+
+  .p-1 {
+    padding: 1rem;
+  }
 </style>
 
 <div class="container">
@@ -103,27 +123,53 @@
   <nav class:hide-nav={!menuOpened}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-missing-attribute -->
-    <a class="nav-head" on:click={() => (menuOpened = !menuOpened)}>
+    <a class="nav-head link-1" on:click={toggleMenu}>
       <span class:hide={!menuOpened}>CODE HELP ADMIN</span>
       <Icon src={AiOutlineMenu} size="32" />
     </a>
     <div class="h-100 column">
-      <a href={Route.index} use:link>
+      <a class="link-1" href={Route.index} use:link>
         <Icon src={AiFillHome} size="32" />
         <span class:hide={!menuOpened}>Home</span>
       </a>
-      <a href={Route.problems_overview} use:link>
-        <Icon src={AiFillQuestionCircle} size="32" />
-        <span class:hide={!menuOpened}>Problems</span>
-      </a>
-      <a href={Route.contests_overview} use:link>
-        <Icon src={AiOutlineBarChart} size="32" />
-        <span class:hide={!menuOpened}>Contests</span>
-      </a>
-      <a href={Route.communities_overview} use:link>
-        <Icon src={RiCommunicationChat1Fill} size="32" />
-        <span class:hide={!menuOpened}>Communities</span>
-      </a>
+      <div>
+        <Accordion>
+          <!-- svelte-ignore a11y-missing-attribute -->
+          <a class="link-1" slot="title" on:click={openMenu} on:keydown={undefined}>
+            <Icon src={RiLogosCoreosFill} size="32" />
+            <span class:hide={!menuOpened}>Core</span>
+          </a>
+          <div>
+            <a class="link-2" href={Route.categories_overview} use:link>
+              <Icon src={BiCategory} size="32" />
+              <span class:hide={!menuOpened}>Categories</span>
+            </a>
+            <a class="link-2" href={Route.problems_overview} use:link>
+              <Icon src={AiFillQuestionCircle} size="32" />
+              <span class:hide={!menuOpened}>Problems</span>
+            </a>
+            <a class="link-2" href={Route.contests_overview} use:link>
+              <Icon src={AiOutlineBarChart} size="32" />
+              <span class:hide={!menuOpened}>Contests</span>
+            </a>
+          </div>
+        </Accordion>
+      </div>
+      <div>
+        <Accordion>
+          <!-- svelte-ignore a11y-missing-attribute -->
+          <a class="link-1" slot="title" on:click={openMenu} on:keydown={undefined}>
+            <Icon src={FaBrandsForumbee} size="32" />
+            <span class:hide={!menuOpened}>Forum</span>
+          </a>
+          <div>
+            <a class="link-2" href={Route.communities_overview} use:link>
+              <Icon src={RiCommunicationChat1Fill} size="32" />
+              <span class:hide={!menuOpened}>Communities</span>
+            </a>
+          </div>
+        </Accordion>
+      </div>
       <div class="logged-in" class:hide={!menuOpened}>Logged in as: Martin</div>
     </div>
   </nav>

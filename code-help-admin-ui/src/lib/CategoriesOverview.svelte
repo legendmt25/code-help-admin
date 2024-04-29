@@ -1,13 +1,16 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
-  import { deleteCommunity, getAllCommunities } from "../services/ForumService";
+  import { getAllCategories } from "../services/ProblemsService";
+  import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
 
-  const getAllCommunitiesPromise = getAllCommunities().then((data) => data.communities);
+  const getAllCategoriesPromise = getAllCategories()
+    .then((data) => data.categories)
+    .catch(() => []);
 
-  const handleDeleteCommunity = (communityName: string) => {
-    deleteCommunity(communityName);
-  };
+  const handleDeleteCategory = (categoryName: string) => {};
+
+  let createCategoryDialog: HTMLDialogElement | undefined = undefined;
 </script>
 
 <style>
@@ -37,28 +40,27 @@
   }
 </style>
 
-{#await getAllCommunitiesPromise}
+{#await getAllCategoriesPromise}
   <Spinner />
-{:then communities}
+{:then categories}
   <section>
+    <Button on:click={() => createCategoryDialog?.showModal()}>Create</Button>
     <table>
       <thead>
         <tr>
           <th>Name</th>
-          <th>Language</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        {#if communities.length === 0}
+        {#if categories.length === 0}
           <div class="no-entries">No entries!</div>
         {/if}
-        {#each communities as communityEntry}
+        {#each categories as categoryEntry}
           <tr>
-            <td>{communityEntry.name}</td>
-            <td>{JSON.stringify(communityEntry.categories)}</td>
+            <td>{categoryEntry.name}</td>
             <td>
-              <Button on:click={() => handleDeleteCommunity(communityEntry.name)}>Delete</Button>
+              <Button on:click={() => handleDeleteCategory(categoryEntry.name)}>Delete</Button>
             </td>
           </tr>
         {/each}
@@ -68,3 +70,5 @@
 {:catch err}
   <div>An error occured! ({err})</div>
 {/await}
+
+<CategoryEditCreateDialog bind:dialog={createCategoryDialog} />

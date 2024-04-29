@@ -6,9 +6,12 @@ import ContestsOverview from "./lib/ContestsOverview.svelte";
 import ContestEditCreate from "./lib/ContestEditCreate.svelte";
 import CommunitiesOverview from "./lib/CommunitiesOverview.svelte";
 import Home from "./lib/Home.svelte";
+import CategoriesOverview from "./lib/CategoriesOverview.svelte";
 
 export const Route = {
   index: "/",
+
+  categories_overview: "/categories",
 
   problems_overview: "/problems",
   problems_create: "/problems/create",
@@ -23,6 +26,9 @@ export const Route = {
 export const routes: RouteDefinition = {
   [Route.index]: wrap({
     component: Home
+  }),
+  [Route.categories_overview]: wrap({
+    component: CategoriesOverview
   }),
   [Route.problems_overview]: wrap({
     component: ProblemsOverview
