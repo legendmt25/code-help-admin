@@ -1,43 +1,51 @@
 package api
 
 import (
+	"admin-api/internal/environment"
+	codeHelpAdminGen "api-spec/generated/code-help-admin"
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 )
 
 type AuthMiddleware struct {
-	handler http.Handler
+	handler     http.Handler
+	environment environment.Environment
 }
 
-func NewAuthMiddleWare(handler http.Handler) http.Handler {
-	return AuthMiddleware{handler: handler}
+func NewAuthMiddlewareWith(environment environment.Environment) codeHelpAdminGen.MiddlewareFunc {
+	return func(handler http.Handler) http.Handler {
+		return AuthMiddleware{handler: handler, environment: environment}
+	}
 }
 
-type AuthCtx struct {
-	St string
+const (
+	AuthenticationContextKey = "Authentication"
+)
+
+type AuthContext struct {
+	Token *oidc.IDToken
 }
 
 func (a AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
-	ctx := context.WithValue(request.Context(), "", AuthCtx{})
+	ctx := context.WithValue(request.Context(), AuthenticationContextKey, AuthContext{})
 
 	authorizationHeaderValues := request.Header["Authorization"]
 
 	if len(authorizationHeaderValues) == 0 || authorizationHeaderValues[0] == "" {
-		a.handler.ServeHTTP(writer, request.WithContext(ctx))
+		a.handler.ServeHTTP(writer, request)
 		return
 	}
 
 	idToken := strings.Replace(authorizationHeaderValues[0], "Bearer ", "", 1)
 
-	issuerUri := os.Getenv("OAUTH2_RESOURCESERVER_JWT_ISSUERURI")
-	jwtSetUri := os.Getenv("OAUTH2_RESOURCESERVER_JWT_JWKSETURI")
+	issuerUri := a.environment.Oauth2Jwt.IssuerUri
+	jwkSetUri := a.environment.Oauth2Jwt.JwkSetUri
 
-	remoteKeySet := oidc.NewRemoteKeySet(ctx, jwtSetUri)
+	remoteKeySet := oidc.NewRemoteKeySet(ctx, jwkSetUri)
 
 	oidcConfig := oidc.Config{SkipClientIDCheck: true}
 
@@ -51,5 +59,6 @@ func (a AuthMiddleware) ServeHTTP(writer http.ResponseWriter, request *http.Requ
 	}
 
 	fmt.Print("\n Token verification success! \n")
+	context.WithValue(ctx, AuthenticationContextKey, AuthContext{Token: token})
 	a.handler.ServeHTTP(writer, request.WithContext(ctx))
 }
