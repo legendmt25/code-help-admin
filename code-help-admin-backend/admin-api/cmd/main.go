@@ -14,5 +14,5 @@ func main() {
 	coreService := admin.NewCoreService(codeHelpAdminClient)
 	adminService := api.NewServiceInterfaceImpl(coreService)
 
-	api.NewAdminApiServer(adminService).Serve()
+	api.NewAdminApiServer(adminService, env).Serve()
 }
