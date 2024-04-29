@@ -140,6 +140,7 @@ func mapContestProblemsToResponse(clientProblem []codeHelpAdminCoreGen.ContestPr
 
 	return problems
 }
+
 func mapContestProblemToResponse(problem codeHelpAdminCoreGen.ContestProblem) codeHelpAdminGen.ContestProblem {
 	return codeHelpAdminGen.ContestProblem{
 		Id:               problem.Id,

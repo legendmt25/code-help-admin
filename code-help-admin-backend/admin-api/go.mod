@@ -3,14 +3,12 @@ module admin-api
 go 1.22
 
 require (
-	github.com/deepmap/oapi-codegen v1.16.2
-	github.com/go-http-utils/headers v0.0.0-20161116095340-dd89efed1674
+	github.com/coreos/go-oidc/v3 v3.10.0
 	github.com/labstack/gommon v0.4.2
 	github.com/oapi-codegen/runtime v1.1.1
 )
 
 require (
-	github.com/coreos/go-oidc/v3 v3.10.0 // indirect
 	github.com/go-jose/go-jose/v4 v4.0.1 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/uuid v1.5.0 // indirect
