@@ -9,7 +9,7 @@ import (
 
 type ForumPostService interface {
 	GetPost(ctx context.Context, uid string) (*codeHelpForumGen.Post, int, error)
-	GetPosts(ctx context.Context, params codeHelpForumGen.GetPostsParams) (*codeHelpForumGen.ShortPosts, error)
+	GetPosts(ctx context.Context, params codeHelpForumGen.GetPostsParams) (*codeHelpForumGen.ShortPosts, int, error)
 
 	CreatePost(ctx context.Context, params codeHelpForumGen.CreateCommunityPostParams, body codeHelpForumGen.CreateCommunityPostJSONRequestBody) (*codeHelpForumGen.Post, int, error)
 
@@ -30,14 +30,18 @@ func NewPostServiceImpl(client codeHelpForumGen.ClientInterface) ForumPostServic
 	}
 }
 
-func (it *forumPostServiceImpl) GetPosts(ctx context.Context, params codeHelpForumGen.GetPostsParams) (*codeHelpForumGen.ShortPosts, error) {
+func (it *forumPostServiceImpl) GetPosts(ctx context.Context, params codeHelpForumGen.GetPostsParams) (*codeHelpForumGen.ShortPosts, int, error) {
 	res, err := it.client.GetPosts(ctx, &params)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return it.decoder.DecodeAllShort(res), nil
+	if res.StatusCode != http.StatusOK {
+		return nil, res.StatusCode, nil
+	}
+
+	return it.decoder.DecodeAllShort(res), http.StatusOK, nil
 }
 
 func (it *forumPostServiceImpl) CreatePost(ctx context.Context, params codeHelpForumGen.CreateCommunityPostParams, body codeHelpForumGen.CreateCommunityPostJSONRequestBody) (*codeHelpForumGen.Post, int, error) {
