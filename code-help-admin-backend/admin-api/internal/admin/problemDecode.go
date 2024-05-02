@@ -1,6 +1,7 @@
 package admin
 
 import (
+	"admin-api/internal/util/decodeUtil"
 	codeHelpAdminCoreGen "api-spec/generated/code-help-admin-core"
 	"net/http"
 )
@@ -10,7 +11,7 @@ type ProblemDecoder interface {
 
 	DecodeDetail(response *http.Response) *codeHelpAdminCoreGen.ProblemDetail
 
-	DecodeAll(response *http.Response) []codeHelpAdminCoreGen.Problem
+	DecodeAll(response *http.Response) *codeHelpAdminCoreGen.ProblemResponse
 }
 
 type problemDecoderImpl struct{}
@@ -21,7 +22,7 @@ func NewProblemDecoder() ProblemDecoder {
 
 func (it *problemDecoderImpl) Decode(response *http.Response) *codeHelpAdminCoreGen.Problem {
 	var problem codeHelpAdminCoreGen.Problem
-	if err := decode(response, &problem); err != nil {
+	if err := decodeUtil.Decode(response, &problem); err != nil {
 		return nil
 	}
 
@@ -30,19 +31,19 @@ func (it *problemDecoderImpl) Decode(response *http.Response) *codeHelpAdminCore
 
 func (it *problemDecoderImpl) DecodeDetail(response *http.Response) *codeHelpAdminCoreGen.ProblemDetail {
 	var problemDetail codeHelpAdminCoreGen.ProblemDetail
-	if err := decode(response, &problemDetail); err != nil {
+	if err := decodeUtil.Decode(response, &problemDetail); err != nil {
 		return nil
 	}
 
 	return &problemDetail
 }
 
-func (it *problemDecoderImpl) DecodeAll(response *http.Response) []codeHelpAdminCoreGen.Problem {
-	var problems []codeHelpAdminCoreGen.Problem
-	err := decode(response, &problems)
+func (it *problemDecoderImpl) DecodeAll(response *http.Response) *codeHelpAdminCoreGen.ProblemResponse {
+	var problems codeHelpAdminCoreGen.ProblemResponse
+	err := decodeUtil.Decode(response, &problems)
 	if err != nil {
-		return []codeHelpAdminCoreGen.Problem{}
+		return nil
 	}
 
-	return problems
+	return &problems
 }

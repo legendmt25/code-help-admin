@@ -180,8 +180,8 @@ type GetCommunityModeratorsParams struct {
 	Name string `form:"name" json:"name"`
 }
 
-// AddANewModeratorToTheCommunityParams defines parameters for AddANewModeratorToTheCommunity.
-type AddANewModeratorToTheCommunityParams struct {
+// AddModeratorParams defines parameters for AddModerator.
+type AddModeratorParams struct {
 	// Community Community name
 	Community string `form:"community" json:"community"`
 }
@@ -212,8 +212,8 @@ type UpdateCommentJSONRequestBody = CommentRequest
 // CreateCommunityJSONRequestBody defines body for CreateCommunity for application/json ContentType.
 type CreateCommunityJSONRequestBody = CommunityRequest
 
-// AddANewModeratorToTheCommunityJSONRequestBody defines body for AddANewModeratorToTheCommunity for application/json ContentType.
-type AddANewModeratorToTheCommunityJSONRequestBody = ModeratorRequest
+// AddModeratorJSONRequestBody defines body for AddModerator for application/json ContentType.
+type AddModeratorJSONRequestBody = ModeratorRequest
 
 // UpdateCommunityJSONRequestBody defines body for UpdateCommunity for application/json ContentType.
 type UpdateCommunityJSONRequestBody = CommunityRequest
@@ -349,10 +349,10 @@ type ClientInterface interface {
 	// GetCommunityModerators request
 	GetCommunityModerators(ctx context.Context, params *GetCommunityModeratorsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// AddANewModeratorToTheCommunityWithBody request with any body
-	AddANewModeratorToTheCommunityWithBody(ctx context.Context, params *AddANewModeratorToTheCommunityParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// AddModeratorWithBody request with any body
+	AddModeratorWithBody(ctx context.Context, params *AddModeratorParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	AddANewModeratorToTheCommunity(ctx context.Context, params *AddANewModeratorToTheCommunityParams, body AddANewModeratorToTheCommunityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	AddModerator(ctx context.Context, params *AddModeratorParams, body AddModeratorJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteCommunity request
 	DeleteCommunity(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -613,8 +613,8 @@ func (c *Client) GetCommunityModerators(ctx context.Context, params *GetCommunit
 	return c.Client.Do(req)
 }
 
-func (c *Client) AddANewModeratorToTheCommunityWithBody(ctx context.Context, params *AddANewModeratorToTheCommunityParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAddANewModeratorToTheCommunityRequestWithBody(c.Server, params, contentType, body)
+func (c *Client) AddModeratorWithBody(ctx context.Context, params *AddModeratorParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddModeratorRequestWithBody(c.Server, params, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -625,8 +625,8 @@ func (c *Client) AddANewModeratorToTheCommunityWithBody(ctx context.Context, par
 	return c.Client.Do(req)
 }
 
-func (c *Client) AddANewModeratorToTheCommunity(ctx context.Context, params *AddANewModeratorToTheCommunityParams, body AddANewModeratorToTheCommunityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewAddANewModeratorToTheCommunityRequest(c.Server, params, body)
+func (c *Client) AddModerator(ctx context.Context, params *AddModeratorParams, body AddModeratorJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAddModeratorRequest(c.Server, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1360,19 +1360,19 @@ func NewGetCommunityModeratorsRequest(server string, params *GetCommunityModerat
 	return req, nil
 }
 
-// NewAddANewModeratorToTheCommunityRequest calls the generic AddANewModeratorToTheCommunity builder with application/json body
-func NewAddANewModeratorToTheCommunityRequest(server string, params *AddANewModeratorToTheCommunityParams, body AddANewModeratorToTheCommunityJSONRequestBody) (*http.Request, error) {
+// NewAddModeratorRequest calls the generic AddModerator builder with application/json body
+func NewAddModeratorRequest(server string, params *AddModeratorParams, body AddModeratorJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewAddANewModeratorToTheCommunityRequestWithBody(server, params, "application/json", bodyReader)
+	return NewAddModeratorRequestWithBody(server, params, "application/json", bodyReader)
 }
 
-// NewAddANewModeratorToTheCommunityRequestWithBody generates requests for AddANewModeratorToTheCommunity with any type of body
-func NewAddANewModeratorToTheCommunityRequestWithBody(server string, params *AddANewModeratorToTheCommunityParams, contentType string, body io.Reader) (*http.Request, error) {
+// NewAddModeratorRequestWithBody generates requests for AddModerator with any type of body
+func NewAddModeratorRequestWithBody(server string, params *AddModeratorParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -1850,10 +1850,10 @@ type ClientWithResponsesInterface interface {
 	// GetCommunityModeratorsWithResponse request
 	GetCommunityModeratorsWithResponse(ctx context.Context, params *GetCommunityModeratorsParams, reqEditors ...RequestEditorFn) (*GetCommunityModeratorsResponse, error)
 
-	// AddANewModeratorToTheCommunityWithBodyWithResponse request with any body
-	AddANewModeratorToTheCommunityWithBodyWithResponse(ctx context.Context, params *AddANewModeratorToTheCommunityParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddANewModeratorToTheCommunityResponse, error)
+	// AddModeratorWithBodyWithResponse request with any body
+	AddModeratorWithBodyWithResponse(ctx context.Context, params *AddModeratorParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddModeratorResponse, error)
 
-	AddANewModeratorToTheCommunityWithResponse(ctx context.Context, params *AddANewModeratorToTheCommunityParams, body AddANewModeratorToTheCommunityJSONRequestBody, reqEditors ...RequestEditorFn) (*AddANewModeratorToTheCommunityResponse, error)
+	AddModeratorWithResponse(ctx context.Context, params *AddModeratorParams, body AddModeratorJSONRequestBody, reqEditors ...RequestEditorFn) (*AddModeratorResponse, error)
 
 	// DeleteCommunityWithResponse request
 	DeleteCommunityWithResponse(ctx context.Context, name string, reqEditors ...RequestEditorFn) (*DeleteCommunityResponse, error)
@@ -2189,13 +2189,13 @@ func (r GetCommunityModeratorsResponse) StatusCode() int {
 	return 0
 }
 
-type AddANewModeratorToTheCommunityResponse struct {
+type AddModeratorResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 }
 
 // Status returns HTTPResponse.Status
-func (r AddANewModeratorToTheCommunityResponse) Status() string {
+func (r AddModeratorResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -2203,7 +2203,7 @@ func (r AddANewModeratorToTheCommunityResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r AddANewModeratorToTheCommunityResponse) StatusCode() int {
+func (r AddModeratorResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2550,21 +2550,21 @@ func (c *ClientWithResponses) GetCommunityModeratorsWithResponse(ctx context.Con
 	return ParseGetCommunityModeratorsResponse(rsp)
 }
 
-// AddANewModeratorToTheCommunityWithBodyWithResponse request with arbitrary body returning *AddANewModeratorToTheCommunityResponse
-func (c *ClientWithResponses) AddANewModeratorToTheCommunityWithBodyWithResponse(ctx context.Context, params *AddANewModeratorToTheCommunityParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddANewModeratorToTheCommunityResponse, error) {
-	rsp, err := c.AddANewModeratorToTheCommunityWithBody(ctx, params, contentType, body, reqEditors...)
+// AddModeratorWithBodyWithResponse request with arbitrary body returning *AddModeratorResponse
+func (c *ClientWithResponses) AddModeratorWithBodyWithResponse(ctx context.Context, params *AddModeratorParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddModeratorResponse, error) {
+	rsp, err := c.AddModeratorWithBody(ctx, params, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAddANewModeratorToTheCommunityResponse(rsp)
+	return ParseAddModeratorResponse(rsp)
 }
 
-func (c *ClientWithResponses) AddANewModeratorToTheCommunityWithResponse(ctx context.Context, params *AddANewModeratorToTheCommunityParams, body AddANewModeratorToTheCommunityJSONRequestBody, reqEditors ...RequestEditorFn) (*AddANewModeratorToTheCommunityResponse, error) {
-	rsp, err := c.AddANewModeratorToTheCommunity(ctx, params, body, reqEditors...)
+func (c *ClientWithResponses) AddModeratorWithResponse(ctx context.Context, params *AddModeratorParams, body AddModeratorJSONRequestBody, reqEditors ...RequestEditorFn) (*AddModeratorResponse, error) {
+	rsp, err := c.AddModerator(ctx, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return ParseAddANewModeratorToTheCommunityResponse(rsp)
+	return ParseAddModeratorResponse(rsp)
 }
 
 // DeleteCommunityWithResponse request returning *DeleteCommunityResponse
@@ -2977,15 +2977,15 @@ func ParseGetCommunityModeratorsResponse(rsp *http.Response) (*GetCommunityModer
 	return response, nil
 }
 
-// ParseAddANewModeratorToTheCommunityResponse parses an HTTP response from a AddANewModeratorToTheCommunityWithResponse call
-func ParseAddANewModeratorToTheCommunityResponse(rsp *http.Response) (*AddANewModeratorToTheCommunityResponse, error) {
+// ParseAddModeratorResponse parses an HTTP response from a AddModeratorWithResponse call
+func ParseAddModeratorResponse(rsp *http.Response) (*AddModeratorResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &AddANewModeratorToTheCommunityResponse{
+	response := &AddModeratorResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -3184,31 +3184,31 @@ func ParseUpdatePostResponse(rsp *http.Response) (*UpdatePostResponse, error) {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"ieWnxeLSJyn13y5x8VT8GwAA//9kPjI8li4AAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

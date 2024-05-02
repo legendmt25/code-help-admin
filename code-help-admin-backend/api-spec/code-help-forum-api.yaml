@@ -123,7 +123,7 @@ paths:
     patch:
       tags:
         - community
-      operationId: Add a new moderator to the community
+      operationId: addModerator
       description: Add a new moderator to the
       requestBody:
         content:

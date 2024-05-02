@@ -14,6 +14,7 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/oapi-codegen/runtime"
@@ -34,8 +35,18 @@ const (
 	MEDIUM Difficulty = "MEDIUM"
 )
 
+// Categories defines model for Categories.
+type Categories struct {
+	Categories []ForumCategory `json:"categories"`
+}
+
 // Category defines model for Category.
 type Category struct {
+	Name string `json:"name"`
+}
+
+// CategoryCreate defines model for CategoryCreate.
+type CategoryCreate struct {
 	Name string `json:"name"`
 }
 
@@ -46,6 +57,52 @@ type CategoryResponse struct {
 
 // Code defines model for Code.
 type Code = string
+
+// Comment defines model for Comment.
+type Comment struct {
+	Content  string    `json:"content"`
+	Created  time.Time `json:"created"`
+	Modified time.Time `json:"modified"`
+	Replies  *struct {
+		Count   int        `json:"count"`
+		Replies *[]Comment `json:"replies,omitempty"`
+	} `json:"replies,omitempty"`
+	Uid  string `json:"uid"`
+	User User   `json:"user"`
+}
+
+// CommentRequest defines model for CommentRequest.
+type CommentRequest struct {
+	Content string `json:"content"`
+}
+
+// Comments defines model for Comments.
+type Comments struct {
+	Comments *[]Comment `json:"comments,omitempty"`
+}
+
+// Community defines model for Community.
+type Community struct {
+	Admin       User        `json:"admin"`
+	Categories  []Category  `json:"categories"`
+	Created     time.Time   `json:"created"`
+	Description string      `json:"description"`
+	Image       *string     `json:"image,omitempty"`
+	Joined      bool        `json:"joined"`
+	Moderators  []User      `json:"moderators"`
+	Name        string      `json:"name"`
+	Posts       []ShortPost `json:"posts"`
+}
+
+// CommunityRequest defines model for CommunityRequest.
+type CommunityRequest struct {
+	Categories *struct {
+		Uids *[]string `json:"uids,omitempty"`
+	} `json:"categories,omitempty"`
+	Description string  `json:"description"`
+	Image       *string `json:"image,omitempty"`
+	Name        string  `json:"name"`
+}
 
 // Contest defines model for Contest.
 type Contest struct {
@@ -110,6 +167,34 @@ type Date = openapi_types.Date
 // Difficulty defines model for Difficulty.
 type Difficulty string
 
+// ForumCategory defines model for ForumCategory.
+type ForumCategory struct {
+	Name string `json:"name"`
+	Uid  string `json:"uid"`
+}
+
+// ModeratorRequest defines model for ModeratorRequest.
+type ModeratorRequest struct {
+	Username string `json:"username"`
+}
+
+// Post defines model for Post.
+type Post struct {
+	Comments []Comment `json:"comments"`
+	Content  string    `json:"content"`
+	Created  time.Time `json:"created"`
+	Modified time.Time `json:"modified"`
+	Title    string    `json:"title"`
+	Uid      string    `json:"uid"`
+	User     User      `json:"user"`
+}
+
+// PostRequest defines model for PostRequest.
+type PostRequest struct {
+	Content string `json:"content"`
+	Title   string `json:"title"`
+}
+
 // Problem defines model for Problem.
 type Problem struct {
 	Category   *Category  `json:"category,omitempty"`
@@ -146,6 +231,32 @@ type ProblemResponse struct {
 	Problems []Problem `json:"problems"`
 }
 
+// ShortCommunities defines model for ShortCommunities.
+type ShortCommunities struct {
+	Communities []ShortCommunity `json:"communities"`
+}
+
+// ShortCommunity defines model for ShortCommunity.
+type ShortCommunity struct {
+	Categories  *[]Category `json:"categories,omitempty"`
+	Description string      `json:"description"`
+	Image       *string     `json:"image,omitempty"`
+	Name        string      `json:"name"`
+}
+
+// ShortPost defines model for ShortPost.
+type ShortPost struct {
+	Created time.Time `json:"created"`
+	Title   string    `json:"title"`
+	Uid     string    `json:"uid"`
+	User    User      `json:"user"`
+}
+
+// ShortPosts defines model for ShortPosts.
+type ShortPosts struct {
+	Posts *[]ShortPost `json:"posts,omitempty"`
+}
+
 // TestCase defines model for TestCase.
 type TestCase = string
 
@@ -156,6 +267,16 @@ type TestCases = []struct {
 	Out *TestCase `json:"out,omitempty"`
 }
 
+// User defines model for User.
+type User struct {
+	Username string `json:"username"`
+}
+
+// Users defines model for Users.
+type Users struct {
+	Users []User `json:"users"`
+}
+
 // CategoryName defines model for CategoryName.
 type CategoryName = string
 
@@ -164,6 +285,62 @@ type ContestId = int64
 
 // ProblemId defines model for ProblemId.
 type ProblemId = int64
+
+// GetCommentsForPostParams defines parameters for GetCommentsForPost.
+type GetCommentsForPostParams struct {
+	// Post Post uid
+	Post string `form:"post" json:"post"`
+}
+
+// CommentOnPostParams defines parameters for CommentOnPost.
+type CommentOnPostParams struct {
+	// Post Post uid
+	Post string `form:"post" json:"post"`
+}
+
+// LeaveCommunityParams defines parameters for LeaveCommunity.
+type LeaveCommunityParams struct {
+	// Community Community uid
+	Community string `form:"community" json:"community"`
+}
+
+// JoinCommunityParams defines parameters for JoinCommunity.
+type JoinCommunityParams struct {
+	// Community Community name
+	Community string `form:"community" json:"community"`
+}
+
+// RemoveModeratorParams defines parameters for RemoveModerator.
+type RemoveModeratorParams struct {
+	// Community Community name
+	Community string `form:"community" json:"community"`
+
+	// Username moderator to remove
+	Username string `form:"username" json:"username"`
+}
+
+// GetCommunityModeratorsParams defines parameters for GetCommunityModerators.
+type GetCommunityModeratorsParams struct {
+	// Name Community uid
+	Name string `form:"name" json:"name"`
+}
+
+// AddModeratorParams defines parameters for AddModerator.
+type AddModeratorParams struct {
+	// Community Community name
+	Community string `form:"community" json:"community"`
+}
+
+// GetPostsParams defines parameters for GetPosts.
+type GetPostsParams struct {
+	// Community Community name
+	Community *string `form:"community,omitempty" json:"community,omitempty"`
+}
+
+// CreateCommunityPostParams defines parameters for CreateCommunityPost.
+type CreateCommunityPostParams struct {
+	Community string `form:"community" json:"community"`
+}
 
 // CreateProblemParams defines parameters for CreateProblem.
 type CreateProblemParams struct {
@@ -181,6 +358,33 @@ type CreateContestJSONRequestBody = ContestRequest
 
 // UpdateContestJSONRequestBody defines body for UpdateContest for application/json ContentType.
 type UpdateContestJSONRequestBody = ContestEditRequest
+
+// CreateForumCategoryJSONRequestBody defines body for CreateForumCategory for application/json ContentType.
+type CreateForumCategoryJSONRequestBody = CategoryCreate
+
+// CommentOnPostJSONRequestBody defines body for CommentOnPost for application/json ContentType.
+type CommentOnPostJSONRequestBody = CommentRequest
+
+// ReplyToCommentJSONRequestBody defines body for ReplyToComment for application/json ContentType.
+type ReplyToCommentJSONRequestBody = CommentRequest
+
+// UpdateCommentJSONRequestBody defines body for UpdateComment for application/json ContentType.
+type UpdateCommentJSONRequestBody = CommentRequest
+
+// CreateCommunityJSONRequestBody defines body for CreateCommunity for application/json ContentType.
+type CreateCommunityJSONRequestBody = CommunityRequest
+
+// AddModeratorJSONRequestBody defines body for AddModerator for application/json ContentType.
+type AddModeratorJSONRequestBody = ModeratorRequest
+
+// UpdateCommunityJSONRequestBody defines body for UpdateCommunity for application/json ContentType.
+type UpdateCommunityJSONRequestBody = CommunityRequest
+
+// CreateCommunityPostJSONRequestBody defines body for CreateCommunityPost for application/json ContentType.
+type CreateCommunityPostJSONRequestBody = PostRequest
+
+// UpdatePostJSONRequestBody defines body for UpdatePost for application/json ContentType.
+type UpdatePostJSONRequestBody = PostRequest
 
 // CreateProblemJSONRequestBody defines body for CreateProblem for application/json ContentType.
 type CreateProblemJSONRequestBody = ProblemRequest
@@ -214,6 +418,75 @@ type ServerInterface interface {
 
 	// (PUT /contests/{id})
 	UpdateContest(w http.ResponseWriter, r *http.Request, id ContestId)
+
+	// (GET /forum/category)
+	GetAllForumCategories(w http.ResponseWriter, r *http.Request)
+
+	// (POST /forum/category)
+	CreateForumCategory(w http.ResponseWriter, r *http.Request)
+
+	// (GET /forum/comment)
+	GetCommentsForPost(w http.ResponseWriter, r *http.Request, params GetCommentsForPostParams)
+
+	// (POST /forum/comment)
+	CommentOnPost(w http.ResponseWriter, r *http.Request, params CommentOnPostParams)
+
+	// (DELETE /forum/comment/{uid})
+	DeleteComment(w http.ResponseWriter, r *http.Request, uid string)
+
+	// (GET /forum/comment/{uid})
+	GetCommentReplies(w http.ResponseWriter, r *http.Request, uid string)
+
+	// (POST /forum/comment/{uid})
+	ReplyToComment(w http.ResponseWriter, r *http.Request, uid string)
+
+	// (PUT /forum/comment/{uid})
+	UpdateComment(w http.ResponseWriter, r *http.Request, uid string)
+
+	// (GET /forum/community)
+	GetAllCommunities(w http.ResponseWriter, r *http.Request)
+
+	// (POST /forum/community)
+	CreateCommunity(w http.ResponseWriter, r *http.Request)
+
+	// (DELETE /forum/community/member)
+	LeaveCommunity(w http.ResponseWriter, r *http.Request, params LeaveCommunityParams)
+
+	// (PATCH /forum/community/member)
+	JoinCommunity(w http.ResponseWriter, r *http.Request, params JoinCommunityParams)
+
+	// (DELETE /forum/community/moderator)
+	RemoveModerator(w http.ResponseWriter, r *http.Request, params RemoveModeratorParams)
+
+	// (GET /forum/community/moderator)
+	GetCommunityModerators(w http.ResponseWriter, r *http.Request, params GetCommunityModeratorsParams)
+
+	// (PATCH /forum/community/moderator)
+	AddModerator(w http.ResponseWriter, r *http.Request, params AddModeratorParams)
+
+	// (DELETE /forum/community/{name})
+	DeleteCommunity(w http.ResponseWriter, r *http.Request, name string)
+
+	// (GET /forum/community/{name})
+	GetCommunityByUid(w http.ResponseWriter, r *http.Request, name string)
+
+	// (PUT /forum/community/{name})
+	UpdateCommunity(w http.ResponseWriter, r *http.Request, name string)
+
+	// (GET /forum/post)
+	GetPosts(w http.ResponseWriter, r *http.Request, params GetPostsParams)
+
+	// (POST /forum/post)
+	CreateCommunityPost(w http.ResponseWriter, r *http.Request, params CreateCommunityPostParams)
+
+	// (DELETE /forum/post/{uid})
+	DeletePost(w http.ResponseWriter, r *http.Request, uid string)
+
+	// (GET /forum/post/{uid})
+	GetPost(w http.ResponseWriter, r *http.Request, uid string)
+
+	// (PUT /forum/post/{uid})
+	UpdatePost(w http.ResponseWriter, r *http.Request, uid string)
 
 	// (GET /problems)
 	GetAllProblems(w http.ResponseWriter, r *http.Request)
@@ -395,6 +668,649 @@ func (siw *ServerInterfaceWrapper) UpdateContest(w http.ResponseWriter, r *http.
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateContest(w, r, id)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetAllForumCategories operation middleware
+func (siw *ServerInterfaceWrapper) GetAllForumCategories(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetAllForumCategories(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreateForumCategory operation middleware
+func (siw *ServerInterfaceWrapper) CreateForumCategory(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateForumCategory(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetCommentsForPost operation middleware
+func (siw *ServerInterfaceWrapper) GetCommentsForPost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetCommentsForPostParams
+
+	// ------------- Required query parameter "post" -------------
+
+	if paramValue := r.URL.Query().Get("post"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "post"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "post", r.URL.Query(), &params.Post)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "post", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCommentsForPost(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CommentOnPost operation middleware
+func (siw *ServerInterfaceWrapper) CommentOnPost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CommentOnPostParams
+
+	// ------------- Required query parameter "post" -------------
+
+	if paramValue := r.URL.Query().Get("post"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "post"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "post", r.URL.Query(), &params.Post)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "post", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CommentOnPost(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteComment operation middleware
+func (siw *ServerInterfaceWrapper) DeleteComment(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "uid" -------------
+	var uid string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uid", r.PathValue("uid"), &uid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "uid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteComment(w, r, uid)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetCommentReplies operation middleware
+func (siw *ServerInterfaceWrapper) GetCommentReplies(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "uid" -------------
+	var uid string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uid", r.PathValue("uid"), &uid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "uid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCommentReplies(w, r, uid)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// ReplyToComment operation middleware
+func (siw *ServerInterfaceWrapper) ReplyToComment(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "uid" -------------
+	var uid string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uid", r.PathValue("uid"), &uid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "uid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ReplyToComment(w, r, uid)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// UpdateComment operation middleware
+func (siw *ServerInterfaceWrapper) UpdateComment(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "uid" -------------
+	var uid string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uid", r.PathValue("uid"), &uid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "uid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateComment(w, r, uid)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetAllCommunities operation middleware
+func (siw *ServerInterfaceWrapper) GetAllCommunities(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetAllCommunities(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreateCommunity operation middleware
+func (siw *ServerInterfaceWrapper) CreateCommunity(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateCommunity(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// LeaveCommunity operation middleware
+func (siw *ServerInterfaceWrapper) LeaveCommunity(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params LeaveCommunityParams
+
+	// ------------- Required query parameter "community" -------------
+
+	if paramValue := r.URL.Query().Get("community"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "community"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "community", r.URL.Query(), &params.Community)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "community", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.LeaveCommunity(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// JoinCommunity operation middleware
+func (siw *ServerInterfaceWrapper) JoinCommunity(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params JoinCommunityParams
+
+	// ------------- Required query parameter "community" -------------
+
+	if paramValue := r.URL.Query().Get("community"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "community"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "community", r.URL.Query(), &params.Community)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "community", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.JoinCommunity(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// RemoveModerator operation middleware
+func (siw *ServerInterfaceWrapper) RemoveModerator(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RemoveModeratorParams
+
+	// ------------- Required query parameter "community" -------------
+
+	if paramValue := r.URL.Query().Get("community"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "community"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "community", r.URL.Query(), &params.Community)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "community", Err: err})
+		return
+	}
+
+	// ------------- Required query parameter "username" -------------
+
+	if paramValue := r.URL.Query().Get("username"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "username"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "username", r.URL.Query(), &params.Username)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "username", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RemoveModerator(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetCommunityModerators operation middleware
+func (siw *ServerInterfaceWrapper) GetCommunityModerators(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetCommunityModeratorsParams
+
+	// ------------- Required query parameter "name" -------------
+
+	if paramValue := r.URL.Query().Get("name"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "name"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "name", r.URL.Query(), &params.Name)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCommunityModerators(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// AddModerator operation middleware
+func (siw *ServerInterfaceWrapper) AddModerator(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params AddModeratorParams
+
+	// ------------- Required query parameter "community" -------------
+
+	if paramValue := r.URL.Query().Get("community"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "community"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "community", r.URL.Query(), &params.Community)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "community", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.AddModerator(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeleteCommunity operation middleware
+func (siw *ServerInterfaceWrapper) DeleteCommunity(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", r.PathValue("name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteCommunity(w, r, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetCommunityByUid operation middleware
+func (siw *ServerInterfaceWrapper) GetCommunityByUid(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", r.PathValue("name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCommunityByUid(w, r, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// UpdateCommunity operation middleware
+func (siw *ServerInterfaceWrapper) UpdateCommunity(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "name" -------------
+	var name string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "name", r.PathValue("name"), &name, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "name", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateCommunity(w, r, name)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetPosts operation middleware
+func (siw *ServerInterfaceWrapper) GetPosts(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetPostsParams
+
+	// ------------- Optional query parameter "community" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "community", r.URL.Query(), &params.Community)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "community", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetPosts(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// CreateCommunityPost operation middleware
+func (siw *ServerInterfaceWrapper) CreateCommunityPost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateCommunityPostParams
+
+	// ------------- Required query parameter "community" -------------
+
+	if paramValue := r.URL.Query().Get("community"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "community"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "community", r.URL.Query(), &params.Community)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "community", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateCommunityPost(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// DeletePost operation middleware
+func (siw *ServerInterfaceWrapper) DeletePost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "uid" -------------
+	var uid string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uid", r.PathValue("uid"), &uid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "uid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeletePost(w, r, uid)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// GetPost operation middleware
+func (siw *ServerInterfaceWrapper) GetPost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "uid" -------------
+	var uid string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uid", r.PathValue("uid"), &uid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "uid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetPost(w, r, uid)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r.WithContext(ctx))
+}
+
+// UpdatePost operation middleware
+func (siw *ServerInterfaceWrapper) UpdatePost(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "uid" -------------
+	var uid string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "uid", r.PathValue("uid"), &uid, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "uid", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdatePost(w, r, uid)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -647,6 +1563,29 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc("DELETE "+options.BaseURL+"/contests/{id}", wrapper.DeleteContest)
 	m.HandleFunc("GET "+options.BaseURL+"/contests/{id}", wrapper.GetContest)
 	m.HandleFunc("PUT "+options.BaseURL+"/contests/{id}", wrapper.UpdateContest)
+	m.HandleFunc("GET "+options.BaseURL+"/forum/category", wrapper.GetAllForumCategories)
+	m.HandleFunc("POST "+options.BaseURL+"/forum/category", wrapper.CreateForumCategory)
+	m.HandleFunc("GET "+options.BaseURL+"/forum/comment", wrapper.GetCommentsForPost)
+	m.HandleFunc("POST "+options.BaseURL+"/forum/comment", wrapper.CommentOnPost)
+	m.HandleFunc("DELETE "+options.BaseURL+"/forum/comment/{uid}", wrapper.DeleteComment)
+	m.HandleFunc("GET "+options.BaseURL+"/forum/comment/{uid}", wrapper.GetCommentReplies)
+	m.HandleFunc("POST "+options.BaseURL+"/forum/comment/{uid}", wrapper.ReplyToComment)
+	m.HandleFunc("PUT "+options.BaseURL+"/forum/comment/{uid}", wrapper.UpdateComment)
+	m.HandleFunc("GET "+options.BaseURL+"/forum/community", wrapper.GetAllCommunities)
+	m.HandleFunc("POST "+options.BaseURL+"/forum/community", wrapper.CreateCommunity)
+	m.HandleFunc("DELETE "+options.BaseURL+"/forum/community/member", wrapper.LeaveCommunity)
+	m.HandleFunc("PATCH "+options.BaseURL+"/forum/community/member", wrapper.JoinCommunity)
+	m.HandleFunc("DELETE "+options.BaseURL+"/forum/community/moderator", wrapper.RemoveModerator)
+	m.HandleFunc("GET "+options.BaseURL+"/forum/community/moderator", wrapper.GetCommunityModerators)
+	m.HandleFunc("PATCH "+options.BaseURL+"/forum/community/moderator", wrapper.AddModerator)
+	m.HandleFunc("DELETE "+options.BaseURL+"/forum/community/{name}", wrapper.DeleteCommunity)
+	m.HandleFunc("GET "+options.BaseURL+"/forum/community/{name}", wrapper.GetCommunityByUid)
+	m.HandleFunc("PUT "+options.BaseURL+"/forum/community/{name}", wrapper.UpdateCommunity)
+	m.HandleFunc("GET "+options.BaseURL+"/forum/post", wrapper.GetPosts)
+	m.HandleFunc("POST "+options.BaseURL+"/forum/post", wrapper.CreateCommunityPost)
+	m.HandleFunc("DELETE "+options.BaseURL+"/forum/post/{uid}", wrapper.DeletePost)
+	m.HandleFunc("GET "+options.BaseURL+"/forum/post/{uid}", wrapper.GetPost)
+	m.HandleFunc("PUT "+options.BaseURL+"/forum/post/{uid}", wrapper.UpdatePost)
 	m.HandleFunc("GET "+options.BaseURL+"/problems", wrapper.GetAllProblems)
 	m.HandleFunc("POST "+options.BaseURL+"/problems", wrapper.CreateProblem)
 	m.HandleFunc("DELETE "+options.BaseURL+"/problems/{id}", wrapper.DeleteProblem)
@@ -659,29 +1598,47 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+RYT2/buBP9KgT7O/wWUC05TXvwzbHd1thtHMTpYdHkwEhjm61EKhSVrhHouy9I0RL1",
-	"z5YXdorFnlo5w+HMe2+GQ75gn0cxZ8BkgkcvOCaCRCBB6K8JkbDmYntNIlDflOERjoncYAcz/Vv+j4MF",
-	"PKVUQIBHUqTg4MTfQETUGrmNlV0iBWVrnGUOnnAmIZHzoMMlDfY6XHEREansmPxwiZ3dDpRJWIPQW9wI",
-	"/hhCdL4tsp15BSeNoOAxCElB/4UZ5OAvEsWh8nFFGRFbJAVAUnq24CnD+pYvfyis+ON38CVWGJodbyGJ",
-	"OUugubOfW5gvKiHS//mfgBUe4TduybtrMnGLNLJiRyIE2TbCsny3BseDWtKrlPmScob+T8R6+Bt6uWcI",
-	"uS7yeQBozSFBGxBwz7J71sSkUEwzySAVRPmt7jbcvPMi7JQ0FmYtvmnQi3GnhUoTFjI10HCdSCJksmCH",
-	"cJ8SCcZepodZyndd5sZ1arSyTUDGn2PnX8TUTpx2PQVJaKjiIGG4WOHRt14R4cyp8xPndXiEBHNXpn4P",
-	"CrHw38zmocxnFlB5C0+pkdBRSe3W9cytVoOVbOZ9lZb4XIDVO+3O1uCsgU83DjtUe2NQ0vAKmVUaTN39",
-	"buleni2OT94m/h3Vb2I5st73HCK5wdH1e/gE2TneE9ayAARYGqlVi5vZNXbw8m58ezebYgdP/lgsZ1PL",
-	"SQm/hrVC2IV3cfHWe/92+KFCurJrW09XK+qnodzaEczGyz+xg7/MpvOvX7CDP49v9fblLsai4c8qvtaD",
-	"envM6RxUgturrtLymMNOUhlC+/jWOG1y20pQbawaAI49XLp7UETEj4D/rFX1mzfo7idHyzQaDAbINGkU",
-	"QOILGndVt0gZA7GbW/YLPICiuo9bojQ9IQkcLKK7wrCOd5FyNYBKAvZG7e3SQNrZLl9Tkf8FEq1yKlNU",
-	"+SVpdPAK0FJdzgl0YKmgq/kfPbydYGpz8A63Klrjq8kUfZxfT9GnxT2bTK6srzYt3Nk0dUxnvZshZX3J",
-	"VtY8lf3Ne0x0OoAV1804l5G+YKHPEMZoHERUAfAMItEDDh4OvIGn44iBkZjiEX438AZD7Og7sM7crV4O",
-	"16AjVtjosUGNc/gTyHEYTkpDxWEuFb3owvOKCYHlc3Uch9TXHtzvST5tlXfqPo2k0KLO2i73EV78nqNF",
-	"1ol1Bd1i1dBinrRkMBFAJBRNKtcgJPKKB9uTh65CzhoQvdPTZyWPPKpg0JVN5tj0uC9qpMu0eNOWHL/G",
-	"QTVH+wGn42QtTdzKA0/28CsgumxCdM2R2XighHyZK61qc0UCZII1Rq2OJFrxlB1A2xpy95XCzuychVAb",
-	"yFvrYIDGYYiKqCuZmfH7YFEYuzMRXrs696yMkvaOnGyy3BcaZLmPEPJJv5roVP9eJnpkYRRvlHlV9Jds",
-	"Jx9d0jpLiCeXpBnbOwRZXPu6tLind50o/bPJ2H49apWy9w+lbM9Xe/rOzc7sjCTXZ8HD568JvtJp2g46",
-	"RIrxnTIkN4Aeif8DmLo4tnWm3QzZkIN+xX9KQZ9y5hnfLzRgv94XU+OF0+Ml/0ziqd2xWoUz7JwOOqC2",
-	"VdOzAXbieaC8yqe33g1w0qJ4WyZdGj9LiCevjX0NcO8A8lENIMrifVunmDMJgpEQJSCeQSAQgovuSuvu",
-	"o6dC8deUwivSlcPVWWKZg3MqcvRqVMfA0PhmjpIYfLoyEWIHpyLEI7yRMh65bsh9Em54IkeXnue5JKbu",
-	"8xBnD9nfAQAA//+AMX8+bh0AAA==",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
