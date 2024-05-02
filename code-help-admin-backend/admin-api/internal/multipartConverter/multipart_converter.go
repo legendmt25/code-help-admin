@@ -1,9 +1,9 @@
-package multipart_converter
+package multipartConverter
 
 import (
 	"bytes"
 	"fmt"
-	openapi_types "github.com/oapi-codegen/runtime/types"
+	openapitypes "github.com/oapi-codegen/runtime/types"
 	"io"
 	"mime/multipart"
 	"reflect"
@@ -50,8 +50,8 @@ func EncodeMultipartFormData(data any, body *bytes.Buffer) (io.Reader, string) {
 
 		if it.value.Kind() == reflect.Struct {
 			switch it.value.Interface().(type) {
-			case openapi_types.File:
-				file := it.value.Interface().(openapi_types.File)
+			case openapitypes.File:
+				file := it.value.Interface().(openapitypes.File)
 				field, err := writer.CreateFormFile(it.key, file.Filename())
 				if err != nil {
 					continue

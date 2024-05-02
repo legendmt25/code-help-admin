@@ -19,18 +19,21 @@ func MapClientProblemDetailToResponse(clientProblem codeHelpAdminCoreGen.Problem
 	}
 }
 
-func MapAllClientProblemToResponse(clientProblems []codeHelpAdminCoreGen.Problem) []codeHelpAdminGen.Problem {
-	clientProblemSize := len(clientProblems)
-	if clientProblemSize == 0 {
-		return make([]codeHelpAdminGen.Problem, 0)
+func MapAllClientProblemToResponse(clientProblems *codeHelpAdminCoreGen.ProblemResponse) *codeHelpAdminGen.ProblemResponse {
+	if clientProblems == nil || len(clientProblems.Problems) <= 0 {
+		return &codeHelpAdminGen.ProblemResponse{
+			Problems: make([]codeHelpAdminGen.Problem, 0),
+		}
 	}
 
-	problems := make([]codeHelpAdminGen.Problem, clientProblemSize)
-	for i, clientProblem := range clientProblems {
+	problems := make([]codeHelpAdminGen.Problem, len(clientProblems.Problems))
+	for i, clientProblem := range clientProblems.Problems {
 		problems[i] = mapClientProblemToResponse(clientProblem)
 	}
 
-	return problems
+	return &codeHelpAdminGen.ProblemResponse{
+		Problems: problems,
+	}
 }
 
 func mapClientProblemToResponse(clientProblem codeHelpAdminCoreGen.Problem) codeHelpAdminGen.Problem {
@@ -176,16 +179,19 @@ func mapClientContestToResponse(clientContest codeHelpAdminCoreGen.Contest) code
 	}
 }
 
-func MapAllCategoryToResponse(clientCategories []codeHelpAdminCoreGen.Category) []codeHelpAdminGen.Category {
-	clientCategorySize := len(clientCategories)
-	if clientCategorySize == 0 {
-		return make([]codeHelpAdminGen.Category, 0)
+func MapAllCategoryToResponse(clientCategories *codeHelpAdminCoreGen.CategoryResponse) *codeHelpAdminGen.CategoryResponse {
+	if clientCategories == nil || len(clientCategories.Categories) <= 0 {
+		return &codeHelpAdminGen.CategoryResponse{
+			Categories: make([]codeHelpAdminGen.Category, 0),
+		}
 	}
 
-	categories := make([]codeHelpAdminGen.Category, clientCategorySize)
-	for i, clientCategory := range clientCategories {
+	categories := make([]codeHelpAdminGen.Category, len(clientCategories.Categories))
+	for i, clientCategory := range clientCategories.Categories {
 		categories[i] = *mapCategoryToResponse(&clientCategory)
 	}
 
-	return categories
+	return &codeHelpAdminGen.CategoryResponse{
+		Categories: categories,
+	}
 }

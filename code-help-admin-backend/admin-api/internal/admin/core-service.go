@@ -1,7 +1,7 @@
 package admin
 
 import (
-	multipart_converter "admin-api/internal"
+	"admin-api/internal/multipartConverter"
 	codeHelpAdminCoreGen "api-spec/generated/code-help-admin-core"
 	"bytes"
 	"context"
@@ -12,9 +12,9 @@ import (
 type ProblemCoreService interface {
 	GetProblem(ctx context.Context, id codeHelpAdminCoreGen.ProblemId) (*codeHelpAdminCoreGen.ProblemDetail, error)
 
-	GetProblems(ctx context.Context) ([]codeHelpAdminCoreGen.Problem, error)
+	GetProblems(ctx context.Context) (*codeHelpAdminCoreGen.ProblemResponse, int, error)
 
-	CreateProblem(ctx context.Context, contestId *codeHelpAdminCoreGen.ContestId, req codeHelpAdminCoreGen.CreateProblemMultipartRequestBody) error
+	CreateProblem(ctx context.Context, contestId *codeHelpAdminCoreGen.ContestId, req codeHelpAdminCoreGen.CreateProblemMultipartRequestBody) (int, error)
 
 	UpdateProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId, req codeHelpAdminCoreGen.UpdateProblemMultipartRequestBody) *codeHelpAdminCoreGen.ProblemDetail
 
@@ -30,7 +30,7 @@ type ProblemCoreService interface {
 
 	DeleteContest(ctx context.Context, contestId codeHelpAdminCoreGen.ContestId) bool
 
-	GetAllCategories(ctx context.Context) ([]codeHelpAdminCoreGen.Category, error)
+	GetAllCategories(ctx context.Context) (*codeHelpAdminCoreGen.CategoryResponse, int, error)
 
 	CreateCategory(ctx context.Context, category codeHelpAdminCoreGen.CreateCategoryJSONRequestBody) bool
 
@@ -56,7 +56,8 @@ type problemCoreServiceImpl struct {
 
 func NewCoreService(client codeHelpAdminCoreGen.ClientInterface) ProblemCoreService {
 	return &problemCoreServiceImpl{
-		client:          client,
+		client: client,
+
 		problemDecoder:  NewProblemDecoder(),
 		contestDecoder:  NewContestDecoder(),
 		categoryDecoder: NewCategoryDecoder(),
@@ -73,33 +74,37 @@ func (it *problemCoreServiceImpl) GetProblem(ctx context.Context, id codeHelpAdm
 	return it.problemDecoder.DecodeDetail(response), nil
 }
 
-func (it *problemCoreServiceImpl) GetProblems(ctx context.Context) ([]codeHelpAdminCoreGen.Problem, error) {
+func (it *problemCoreServiceImpl) GetProblems(ctx context.Context) (*codeHelpAdminCoreGen.ProblemResponse, int, error) {
 	response, err := it.client.GetAllProblems(ctx)
 	if err != nil {
 		log.Errorf("Request Failed %s\n", err.Error())
-		return []codeHelpAdminCoreGen.Problem{}, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return it.problemDecoder.DecodeAll(response), nil
+	if response.StatusCode != http.StatusOK {
+		return nil, response.StatusCode, nil
+	}
+
+	return it.problemDecoder.DecodeAll(response), http.StatusOK, nil
 }
 
-func (it *problemCoreServiceImpl) CreateProblem(ctx context.Context, contestId *codeHelpAdminCoreGen.ContestId, req codeHelpAdminCoreGen.CreateProblemMultipartRequestBody) error {
+func (it *problemCoreServiceImpl) CreateProblem(ctx context.Context, contestId *codeHelpAdminCoreGen.ContestId, req codeHelpAdminCoreGen.CreateProblemMultipartRequestBody) (int, error) {
 	var body = &bytes.Buffer{}
-	_, contentType := multipart_converter.EncodeMultipartFormData(req, body)
-	_, err := it.client.CreateProblemWithBody(ctx, &codeHelpAdminCoreGen.CreateProblemParams{
+	_, contentType := multipartConverter.EncodeMultipartFormData(req, body)
+	res, err := it.client.CreateProblemWithBody(ctx, &codeHelpAdminCoreGen.CreateProblemParams{
 		ContestId: contestId,
 	}, contentType, body)
 	if err != nil {
 		log.Error("Error: ", err)
-		return nil
+		return http.StatusOK, nil
 	}
 
-	return err
+	return res.StatusCode, err
 }
 
 func (it *problemCoreServiceImpl) UpdateProblem(ctx context.Context, problemId codeHelpAdminCoreGen.ProblemId, req codeHelpAdminCoreGen.UpdateProblemMultipartRequestBody) *codeHelpAdminCoreGen.ProblemDetail {
 	var body = &bytes.Buffer{}
-	_, contentType := multipart_converter.EncodeMultipartFormData(req, body)
+	_, contentType := multipartConverter.EncodeMultipartFormData(req, body)
 	response, err := it.client.UpdateProblemWithBody(ctx, problemId, contentType, body)
 	if err != nil {
 		log.Fatal(err)
@@ -189,14 +194,18 @@ func (it *problemCoreServiceImpl) DeleteContest(ctx context.Context, contestId c
 	return false
 }
 
-func (it *problemCoreServiceImpl) GetAllCategories(ctx context.Context) ([]codeHelpAdminCoreGen.Category, error) {
+func (it *problemCoreServiceImpl) GetAllCategories(ctx context.Context) (*codeHelpAdminCoreGen.CategoryResponse, int, error) {
 	response, err := it.client.GetAllCategories(ctx)
 	if err != nil {
 		log.Error(err)
-		return []codeHelpAdminCoreGen.Category{}, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return it.categoryDecoder.DecodeAll(response), nil
+	if response.StatusCode != http.StatusOK {
+		return nil, response.StatusCode, nil
+	}
+
+	return it.categoryDecoder.DecodeAll(response), http.StatusOK, nil
 }
 
 func (it *problemCoreServiceImpl) CreateCategory(ctx context.Context, body codeHelpAdminCoreGen.CreateCategoryJSONRequestBody) bool {

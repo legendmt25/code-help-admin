@@ -6,8 +6,9 @@ import (
 )
 
 type Environment struct {
-	CoreServerUrl string
-	Oauth2Jwt     Oauth2Jwt
+	CoreServerUrl  string
+	ForumServerUrl string
+	Oauth2Jwt      Oauth2Jwt
 }
 
 type Oauth2Jwt struct {
@@ -17,12 +18,13 @@ type Oauth2Jwt struct {
 
 func Load() Environment {
 	return Environment{
-		CoreServerUrl: getAdminApiServerUtl(),
-		Oauth2Jwt:     getOauth2JwtData(),
+		CoreServerUrl:  getAdminApiServerUrl(),
+		ForumServerUrl: getForumApiServerUrl(),
+		Oauth2Jwt:      getOauth2JwtData(),
 	}
 }
 
-func getAdminApiServerUtl() string {
+func getAdminApiServerUrl() string {
 	envValue := os.Getenv("CORE_ADMIN_API_SERVER_URL")
 
 	if isNotBlank(envValue) {
@@ -30,6 +32,16 @@ func getAdminApiServerUtl() string {
 	}
 
 	return "http://localhost:3000/api"
+}
+
+func getForumApiServerUrl() string {
+	envValue := os.Getenv("FORUM_API_SERVER_URL")
+
+	if isNotBlank(envValue) {
+		return envValue
+	}
+
+	return "http://localhost:3001/api/v1"
 }
 
 func getOauth2JwtData() Oauth2Jwt {

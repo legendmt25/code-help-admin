@@ -2,9 +2,11 @@ package api
 
 import (
 	"admin-api/internal/admin"
-	api_mapper "admin-api/internal/api/mapper"
+	"admin-api/internal/admin/forum"
+	apimapper "admin-api/internal/api/mapper"
 	codeHelpAdminGen "api-spec/generated/code-help-admin"
 	codeHelpAdminCoreGen "api-spec/generated/code-help-admin-core"
+	codeHelpForumGen "api-spec/generated/code-help-forum"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -20,11 +22,15 @@ func (it AdminApiServer) Serve() {
 }
 
 type ServerInterfaceImpl struct {
-	coreService admin.ProblemCoreService
+	coreService  admin.ProblemCoreService
+	forumService forum.Service
 }
 
-func NewServiceInterfaceImpl(coreService admin.ProblemCoreService) codeHelpAdminGen.ServerInterface {
-	return &ServerInterfaceImpl{coreService}
+func NewServiceInterfaceImpl(coreService admin.ProblemCoreService, forumService forum.Service) codeHelpAdminGen.ServerInterface {
+	return &ServerInterfaceImpl{
+		coreService:  coreService,
+		forumService: forumService,
+	}
 }
 
 func (it *ServerInterfaceImpl) GetProblem(w http.ResponseWriter, r *http.Request, id codeHelpAdminGen.ProblemId) {
@@ -34,37 +40,36 @@ func (it *ServerInterfaceImpl) GetProblem(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(api_mapper.MapClientProblemDetailToResponse(*problem))
+	_ = json.NewEncoder(w).Encode(apimapper.MapClientProblemDetailToResponse(*problem))
 }
 
 func (it *ServerInterfaceImpl) GetAllProblems(w http.ResponseWriter, r *http.Request) {
-	problems, _ := it.coreService.GetProblems(r.Context())
-	_ = json.NewEncoder(w).Encode(api_mapper.MapAllClientProblemToResponse(problems))
+	problems, statusCode, _ := it.coreService.GetProblems(r.Context())
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(apimapper.MapAllClientProblemToResponse(problems))
 }
 
 func (it *ServerInterfaceImpl) CreateProblem(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.CreateProblemParams) {
 	var data codeHelpAdminGen.CreateProblemJSONRequestBody
 	_ = json.NewDecoder(r.Body).Decode(&data)
 
-	if response := it.coreService.CreateProblem(r.Context(), params.ContestId, api_mapper.MapToClientCreateReq(data)); response == nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
+	statusCode, _ := it.coreService.CreateProblem(r.Context(), params.ContestId, apimapper.MapToClientCreateReq(data))
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(statusCode)
 }
 
 func (it *ServerInterfaceImpl) UpdateProblem(w http.ResponseWriter, r *http.Request, id codeHelpAdminGen.ProblemId) {
 	var data codeHelpAdminGen.CreateProblemJSONRequestBody
 	_ = json.NewDecoder(r.Body).Decode(&data)
 
-	response := it.coreService.UpdateProblem(r.Context(), id, api_mapper.MapToClientUpdateReq(data))
+	response := it.coreService.UpdateProblem(r.Context(), id, apimapper.MapToClientUpdateReq(data))
 	if response == nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(api_mapper.MapClientResponseToResponse(*response))
+	_ = json.NewEncoder(w).Encode(apimapper.MapClientResponseToResponse(*response))
 }
 
 func (it *ServerInterfaceImpl) DeleteProblem(w http.ResponseWriter, r *http.Request, id codeHelpAdminGen.ProblemId) {
@@ -73,7 +78,7 @@ func (it *ServerInterfaceImpl) DeleteProblem(w http.ResponseWriter, r *http.Requ
 
 func (it *ServerInterfaceImpl) GetAllContests(w http.ResponseWriter, r *http.Request) {
 	contests, _ := it.coreService.GetContests(r.Context())
-	_ = json.NewEncoder(w).Encode(api_mapper.MapAllClientContestToResponse(contests))
+	_ = json.NewEncoder(w).Encode(apimapper.MapAllClientContestToResponse(contests))
 }
 
 func (it *ServerInterfaceImpl) GetContest(w http.ResponseWriter, r *http.Request, id codeHelpAdminGen.ContestId) {
@@ -83,7 +88,7 @@ func (it *ServerInterfaceImpl) GetContest(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	_ = json.NewEncoder(w).Encode(api_mapper.MapClientContestDetailToResponse(*contest))
+	_ = json.NewEncoder(w).Encode(apimapper.MapClientContestDetailToResponse(*contest))
 }
 
 func (it *ServerInterfaceImpl) CreateContest(w http.ResponseWriter, r *http.Request) {
@@ -128,14 +133,14 @@ func (it *ServerInterfaceImpl) DeleteContest(w http.ResponseWriter, r *http.Requ
 }
 
 func (it *ServerInterfaceImpl) GetAllCategories(w http.ResponseWriter, r *http.Request) {
-	categories, err := it.coreService.GetAllCategories(r.Context())
+	categories, statusCode, err := it.coreService.GetAllCategories(r.Context())
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(w).Encode(api_mapper.MapAllCategoryToResponse(categories))
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(apimapper.MapAllCategoryToResponse(categories))
 }
 
 func (it *ServerInterfaceImpl) CreateCategory(w http.ResponseWriter, r *http.Request) {
@@ -164,4 +169,157 @@ func (it *ServerInterfaceImpl) UpdateCategory(w http.ResponseWriter, r *http.Req
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
 	}
+}
+
+func (it *ServerInterfaceImpl) CreateForumCategory(w http.ResponseWriter, r *http.Request) {
+	var data codeHelpAdminGen.CreateForumCategoryJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	statusCode, _ := it.forumService.Category().CreateCategory(r.Context(), codeHelpForumGen.CreateCategoryJSONRequestBody{
+		Name: data.Name,
+	})
+
+	w.WriteHeader(statusCode)
+}
+
+func (it *ServerInterfaceImpl) GetCommentsForPost(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.GetCommentsForPostParams) {
+	res, statusCode, _ := it.forumService.Comment().GetComments(r.Context(), codeHelpForumGen.GetCommentsForPostParams{
+		Post: params.Post,
+	})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
+}
+
+func (it *ServerInterfaceImpl) CommentOnPost(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.CommentOnPostParams) {
+	var data codeHelpAdminGen.CommentOnPostJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res, statusCode, _ := it.forumService.Comment().CreateComment(r.Context(), codeHelpForumGen.CommentOnPostParams{
+		Post: params.Post,
+	}, codeHelpForumGen.CommentOnPostJSONRequestBody{
+		Content: data.Content,
+	})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
+}
+
+func (it *ServerInterfaceImpl) DeleteComment(w http.ResponseWriter, r *http.Request, uid string) {
+	statusCode, _ := it.forumService.Comment().DeleteComment(r.Context(), uid)
+
+	w.WriteHeader(statusCode)
+}
+
+func (it *ServerInterfaceImpl) GetCommentReplies(w http.ResponseWriter, r *http.Request, uid string) {
+
+	res, statusCode, _ := it.forumService.Comment().GetReplies(r.Context(), uid)
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
+}
+
+func (it *ServerInterfaceImpl) ReplyToComment(w http.ResponseWriter, r *http.Request, uid string) {
+	var data codeHelpAdminGen.ReplyToCommentJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res, statusCode, _ := it.forumService.Comment().ReplyToComment(r.Context(), uid, codeHelpForumGen.ReplyToCommentJSONRequestBody{
+		Content: data.Content,
+	})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
+}
+
+func (it *ServerInterfaceImpl) UpdateComment(w http.ResponseWriter, r *http.Request, uid string) {
+	var data codeHelpAdminGen.UpdateCommentJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res, statusCode, _ := it.forumService.Comment().EditComment(r.Context(), uid, codeHelpForumGen.UpdateCommentJSONRequestBody{
+		Content: data.Content,
+	})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
+}
+
+func (it *ServerInterfaceImpl) GetAllCommunities(w http.ResponseWriter, r *http.Request) {
+
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) CreateCommunity(w http.ResponseWriter, r *http.Request) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) LeaveCommunity(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.LeaveCommunityParams) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) JoinCommunity(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.JoinCommunityParams) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) RemoveModerator(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.RemoveModeratorParams) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) GetCommunityModerators(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.GetCommunityModeratorsParams) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) AddModerator(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.AddModeratorParams) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) DeleteCommunity(w http.ResponseWriter, r *http.Request, name string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) GetCommunityByUid(w http.ResponseWriter, r *http.Request, name string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) UpdateCommunity(w http.ResponseWriter, r *http.Request, name string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) GetPosts(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.GetPostsParams) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) CreateCommunityPost(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.CreateCommunityPostParams) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) DeletePost(w http.ResponseWriter, r *http.Request, uid string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) GetPost(w http.ResponseWriter, r *http.Request, uid string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) UpdatePost(w http.ResponseWriter, r *http.Request, uid string) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (it *ServerInterfaceImpl) GetAllForumCategories(w http.ResponseWriter, r *http.Request) {
+	//TODO implement me
+	panic("implement me")
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"admin-api/internal/admin"
+	"admin-api/internal/admin/forum"
 	"admin-api/internal/api"
 	"admin-api/internal/core"
 	"admin-api/internal/environment"
@@ -12,7 +13,11 @@ func main() {
 
 	codeHelpAdminClient, _ := core.CreateClient(env.CoreServerUrl)
 	coreService := admin.NewCoreService(codeHelpAdminClient)
-	adminService := api.NewServiceInterfaceImpl(coreService)
+
+	codeHelpForumClient, _ := forum.CreateClient(env.ForumServerUrl)
+	forumService := forum.NewForumService(codeHelpForumClient)
+
+	adminService := api.NewServiceInterfaceImpl(coreService, forumService)
 
 	api.NewAdminApiServer(adminService, env).Serve()
 }
