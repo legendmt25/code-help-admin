@@ -244,29 +244,50 @@ func (it *ServerInterfaceImpl) UpdateComment(w http.ResponseWriter, r *http.Requ
 }
 
 func (it *ServerInterfaceImpl) GetAllCommunities(w http.ResponseWriter, r *http.Request) {
+	res, statusCode, _ := it.forumService.Community().GetCommunities(r.Context())
 
-	//TODO implement me
-	panic("implement me")
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }
 
 func (it *ServerInterfaceImpl) CreateCommunity(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	var data codeHelpAdminGen.CreateCommunityJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res, statusCode, _ := it.forumService.Community().CreateCommunity(r.Context(), codeHelpForumGen.CreateCommunityJSONRequestBody{
+		Categories:  data.Categories,
+		Description: data.Description,
+		Image:       data.Image,
+		Name:        data.Name,
+	})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }
 
 func (it *ServerInterfaceImpl) LeaveCommunity(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.LeaveCommunityParams) {
-	//TODO implement me
-	panic("implement me")
+	statusCode := it.forumService.Community().LeaveCommunity(r.Context(), codeHelpForumGen.LeaveCommunityParams{
+		Community: params.Community,
+	})
+
+	w.WriteHeader(statusCode)
 }
 
 func (it *ServerInterfaceImpl) JoinCommunity(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.JoinCommunityParams) {
-	//TODO implement me
-	panic("implement me")
+	statusCode := it.forumService.Community().JoinCommunity(r.Context(), codeHelpForumGen.JoinCommunityParams{
+		Community: params.Community,
+	})
+
+	w.WriteHeader(statusCode)
 }
 
 func (it *ServerInterfaceImpl) RemoveModerator(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.RemoveModeratorParams) {
-	//TODO implement me
-	panic("implement me")
+	statusCode := it.forumService.Community().RemoveModerator(r.Context(), codeHelpForumGen.RemoveModeratorParams{
+		Community: params.Community,
+		Username:  params.Username,
+	})
+
+	w.WriteHeader(statusCode)
 }
 
 func (it *ServerInterfaceImpl) GetCommunityModerators(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.GetCommunityModeratorsParams) {
@@ -275,51 +296,98 @@ func (it *ServerInterfaceImpl) GetCommunityModerators(w http.ResponseWriter, r *
 }
 
 func (it *ServerInterfaceImpl) AddModerator(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.AddModeratorParams) {
-	//TODO implement me
-	panic("implement me")
+	var data codeHelpAdminGen.AddModeratorJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	statusCode := it.forumService.Community().AddModerator(r.Context(),
+		codeHelpForumGen.AddModeratorParams{
+			Community: params.Community,
+		}, codeHelpForumGen.AddModeratorJSONRequestBody{
+			Username: data.Username,
+		})
+
+	w.WriteHeader(statusCode)
 }
 
 func (it *ServerInterfaceImpl) DeleteCommunity(w http.ResponseWriter, r *http.Request, name string) {
-	//TODO implement me
-	panic("implement me")
+	statusCode := it.forumService.Community().DeleteCommunity(r.Context(), name)
+
+	w.WriteHeader(statusCode)
 }
 
 func (it *ServerInterfaceImpl) GetCommunityByUid(w http.ResponseWriter, r *http.Request, name string) {
-	//TODO implement me
-	panic("implement me")
+	res, statusCode, _ := it.forumService.Community().GetCommunity(r.Context(), name)
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }
 
 func (it *ServerInterfaceImpl) UpdateCommunity(w http.ResponseWriter, r *http.Request, name string) {
-	//TODO implement me
-	panic("implement me")
+	var data codeHelpAdminGen.UpdateCommunityJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res, statusCode, _ := it.forumService.Community().UpdateCommunity(r.Context(), name, codeHelpForumGen.UpdateCommunityJSONRequestBody{
+		Categories:  data.Categories,
+		Description: data.Description,
+		Image:       data.Image,
+		Name:        data.Name,
+	})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }
 
 func (it *ServerInterfaceImpl) GetPosts(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.GetPostsParams) {
-	//TODO implement me
-	panic("implement me")
+	res, statusCode, _ := it.forumService.Post().GetPosts(r.Context(), codeHelpForumGen.GetPostsParams{Community: params.Community})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }
 
 func (it *ServerInterfaceImpl) CreateCommunityPost(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.CreateCommunityPostParams) {
-	//TODO implement me
-	panic("implement me")
+	var data codeHelpAdminGen.CreateCommunityPostJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res, statusCode, _ := it.forumService.Post().CreatePost(r.Context(),
+		codeHelpForumGen.CreateCommunityPostParams{Community: params.Community},
+		codeHelpForumGen.CreateCommunityPostJSONRequestBody{
+			Content: data.Content,
+			Title:   data.Title,
+		})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }
 
 func (it *ServerInterfaceImpl) DeletePost(w http.ResponseWriter, r *http.Request, uid string) {
-	//TODO implement me
-	panic("implement me")
+	statusCode, _ := it.forumService.Post().DeletePost(r.Context(), uid)
+
+	w.WriteHeader(statusCode)
 }
 
 func (it *ServerInterfaceImpl) GetPost(w http.ResponseWriter, r *http.Request, uid string) {
-	//TODO implement me
-	panic("implement me")
+	res, statusCode, _ := it.forumService.Post().GetPost(r.Context(), uid)
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }
 
 func (it *ServerInterfaceImpl) UpdatePost(w http.ResponseWriter, r *http.Request, uid string) {
-	//TODO implement me
-	panic("implement me")
+	var data codeHelpAdminGen.UpdatePostJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res, statusCode, _ := it.forumService.Post().UpdatePost(r.Context(), uid, codeHelpForumGen.UpdatePostJSONRequestBody{
+		Content: data.Content,
+		Title:   data.Title,
+	})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }
 
 func (it *ServerInterfaceImpl) GetAllForumCategories(w http.ResponseWriter, r *http.Request) {
-	//TODO implement me
-	panic("implement me")
+	res, statusCode, _ := it.forumService.Category().GetCategories(r.Context())
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
 }

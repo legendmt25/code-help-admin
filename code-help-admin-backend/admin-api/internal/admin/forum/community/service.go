@@ -9,17 +9,17 @@ import (
 )
 
 type ForumCommunityService interface {
-	GetCommunity(ctx context.Context, name string) (*codeHelpForumGen.Community, error)
+	GetCommunity(ctx context.Context, name string) (*codeHelpForumGen.Community, int, error)
 
-	GetCommunities(ctx context.Context) []codeHelpForumGen.ShortCommunity
+	GetCommunities(ctx context.Context) (*codeHelpForumGen.ShortCommunities, int, error)
 
-	CreateCommunity(ctx context.Context, body codeHelpForumGen.CreateCommunityJSONRequestBody) (*codeHelpForumGen.Community, error)
+	CreateCommunity(ctx context.Context, body codeHelpForumGen.CreateCommunityJSONRequestBody) (*codeHelpForumGen.Community, int, error)
 
-	UpdateCommunity(ctx context.Context, name string, body codeHelpForumGen.UpdateCommunityJSONRequestBody) (*codeHelpForumGen.Community, error)
+	UpdateCommunity(ctx context.Context, name string, body codeHelpForumGen.UpdateCommunityJSONRequestBody) (*codeHelpForumGen.Community, int, error)
 
 	DeleteCommunity(ctx context.Context, name string) int
 
-	GetModerators(ctx context.Context, params codeHelpForumGen.GetCommunityModeratorsParams) (*codeHelpForumGen.Users, error)
+	GetModerators(ctx context.Context, params codeHelpForumGen.GetCommunityModeratorsParams) (*codeHelpForumGen.Users, int, error)
 
 	AddModerator(ctx context.Context, params codeHelpForumGen.AddModeratorParams, body codeHelpForumGen.AddModeratorJSONRequestBody) int
 
@@ -44,41 +44,57 @@ func NewCommunityServiceImpl(client codeHelpForumGen.ClientInterface) ForumCommu
 	}
 }
 
-func (it *forumCommunityServiceImpl) GetCommunities(ctx context.Context) []codeHelpForumGen.ShortCommunity {
+func (it *forumCommunityServiceImpl) GetCommunities(ctx context.Context) (*codeHelpForumGen.ShortCommunities, int, error) {
 	res, err := it.client.GetAllCommunities(ctx)
 
 	if err != nil {
-		return make([]codeHelpForumGen.ShortCommunity, 0)
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return it.decoder.DecodeAllShort(res)
+	if res.StatusCode != http.StatusOK {
+		return nil, res.StatusCode, nil
+	}
+
+	return it.decoder.DecodeAllShort(res), http.StatusOK, nil
 }
 
-func (it *forumCommunityServiceImpl) CreateCommunity(ctx context.Context, body codeHelpForumGen.CreateCommunityJSONRequestBody) (*codeHelpForumGen.Community, error) {
+func (it *forumCommunityServiceImpl) CreateCommunity(ctx context.Context, body codeHelpForumGen.CreateCommunityJSONRequestBody) (*codeHelpForumGen.Community, int, error) {
 	res, err := it.client.CreateCommunity(ctx, body)
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return it.decoder.Decode(res), nil
+	if res.StatusCode != http.StatusOK {
+		return nil, res.StatusCode, nil
+	}
+
+	return it.decoder.Decode(res), http.StatusOK, nil
 }
 
-func (it *forumCommunityServiceImpl) GetCommunity(ctx context.Context, name string) (*codeHelpForumGen.Community, error) {
+func (it *forumCommunityServiceImpl) GetCommunity(ctx context.Context, name string) (*codeHelpForumGen.Community, int, error) {
 	res, err := it.client.GetCommunityByUid(ctx, name)
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return it.decoder.Decode(res), nil
+	if res.StatusCode != http.StatusOK {
+		return nil, res.StatusCode, nil
+	}
+
+	return it.decoder.Decode(res), http.StatusOK, nil
 }
 
-func (it *forumCommunityServiceImpl) UpdateCommunity(ctx context.Context, name string, body codeHelpForumGen.UpdateCommunityJSONRequestBody) (*codeHelpForumGen.Community, error) {
+func (it *forumCommunityServiceImpl) UpdateCommunity(ctx context.Context, name string, body codeHelpForumGen.UpdateCommunityJSONRequestBody) (*codeHelpForumGen.Community, int, error) {
 	res, err := it.client.UpdateCommunity(ctx, name, body)
 	if err != nil {
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return it.decoder.Decode(res), nil
+	if res.StatusCode != http.StatusOK {
+		return nil, res.StatusCode, nil
+	}
+
+	return it.decoder.Decode(res), http.StatusOK, nil
 }
 
 func (it *forumCommunityServiceImpl) DeleteCommunity(ctx context.Context, name string) int {
@@ -91,14 +107,18 @@ func (it *forumCommunityServiceImpl) DeleteCommunity(ctx context.Context, name s
 	return res.StatusCode
 }
 
-func (it *forumCommunityServiceImpl) GetModerators(ctx context.Context, params codeHelpForumGen.GetCommunityModeratorsParams) (*codeHelpForumGen.Users, error) {
+func (it *forumCommunityServiceImpl) GetModerators(ctx context.Context, params codeHelpForumGen.GetCommunityModeratorsParams) (*codeHelpForumGen.Users, int, error) {
 	res, err := it.client.GetCommunityModerators(ctx, &params)
 	if err != nil {
 		log.Error(err)
-		return nil, err
+		return nil, http.StatusInternalServerError, err
 	}
 
-	return it.userDecoder.DecodeAll(res), err
+	if res.StatusCode != http.StatusOK {
+		return nil, res.StatusCode, nil
+	}
+
+	return it.userDecoder.DecodeAll(res), http.StatusOK, err
 }
 
 func (it *forumCommunityServiceImpl) AddModerator(ctx context.Context, params codeHelpForumGen.AddModeratorParams, body codeHelpForumGen.AddModeratorJSONRequestBody) int {
