@@ -83,7 +83,7 @@ func mapCategoryToResponse(category *codeHelpAdminCoreGen.Category) *codeHelpAdm
 		return nil
 	}
 
-	return &codeHelpAdminGen.Category{Name: category.Name}
+	return &codeHelpAdminGen.Category{Id: category.Id, Name: category.Name}
 }
 
 func mapCategory(category *codeHelpAdminGen.Category) *codeHelpAdminCoreGen.Category {
