@@ -5,8 +5,9 @@ import (
 	codeHelpAdminCoreGen "api-spec/generated/code-help-admin-core"
 	"bytes"
 	"context"
-	"github.com/labstack/gommon/log"
 	"net/http"
+
+	"github.com/labstack/gommon/log"
 )
 
 type ProblemCoreService interface {
@@ -34,9 +35,9 @@ type ProblemCoreService interface {
 
 	CreateCategory(ctx context.Context, category codeHelpAdminCoreGen.CreateCategoryJSONRequestBody) bool
 
-	UpdateCategory(ctx context.Context, name codeHelpAdminCoreGen.CategoryName, body codeHelpAdminCoreGen.CreateCategoryJSONRequestBody) bool
+	UpdateCategory(ctx context.Context, name codeHelpAdminCoreGen.CategoryId, body codeHelpAdminCoreGen.CreateCategoryJSONRequestBody) bool
 
-	DeleteCategory(ctx context.Context, category codeHelpAdminCoreGen.CategoryName) bool
+	DeleteCategory(ctx context.Context, category codeHelpAdminCoreGen.CategoryId) bool
 }
 
 type ProblemServiceContext struct {
@@ -223,8 +224,8 @@ func (it *problemCoreServiceImpl) CreateCategory(ctx context.Context, body codeH
 	}
 }
 
-func (it *problemCoreServiceImpl) UpdateCategory(ctx context.Context, name codeHelpAdminCoreGen.CategoryName, body codeHelpAdminCoreGen.CreateCategoryJSONRequestBody) bool {
-	res, err := it.client.UpdateCategory(ctx, name, body)
+func (it *problemCoreServiceImpl) UpdateCategory(ctx context.Context, id codeHelpAdminCoreGen.CategoryId, body codeHelpAdminCoreGen.CreateCategoryJSONRequestBody) bool {
+	res, err := it.client.UpdateCategory(ctx, id, body)
 	if err != nil {
 		log.Error(err)
 		return false
@@ -238,8 +239,8 @@ func (it *problemCoreServiceImpl) UpdateCategory(ctx context.Context, name codeH
 	}
 }
 
-func (it *problemCoreServiceImpl) DeleteCategory(ctx context.Context, category codeHelpAdminCoreGen.CategoryName) bool {
-	res, err := it.client.DeleteCategory(ctx, category)
+func (it *problemCoreServiceImpl) DeleteCategory(ctx context.Context, id codeHelpAdminCoreGen.CategoryId) bool {
+	res, err := it.client.DeleteCategory(ctx, id)
 	if err != nil {
 		log.Error(err)
 		return false

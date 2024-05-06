@@ -158,16 +158,30 @@ func (it *ServerInterfaceImpl) CreateCategory(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (it *ServerInterfaceImpl) UpdateCategory(w http.ResponseWriter, r *http.Request, name codeHelpAdminGen.CategoryName) {
+func (it *ServerInterfaceImpl) UpdateCategory(w http.ResponseWriter, r *http.Request, id codeHelpAdminGen.CategoryId) {
 
-	res := it.coreService.UpdateCategory(r.Context(), name, codeHelpAdminCoreGen.CreateCategoryJSONRequestBody{
-		Name: name,
+	var data codeHelpAdminGen.UpdateCategoryJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res := it.coreService.UpdateCategory(r.Context(), id, codeHelpAdminCoreGen.UpdateCategoryJSONRequestBody{
+		Name: data.Name,
 	})
 
 	if res {
 		w.WriteHeader(http.StatusOK)
 	} else {
 		w.WriteHeader(http.StatusBadRequest)
+	}
+}
+
+func (it *ServerInterfaceImpl) DeleteCategory(w http.ResponseWriter, r *http.Request, id codeHelpAdminGen.CategoryId) {
+
+	res := it.coreService.DeleteCategory(r.Context(), id)
+
+	if res {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
 	}
 }
 

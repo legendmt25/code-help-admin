@@ -1,16 +1,29 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
-  import { getAllCategories } from "../services/ProblemsService";
+  import { getAllCategories, updateCategory } from "../services/ProblemsService";
   import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
 
-  const getAllCategoriesPromise = getAllCategories()
-    .then((data) => data.categories)
-    .catch(() => []);
+  let categoryToEdit: string | undefined = undefined;
+  let createEditCategoryDialog: HTMLDialogElement | undefined = undefined;
+
+  const handleGetAllCategories = () =>
+    getAllCategories()
+      .then((data) => data.categories)
+      .catch(() => []);
+
+  let getAllCategoriesPromise = handleGetAllCategories();
 
   const handleDeleteCategory = (categoryName: string) => {};
 
-  let createCategoryDialog: HTMLDialogElement | undefined = undefined;
+  const handleSaveCategorySuccess = () => {
+    getAllCategoriesPromise = handleGetAllCategories();
+  };
+
+  const handleEditCategory = (categoryName: string) => {
+    categoryToEdit = categoryName;
+    createEditCategoryDialog?.showModal();
+  };
 </script>
 
 <style>
@@ -44,7 +57,11 @@
   <Spinner />
 {:then categories}
   <section>
-    <Button on:click={() => createCategoryDialog?.showModal()}>Create</Button>
+    <Button
+      on:click={() => {
+        categoryToEdit = undefined;
+        createEditCategoryDialog?.showModal();
+      }}>Create</Button>
     <table>
       <thead>
         <tr>
@@ -60,6 +77,7 @@
           <tr>
             <td>{categoryEntry.name}</td>
             <td>
+              <Button on:click={() => handleEditCategory(categoryEntry.name)}>Edit</Button>
               <Button on:click={() => handleDeleteCategory(categoryEntry.name)}>Delete</Button>
             </td>
           </tr>
@@ -71,4 +89,10 @@
   <div>An error occured! ({err})</div>
 {/await}
 
-<CategoryEditCreateDialog bind:dialog={createCategoryDialog} />
+<CategoryEditCreateDialog
+  bind:oldCategoryNameValue={categoryToEdit}
+  on:success={() => {
+    handleSaveCategorySuccess();
+    console.log("category save success");
+  }}
+  bind:dialog={createEditCategoryDialog} />

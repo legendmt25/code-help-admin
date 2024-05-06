@@ -3,12 +3,15 @@
   import Dialog from "../components/Dialog.svelte";
   import { createCategory, updateCategory } from "../services/ProblemsService";
   import Button from "../components/Button.svelte";
+  import { createEventDispatcher } from "svelte";
 
-  export const oldCategoryNameValue: string | undefined = undefined;
+  export let oldCategoryNameValue: string | undefined = undefined;
   let categoryNameValue: string | undefined = undefined;
   export let dialog: HTMLDialogElement | undefined = undefined;
 
   const title = !oldCategoryNameValue ? "Create category" : `Update category - ${oldCategoryNameValue}`;
+
+  const dispatch = createEventDispatcher();
 
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -17,11 +20,19 @@
       return;
     }
 
+    let createEditCategoryPromise: Promise<void>;
+    console.log("old category name value:", oldCategoryNameValue);
+
     if (oldCategoryNameValue) {
-      updateCategory(oldCategoryNameValue, { category: { name: categoryNameValue } });
+      createEditCategoryPromise = updateCategory(oldCategoryNameValue, { category: { name: categoryNameValue } });
     } else {
-      createCategory({ category: { name: categoryNameValue } });
+      createEditCategoryPromise = createCategory({ category: { name: categoryNameValue } });
     }
+
+    createEditCategoryPromise
+      .catch((err) => dispatch("error", err))
+      .then(() => dispatch("success"))
+      .finally(() => dialog?.close());
   };
 </script>
 
@@ -50,7 +61,7 @@
   }
 </style>
 
-<Dialog bind:dialog title={title}>
+<Dialog bind:dialog {title}>
   <form on:submit={handleFormSubmit} id="create-category-form" class="form p-1">
     <div class="input-container">
       <label for="name">Category name</label>

@@ -1,0 +1,3 @@
+../pkg/oapi-codegen.exe --generate types,client,spec --package codeHelpAdminCoreGen ../code-help-admin-core-api.yaml > ../generated/code-help-admin-core/code-help-admin-core.go
+../pkg/oapi-codegen.exe --generate types,client,spec --package codeHelpForumGen ../code-help-forum-api.yaml > ../generated/code-help-forum/code-help-forum.go
+../pkg/oapi-codegen.exe --generate types,std-http,spec --package codeHelpAdminGen ../code-help-admin-api.yaml > ../generated/code-help-admin/code-help-admin.go

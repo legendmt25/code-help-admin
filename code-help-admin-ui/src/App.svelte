@@ -14,7 +14,7 @@
   let menuOpened: boolean = false;
 
   onMount(() => {
-    if (!env.DEV || !getInstance()?.isTokenExpired(0))
+    if (!env.DEV || !getInstance())
       initKeycloak().then((keycloak) => localStorage.setItem(KEYCLOAK_KEY, JSON.stringify(keycloak)));
   });
 
