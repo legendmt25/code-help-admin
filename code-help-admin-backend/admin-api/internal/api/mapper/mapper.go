@@ -68,7 +68,7 @@ func MapToClientUpdateReq(data codeHelpAdminGen.UpdateProblemJSONRequestBody) co
 
 func mapToClientReq(data codeHelpAdminGen.CreateProblemJSONRequestBody) codeHelpAdminCoreGen.ProblemRequest {
 	return codeHelpAdminCoreGen.ProblemRequest{
-		Category:    mapCategory(data.Category),
+		Category:    mapCategoryRequest(data.Category),
 		Title:       data.Title,
 		Difficulty:  mapDifficulty(data.Difficulty),
 		Markdown:    data.Markdown,
@@ -91,7 +91,15 @@ func mapCategory(category *codeHelpAdminGen.Category) *codeHelpAdminCoreGen.Cate
 		return nil
 	}
 
-	return &codeHelpAdminCoreGen.Category{Name: category.Name}
+	return &codeHelpAdminCoreGen.Category{Id: category.Id, Name: category.Name}
+}
+
+func mapCategoryRequest(category *codeHelpAdminGen.CategoryRequest) *codeHelpAdminCoreGen.CategoryRequest {
+	if category == nil {
+		return nil
+	}
+
+	return &codeHelpAdminCoreGen.CategoryRequest{Name: category.Name}
 }
 
 func mapDifficulty(difficulty codeHelpAdminGen.Difficulty) codeHelpAdminCoreGen.Difficulty {
@@ -155,18 +163,21 @@ func mapContestProblemToResponse(problem codeHelpAdminCoreGen.ContestProblem) co
 	}
 }
 
-func MapAllClientContestToResponse(clientContests []codeHelpAdminCoreGen.Contest) []codeHelpAdminGen.Contest {
-	clientContestSize := len(clientContests)
-	if clientContestSize == 0 {
-		return make([]codeHelpAdminGen.Contest, 0)
+func MapAllClientContestToResponse(clientContests *codeHelpAdminCoreGen.ContestResponse) *codeHelpAdminGen.ContestResponse {
+	if clientContests == nil || len(clientContests.Contests) <= 0 {
+		return &codeHelpAdminGen.ContestResponse{
+			Contests: make([]codeHelpAdminGen.Contest, 0),
+		}
 	}
 
-	contests := make([]codeHelpAdminGen.Contest, clientContestSize)
-	for i, clientContest := range clientContests {
+	contests := make([]codeHelpAdminGen.Contest, len(clientContests.Contests))
+	for i, clientContest := range clientContests.Contests {
 		contests[i] = mapClientContestToResponse(clientContest)
 	}
 
-	return contests
+	return &codeHelpAdminGen.ContestResponse{
+		Contests: contests,
+	}
 }
 
 func mapClientContestToResponse(clientContest codeHelpAdminCoreGen.Contest) codeHelpAdminGen.Contest {

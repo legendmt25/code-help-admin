@@ -23,7 +23,7 @@ type ProblemCoreService interface {
 
 	GetContest(ctx context.Context, contestId codeHelpAdminCoreGen.ContestId) *codeHelpAdminCoreGen.ContestDetail
 
-	GetContests(ctx context.Context) ([]codeHelpAdminCoreGen.Contest, error)
+	GetContests(ctx context.Context) (*codeHelpAdminCoreGen.ContestResponse, error)
 
 	CreateContest(ctx context.Context, body codeHelpAdminCoreGen.CreateContestJSONRequestBody) bool
 
@@ -95,6 +95,7 @@ func (it *problemCoreServiceImpl) CreateProblem(ctx context.Context, contestId *
 	res, err := it.client.CreateProblemWithBody(ctx, &codeHelpAdminCoreGen.CreateProblemParams{
 		ContestId: contestId,
 	}, contentType, body)
+
 	if err != nil {
 		log.Error("Error: ", err)
 		return http.StatusOK, nil
@@ -135,11 +136,11 @@ func (it *problemCoreServiceImpl) GetContest(ctx context.Context, contestId code
 	return it.contestDecoder.DecodeDetail(contest)
 }
 
-func (it *problemCoreServiceImpl) GetContests(ctx context.Context) ([]codeHelpAdminCoreGen.Contest, error) {
+func (it *problemCoreServiceImpl) GetContests(ctx context.Context) (*codeHelpAdminCoreGen.ContestResponse, error) {
 	contests, err := it.client.GetAllContests(ctx)
 	if err != nil {
 		log.Error(err)
-		return []codeHelpAdminCoreGen.Contest{}, err
+		return nil, err
 	}
 
 	return it.contestDecoder.DecodeAll(contests), nil

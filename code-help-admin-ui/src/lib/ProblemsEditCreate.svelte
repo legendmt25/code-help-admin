@@ -6,7 +6,7 @@
   import type { FormEventHandler } from "svelte/elements";
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
-  import { Difficulty, type Category, type ProblemRequest } from "../generated/admin-api";
+  import { Difficulty, type Category, type CategoryRequest, type ProblemRequest } from "../generated/admin-api";
   import { createProblem, getAllCategories, getProblemById, updateProblem } from "../services/ProblemsService";
   import { Icon } from "svelte-icons-pack";
   import { BiSave } from "svelte-icons-pack/bi";
@@ -38,7 +38,7 @@
       promiseArray.push(
         getProblemById(Number(params.id)).then((problem) => {
           formValue = {
-            category: problem.category,
+            category: problem.category as CategoryRequest,
             difficulty: problem.difficulty,
             markdown: problem.markdown,
             title: problem.title,
@@ -50,7 +50,11 @@
       );
     }
 
-    Promise.all(promiseArray).finally(() => (loading = false));
+    Promise.all(promiseArray)
+      .then(() => {
+        formValue.category = categories.find(category => category.name === formValue.category?.name);
+      })
+      .finally(() => (loading = false));
   });
 
   const handleEditCreate: FormEventHandler<HTMLFormElement> = (event) => {
@@ -64,7 +68,6 @@
     } else {
       createProblem(body);
     }
-    console.log(body);
   };
 </script>
 
@@ -101,7 +104,8 @@
 
   /* Extra small devices (phones, 600px and down) */
   @media only screen and (max-width: 600px) {
-    .sm-column, .sm-column * {
+    .sm-column,
+    .sm-column * {
       flex-direction: column;
       width: 100% !important;
     }
@@ -212,7 +216,7 @@
             </div>
             <div class="input-container">
               {#if previewEnabled}
-                {formValue.category}
+                {formValue.category?.name}
               {:else}
                 <label for="category">Category</label>
                 <select id="category" name="category" class="input-container" bind:value={formValue.category}>

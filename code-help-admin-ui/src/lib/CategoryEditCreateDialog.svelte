@@ -5,11 +5,11 @@
   import Button from "../components/Button.svelte";
   import { createEventDispatcher } from "svelte";
 
-  export let oldCategoryNameValue: string | undefined = undefined;
-  let categoryNameValue: string | undefined = undefined;
+  export let categoryId: number | undefined = undefined;
+  export let categoryNameValue: string | undefined = undefined;
   export let dialog: HTMLDialogElement | undefined = undefined;
 
-  const title = !oldCategoryNameValue ? "Create category" : `Update category - ${oldCategoryNameValue}`;
+  const title = !categoryId ? "Create category" : `Update category - ${categoryId}`;
 
   const dispatch = createEventDispatcher();
 
@@ -21,12 +21,13 @@
     }
 
     let createEditCategoryPromise: Promise<void>;
-    console.log("old category name value:", oldCategoryNameValue);
 
-    if (oldCategoryNameValue) {
-      createEditCategoryPromise = updateCategory(oldCategoryNameValue, { category: { name: categoryNameValue } });
+    if (!Number.isNaN(Number(categoryId))) {
+      console.log('edit category: ', categoryId);
+      createEditCategoryPromise = updateCategory(categoryId!, { categoryRequest: { name: categoryNameValue } });
     } else {
-      createEditCategoryPromise = createCategory({ category: { name: categoryNameValue } });
+      console.log('create category');
+      createEditCategoryPromise = createCategory({ categoryRequest: { name: categoryNameValue } });
     }
 
     createEditCategoryPromise

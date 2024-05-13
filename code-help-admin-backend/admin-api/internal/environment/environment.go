@@ -68,7 +68,7 @@ func getJwkSetUri() string {
 		return jwkSetUri
 	}
 
-	return "http://localhost/iam/realms/code-help/protocol/openid"
+	return "http://localhost/iam/realms/code-help/protocol/openid-connect/certs"
 }
 
 func isNotBlank(value string) bool {

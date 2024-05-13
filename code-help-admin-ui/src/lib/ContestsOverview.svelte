@@ -2,9 +2,18 @@
   import { link } from "svelte-spa-router";
   import Spinner from "../components/Spinner.svelte";
   import { Route } from "../routes";
-  import { getAllContests } from "../services/ContestService";
+  import { deleteContest, getAllContests } from "../services/ContestService";
+  import Link from "../components/Link.svelte";
 
-  const getAllContestsPromise = getAllContests().then((data) => data.contests);
+  const handleGetAllContests = () =>
+    getAllContests()
+      .then((data) => data.contests)
+      .catch(() => []);
+
+  let getAllContestsPromise = handleGetAllContests();
+
+  const handleDeleteContest = (contestId: number) =>
+    deleteContest(contestId).then(() => (getAllContestsPromise = handleGetAllContests()));
 </script>
 
 <style>
@@ -38,12 +47,15 @@
   <Spinner />
 {:then contests}
   <section>
+    <Link href={Route.contests_create}>Create</Link>
     <table>
       <thead>
         <tr>
           <th>#</th>
           <th>Name</th>
-          <th>Language</th>
+          <th>Starts on</th>
+          <th>Duration</th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -55,11 +67,14 @@
           <tr>
             <td>{contestEntry.id}</td>
             <td>{contestEntry.name}</td>
-            <td>{contestEntry.name}</td>
+            <td>{contestEntry.startsOn}</td>
+            <td>{contestEntry.duration}</td>
+            <td>{contestEntry.status}</td>
             <td>
               <a
                 href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}
                 use:link>Edit</a>
+              <a on:click={() => handleDeleteContest(contestEntry.id)}>Delete</a>
               /
             </td>
           </tr>

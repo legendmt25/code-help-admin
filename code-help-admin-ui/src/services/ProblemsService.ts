@@ -17,14 +17,18 @@ export const getProblemById = (id: number) => {
 };
 
 export const createCategory = (body: CreateCategoryRequest) => {
-  return CATEGORIES_API.createCategory({ category: body.category });
+  return CATEGORIES_API.createCategory({ categoryRequest: body.categoryRequest });
 };
 
-export const updateCategory = (oldCategory: string, body: CreateCategoryRequest) => {
+export const updateCategory = (id: number, body: CreateCategoryRequest) => {
   return CATEGORIES_API.updateCategory({
-    name: oldCategory,
-    category: body.category
+    id,
+    categoryRequest: body.categoryRequest
   });
+};
+
+export const deleteCategory = (id: number) => {
+  return CATEGORIES_API.deleteCategory({ id });
 };
 
 export const deleteProblem = (id: number) => {

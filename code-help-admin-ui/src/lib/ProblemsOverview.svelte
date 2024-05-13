@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getAllProblems } from "../services/ProblemsService";
+  import { deleteProblem, getAllProblems } from "../services/ProblemsService";
   import { link } from "svelte-spa-router";
   import Spinner from "../components/Spinner.svelte";
   import { Route } from "../routes";
@@ -8,6 +8,8 @@
   const getAllProblemsPromise = getAllProblems()
     .then((x) => x.problems)
     .catch(() => []);
+
+  const handleDeleteProblem = (problemId: number) => deleteProblem(problemId);
 </script>
 
 <style>
@@ -64,7 +66,10 @@
                 href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
                 use:link>Edit</a>
               /
-              <a>Delete</a>
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <!-- svelte-ignore a11y-missing-attribute -->
+              <a on:click={() => handleDeleteProblem(problemEntry.id)}>Delete</a>
             </td>
           </tr>
         {/each}

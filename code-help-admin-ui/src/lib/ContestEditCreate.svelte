@@ -1,17 +1,24 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { link } from "svelte-spa-router";
-  import type { FormEventHandler } from "svelte/elements";
+  import type { ChangeEventHandler, FormEventHandler } from "svelte/elements";
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
-  import { type ContestDetail, type ContestEditRequest, type ContestRequest } from "../generated/admin-api";
+  import {
+    ContestStatus,
+    type ContestDetail,
+    type ContestEditRequest,
+    type ContestRequest
+  } from "../generated/admin-api";
   import { Route } from "../routes";
   import { createContest, getContestById, updateContest } from "../services/ContestService";
 
   export let params: { id?: string } = {};
 
   let loading: boolean = false;
-  let value: Partial<ContestEditRequest> = {};
+  let value: Partial<ContestEditRequest> = {
+    problems: []
+  };
 
   let contestEntry: ContestDetail | undefined = undefined;
 
@@ -25,7 +32,8 @@
             name: contest.name,
             duration: contest.duration,
             startsOn: contest.startsOn,
-            status: contest.status
+            status: contest.status,
+            problems: contestEntry.problems
           };
         })
         .finally(() => (loading = false));
@@ -41,7 +49,10 @@
     } else {
       createContest(value as ContestRequest);
     }
-    console.log(value);
+  };
+
+  const handleDateChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    value.startsOn = new Date(event.currentTarget.value);
   };
 </script>
 
@@ -55,7 +66,8 @@
     flex-direction: column;
   }
 
-  input {
+  input,
+  select {
     width: 100%;
     max-width: 300px;
     padding: 5px;
@@ -85,7 +97,20 @@
       </div>
       <div class="input-container">
         <label for="startsOn">Starts on</label>
-        <input id="startsOn" name="startsOn" bind:value={value.startsOn} />
+        <input
+          type="date"
+          id="startsOn"
+          name="startsOn"
+          value={value.startsOn?.toISOString().substring(0, 10)}
+          on:change={handleDateChange} />
+      </div>
+      <div class="input-container">
+        <label for="status">Status</label>
+        <select id="status" name="status" bind:value={value.status}>
+          {#each Object.values(ContestStatus) as status}
+            <option value={status}>{status}</option>
+          {/each}
+        </select>
       </div>
       <Button>Submit</Button>
     </form>

@@ -118,6 +118,7 @@ func (it *ServerInterfaceImpl) UpdateContest(w http.ResponseWriter, r *http.Requ
 		Name:     data.Name,
 		StartsOn: data.StartsOn,
 		Status:   (*codeHelpAdminCoreGen.ContestStatus)(data.Status),
+		Problems: data.Problems,
 	})
 
 	if res {

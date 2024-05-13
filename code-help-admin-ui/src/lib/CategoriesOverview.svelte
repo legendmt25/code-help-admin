@@ -1,10 +1,11 @@
 <script lang="ts">
   import Button from "../components/Button.svelte";
   import Spinner from "../components/Spinner.svelte";
-  import { getAllCategories, updateCategory } from "../services/ProblemsService";
+  import { getAllCategories, deleteCategory } from "../services/ProblemsService";
   import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
 
-  let categoryToEdit: string | undefined = undefined;
+  let categoryValueToEdit: string | undefined = undefined;
+  let categoryIdToEdit: number | undefined = undefined;
   let createEditCategoryDialog: HTMLDialogElement | undefined = undefined;
 
   const handleGetAllCategories = () =>
@@ -14,14 +15,16 @@
 
   let getAllCategoriesPromise = handleGetAllCategories();
 
-  const handleDeleteCategory = (categoryName: string) => {};
+  const handleDeleteCategory = (categoryId: number) =>
+    deleteCategory(categoryId).then(() => (getAllCategoriesPromise = handleGetAllCategories()));
 
   const handleSaveCategorySuccess = () => {
     getAllCategoriesPromise = handleGetAllCategories();
   };
 
-  const handleEditCategory = (categoryName: string) => {
-    categoryToEdit = categoryName;
+  const handleEditCategory = (categoryId: number, categoryName: string) => {
+    categoryIdToEdit = categoryId;
+    categoryValueToEdit = categoryName;
     createEditCategoryDialog?.showModal();
   };
 </script>
@@ -59,12 +62,14 @@
   <section>
     <Button
       on:click={() => {
-        categoryToEdit = undefined;
+        categoryValueToEdit = undefined;
+        categoryIdToEdit = undefined;
         createEditCategoryDialog?.showModal();
       }}>Create</Button>
     <table>
       <thead>
         <tr>
+          <th>#</th>
           <th>Name</th>
           <th>Actions</th>
         </tr>
@@ -75,10 +80,11 @@
         {/if}
         {#each categories as categoryEntry}
           <tr>
+            <td>{categoryEntry.id}</td>
             <td>{categoryEntry.name}</td>
             <td>
-              <Button on:click={() => handleEditCategory(categoryEntry.name)}>Edit</Button>
-              <Button on:click={() => handleDeleteCategory(categoryEntry.name)}>Delete</Button>
+              <Button on:click={() => handleEditCategory(categoryEntry.id, categoryEntry.name)}>Edit</Button>
+              <Button on:click={() => handleDeleteCategory(categoryEntry.id)}>Delete</Button>
             </td>
           </tr>
         {/each}
@@ -90,9 +96,7 @@
 {/await}
 
 <CategoryEditCreateDialog
-  bind:oldCategoryNameValue={categoryToEdit}
-  on:success={() => {
-    handleSaveCategorySuccess();
-    console.log("category save success");
-  }}
+  bind:categoryNameValue={categoryValueToEdit}
+  bind:categoryId={categoryIdToEdit}
+  on:success={handleSaveCategorySuccess}
   bind:dialog={createEditCategoryDialog} />

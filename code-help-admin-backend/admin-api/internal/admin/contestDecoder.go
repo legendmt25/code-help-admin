@@ -11,7 +11,7 @@ type ContestDecoder interface {
 
 	DecodeDetail(response *http.Response) *codeHelpAdminCoreGen.ContestDetail
 
-	DecodeAll(response *http.Response) []codeHelpAdminCoreGen.Contest
+	DecodeAll(response *http.Response) *codeHelpAdminCoreGen.ContestResponse
 }
 
 type contestDecoderImpl struct{}
@@ -38,11 +38,11 @@ func (it *contestDecoderImpl) DecodeDetail(response *http.Response) *codeHelpAdm
 	return &problemDetail
 }
 
-func (it *contestDecoderImpl) DecodeAll(response *http.Response) []codeHelpAdminCoreGen.Contest {
-	var problems []codeHelpAdminCoreGen.Contest
+func (it *contestDecoderImpl) DecodeAll(response *http.Response) *codeHelpAdminCoreGen.ContestResponse {
+	var problems *codeHelpAdminCoreGen.ContestResponse
 	err := decodeUtil.Decode(response, &problems)
 	if err != nil {
-		return []codeHelpAdminCoreGen.Contest{}
+		return nil
 	}
 
 	return problems
