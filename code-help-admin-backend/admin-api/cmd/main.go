@@ -11,13 +11,15 @@ import (
 func main() {
 	env := environment.Load()
 
-	codeHelpAdminClient, _ := core.CreateClient(env.CoreServerUrl)
+	oidcService := api.NewOidcService(env)
+
+	codeHelpAdminClient, _ := core.CreateClient(env.CoreServerUrl, oidcService)
 	coreService := admin.NewCoreService(codeHelpAdminClient)
 
-	codeHelpForumClient, _ := forum.CreateClient(env.ForumServerUrl)
+	codeHelpForumClient, _ := forum.CreateClient(env.ForumServerUrl, oidcService)
 	forumService := forum.NewForumService(codeHelpForumClient)
 
 	adminService := api.NewServiceInterfaceImpl(coreService, forumService)
 
-	api.NewAdminApiServer(adminService, env).Serve()
+	api.NewAdminApiServer(adminService, oidcService).Serve()
 }
