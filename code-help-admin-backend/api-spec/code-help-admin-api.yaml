@@ -888,7 +888,7 @@ components:
             categories:
               type: array
               items:
-                $ref: '#/components/schemas/Category'
+                $ref: '#/components/schemas/ForumCategory'
             posts:
               type: array
               items:
@@ -923,7 +923,7 @@ components:
         categories:
           type: array
           items:
-            $ref: '#/components/schemas/Category'
+            $ref: '#/components/schemas/ForumCategory'
     ShortCommunities:
       type: object
       required: [ communities ]

@@ -39,7 +39,9 @@
           value = {
             ...value,
             name: community.name,
-            description: community.description
+            description: community.description,
+            categories: { uids: community.categories.map((x) => x.uid) },
+            image: community.image
           };
         })
       ];
@@ -129,7 +131,8 @@
         on:change={(event) =>
           (value.categories.uids = Array.from(event.currentTarget.selectedOptions).map((x) => x.value))}>
         {#each categories as category}
-          <option value={category.uid}>{category.name}</option>
+          <option value={category.uid} selected={!!value.categories.uids.find((uid) => category.uid === uid)}
+            >{category.name}</option>
         {/each}
       </select>
       <Button>Submit</Button>
