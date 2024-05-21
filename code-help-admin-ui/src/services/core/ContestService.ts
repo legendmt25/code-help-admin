@@ -1,7 +1,5 @@
-import { ContestApi, type ContestEditRequest, type ContestRequest } from "../generated/admin-api";
-import { baseConfiguration } from "./api";
-
-const CONTEST_API = new ContestApi(baseConfiguration);
+import { type ContestEditRequest, type ContestRequest } from "../../generated/admin-api";
+import { CONTEST_API } from "../api";
 
 export const getAllContests = () => CONTEST_API.getAllContests();
 export const getContestById = (id: number) => CONTEST_API.getContest({ id });

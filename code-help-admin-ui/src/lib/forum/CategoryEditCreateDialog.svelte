@@ -1,15 +1,15 @@
 <script lang="ts">
   import type { FormEventHandler } from "svelte/elements";
-  import Dialog from "../components/Dialog.svelte";
-  import { createCategory, updateCategory } from "../services/ProblemsService";
-  import Button from "../components/Button.svelte";
+  import Dialog from "../../components/Dialog.svelte";
+  import { createCategory, updateCategory } from "../../services/forum/ForumService";
+  import Button from "../../components/Button.svelte";
   import { createEventDispatcher } from "svelte";
 
-  export let categoryId: number | undefined = undefined;
+  export let categoryUid: string | undefined = undefined;
   export let categoryNameValue: string | undefined = undefined;
   export let dialog: HTMLDialogElement | undefined = undefined;
 
-  const title = !categoryId ? "Create category" : `Update category - ${categoryId}`;
+  const title = !categoryUid ? "Create category" : `Update category - ${categoryUid}`;
 
   const dispatch = createEventDispatcher();
 
@@ -22,12 +22,10 @@
 
     let createEditCategoryPromise: Promise<void>;
 
-    if (!Number.isNaN(Number(categoryId))) {
-      console.log('edit category: ', categoryId);
-      createEditCategoryPromise = updateCategory(categoryId!, { categoryRequest: { name: categoryNameValue } });
+    if (categoryUid) {
+      createEditCategoryPromise = updateCategory(categoryUid!, categoryNameValue);
     } else {
-      console.log('create category');
-      createEditCategoryPromise = createCategory({ categoryRequest: { name: categoryNameValue } });
+      createEditCategoryPromise = createCategory(categoryNameValue);
     }
 
     createEditCategoryPromise

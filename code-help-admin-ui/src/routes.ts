@@ -1,12 +1,14 @@
 import { type RouteDefinition } from "svelte-spa-router";
 import { wrap } from "svelte-spa-router/wrap";
-import ProblemsEditCreate from "./lib/ProblemsEditCreate.svelte";
-import ProblemsOverview from "./lib/ProblemsOverview.svelte";
-import ContestsOverview from "./lib/ContestsOverview.svelte";
-import ContestEditCreate from "./lib/ContestEditCreate.svelte";
-import CommunitiesOverview from "./lib/CommunitiesOverview.svelte";
 import Home from "./lib/Home.svelte";
-import CategoriesOverview from "./lib/CategoriesOverview.svelte";
+import CategoriesOverview from "./lib/core/CategoriesOverview.svelte";
+import ContestEditCreate from "./lib/core/ContestEditCreate.svelte";
+import ContestsOverview from "./lib/core/ContestsOverview.svelte";
+import ProblemsEditCreate from "./lib/core/ProblemsEditCreate.svelte";
+import ProblemsOverview from "./lib/core/ProblemsOverview.svelte";
+import CommunitiesOverview from "./lib/forum/CommunitiesOverview.svelte";
+import CommunityEditCreate from "./lib/forum/CommunityEditCreate.svelte";
+import { default as ForumCategoriesOverview } from "./lib/forum/CategoriesOverview.svelte";
 
 export const Route = {
   index: "/",
@@ -16,11 +18,17 @@ export const Route = {
   problems_overview: "/problems",
   problems_create: "/problems/create",
   problems_edit: "/problems/edit/:id",
+  contest_problems_create: "/problems/create?contestId=:contestId",
 
   contests_overview: "/contests",
   contests_create: "/contests/create",
   contests_edit: "/contests/edit/:id",
-  communities_overview: "/communities"
+
+  communities_overview: "/communities",
+  communities_create: "/communities/create",
+  communities_edit: "/communities/edit/:name",
+
+  forum_categories_overview: "/forum-categories"
 } as const;
 
 export const routes: RouteDefinition = {
@@ -50,5 +58,14 @@ export const routes: RouteDefinition = {
   }),
   [Route.communities_overview]: wrap({
     component: CommunitiesOverview
+  }),
+  [Route.communities_create]: wrap({
+    component: CommunityEditCreate
+  }),
+  [Route.communities_edit]: wrap({
+    component: CommunityEditCreate
+  }),
+  [Route.forum_categories_overview]: wrap({
+    component: ForumCategoriesOverview
   })
 };

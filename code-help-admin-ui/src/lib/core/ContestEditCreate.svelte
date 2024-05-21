@@ -1,17 +1,18 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { link } from "svelte-spa-router";
+  import { link, push } from "svelte-spa-router";
   import type { ChangeEventHandler, FormEventHandler } from "svelte/elements";
-  import Button from "../components/Button.svelte";
-  import Spinner from "../components/Spinner.svelte";
+  import Button from "../../components/Button.svelte";
+  import Link from "../../components/Link.svelte";
+  import Spinner from "../../components/Spinner.svelte";
   import {
     ContestStatus,
     type ContestDetail,
     type ContestEditRequest,
     type ContestRequest
-  } from "../generated/admin-api";
-  import { Route } from "../routes";
-  import { createContest, getContestById, updateContest } from "../services/ContestService";
+  } from "../../generated/admin-api";
+  import { Route } from "../../routes";
+  import { createContest, getContestById, updateContest } from "../../services/core/ContestService";
 
   export let params: { id?: string } = {};
 
@@ -44,11 +45,16 @@
     event.preventDefault();
 
     const id = Number(params.id);
+
+    let editCreatePromise: Promise<void>;
+
     if (!Number.isNaN(id)) {
-      updateContest(id, value as ContestEditRequest);
+      editCreatePromise = updateContest(id, value as ContestEditRequest);
     } else {
-      createContest(value as ContestRequest);
+      editCreatePromise = createContest(value as ContestRequest);
     }
+
+    editCreatePromise.finally(() => push(Route.contests_overview));
   };
 
   const handleDateChange: ChangeEventHandler<HTMLInputElement> = (event) => {
@@ -57,6 +63,18 @@
 </script>
 
 <style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid #eee;
+    padding: 10px;
+  }
+
   .p-1 {
     padding: 1rem;
   }
@@ -80,12 +98,21 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  .gap-1 {
+    gap: 1rem;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+  }
 </style>
 
 {#if loading}
   <Spinner />
 {:else}
-  <div class="p-1">
+  <div class="column p-1 gap-1">
     <form on:submit={handleFormSubmit} class="form">
       <div class="input-container">
         <label for="name">Name</label>
@@ -115,7 +142,9 @@
       <Button>Submit</Button>
     </form>
 
-    {#if contestEntry != undefined}
+    {#if contestEntry != undefined && params.id}
+      <Link href={Route.contest_problems_create.replace(":contestId", params.id)}>Create problem</Link>
+
       <table>
         <thead>
           <tr>

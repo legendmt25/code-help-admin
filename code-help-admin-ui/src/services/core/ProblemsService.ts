@@ -1,15 +1,12 @@
-import { CategoryApi, ProblemApi, type CreateCategoryRequest, type ProblemRequest } from "../generated/admin-api";
-import { baseConfiguration } from "./api";
-
-const PROBLEM_API = new ProblemApi(baseConfiguration);
-const CATEGORIES_API = new CategoryApi(baseConfiguration);
+import { type CreateCategoryRequest, type ProblemRequest } from "../../generated/admin-api";
+import { CATEGORY_API, PROBLEM_API } from "../api";
 
 export const getAllProblems = () => {
   return PROBLEM_API.getAllProblems();
 };
 
 export const getAllCategories = () => {
-  return CATEGORIES_API.getAllCategories();
+  return CATEGORY_API.getAllCategories();
 };
 
 export const getProblemById = (id: number) => {
@@ -17,18 +14,18 @@ export const getProblemById = (id: number) => {
 };
 
 export const createCategory = (body: CreateCategoryRequest) => {
-  return CATEGORIES_API.createCategory({ categoryRequest: body.categoryRequest });
+  return CATEGORY_API.createCategory({ categoryRequest: body.categoryRequest });
 };
 
 export const updateCategory = (id: number, body: CreateCategoryRequest) => {
-  return CATEGORIES_API.updateCategory({
+  return CATEGORY_API.updateCategory({
     id,
     categoryRequest: body.categoryRequest
   });
 };
 
 export const deleteCategory = (id: number) => {
-  return CATEGORIES_API.deleteCategory({ id });
+  return CATEGORY_API.deleteCategory({ id });
 };
 
 export const deleteProblem = (id: number) => {
@@ -37,6 +34,10 @@ export const deleteProblem = (id: number) => {
 
 export const createProblem = (body: ProblemRequest) => {
   return PROBLEM_API.createProblem({ problemRequest: body });
+};
+
+export const createContestProblem = (body: ProblemRequest, contestId: number) => {
+  return PROBLEM_API.createProblem({ problemRequest: body, contestId });
 };
 
 export const updateProblem = (id: number, body: ProblemRequest) => {

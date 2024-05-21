@@ -127,6 +127,38 @@ func toMultipart(cases codeHelpAdminGen.TestCases) []codeHelpAdminCoreGen.File {
 	return files
 }
 
+func MapContestEditRequestToClient(data codeHelpAdminGen.ContestEditRequest) codeHelpAdminCoreGen.ContestEditRequest {
+	return codeHelpAdminCoreGen.ContestEditRequest{
+		Duration: data.Duration,
+		Name:     data.Name,
+		StartsOn: data.StartsOn,
+		Status:   (*codeHelpAdminCoreGen.ContestStatus)(data.Status),
+		Problems: MapContestProblemsToClient(*data.Problems),
+	}
+}
+
+func MapContestProblemEditRequestToClient(data codeHelpAdminGen.ContestProblemEditRequest) codeHelpAdminCoreGen.ContestProblemEditRequest {
+	return codeHelpAdminCoreGen.ContestProblemEditRequest{
+		ContestProblemId: data.ContestProblemId,
+		Score:            data.Score,
+	}
+}
+
+func MapContestProblemsToClient(data []codeHelpAdminGen.ContestProblemEditRequest) *[]codeHelpAdminCoreGen.ContestProblemEditRequest {
+	dataSize := len(data)
+	if dataSize == 0 {
+		var emptyList = make([]codeHelpAdminCoreGen.ContestProblemEditRequest, 0)
+		return &emptyList
+	}
+
+	mappedData := make([]codeHelpAdminCoreGen.ContestProblemEditRequest, dataSize)
+	for i, item := range data {
+		mappedData[i] = MapContestProblemEditRequestToClient(item)
+	}
+
+	return &mappedData
+}
+
 func MapClientContestDetailToResponse(clientContest codeHelpAdminCoreGen.ContestDetail) codeHelpAdminGen.ContestDetail {
 	return codeHelpAdminGen.ContestDetail{
 		Duration: clientContest.Duration,

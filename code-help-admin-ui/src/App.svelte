@@ -163,6 +163,10 @@
             <span class:hide={!menuOpened}>Forum</span>
           </a>
           <div>
+            <a class="link-2" href={Route.forum_categories_overview} use:link>
+              <Icon src={BiCategory} size="32" />
+              <span class:hide={!menuOpened}>Categories</span>
+            </a>
             <a class="link-2" href={Route.communities_overview} use:link>
               <Icon src={RiCommunicationChat1Fill} size="32" />
               <span class:hide={!menuOpened}>Communities</span>

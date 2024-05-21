@@ -4,14 +4,27 @@
   import { onMount } from "svelte";
   import CodeMirror from "svelte-codemirror-editor";
   import type { FormEventHandler } from "svelte/elements";
-  import Button from "../components/Button.svelte";
-  import Spinner from "../components/Spinner.svelte";
-  import { Difficulty, type Category, type CategoryRequest, type ProblemRequest } from "../generated/admin-api";
-  import { createProblem, getAllCategories, getProblemById, updateProblem } from "../services/ProblemsService";
+  import Button from "../../components/Button.svelte";
+  import Spinner from "../../components/Spinner.svelte";
+  import { Difficulty, type Category, type CategoryRequest, type ProblemRequest } from "../../generated/admin-api";
+  import {
+    createContestProblem,
+    createProblem,
+    getAllCategories,
+    getProblemById,
+    updateProblem
+  } from "../../services/core/ProblemsService";
   import { Icon } from "svelte-icons-pack";
   import { BiSave } from "svelte-icons-pack/bi";
   import { VscPreview } from "svelte-icons-pack/vsc";
-  export let params: { id?: string } = {};
+  import { push, querystring } from "svelte-spa-router";
+  import { Route } from "../../routes";
+
+  export let params: { id?: string; contestId?: string } = {
+    contestId: new URLSearchParams($querystring).get("contestId") ?? undefined
+  };
+
+  console.log(window.location.search);
 
   let previewEnabled: boolean = false;
   let testCaseSelected: number | undefined = undefined;
@@ -52,21 +65,34 @@
 
     Promise.all(promiseArray)
       .then(() => {
-        formValue.category = categories.find(category => category.name === formValue.category?.name);
+        formValue.category = categories.find((category) => category.name === formValue.category?.name);
       })
       .finally(() => (loading = false));
   });
+  console.log(params.contestId);
 
   const handleEditCreate: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
     const body: ProblemRequest = formValue as ProblemRequest;
 
+    let editCreatePromise: Promise<void>;
+
     const id = Number(params.id);
-    if (!Number.isNaN(id)) {
-      updateProblem(id, body);
+    const contestId = Number(params.contestId);
+
+    if (!Number.isNaN(contestId) && Number.isNaN(id)) {
+      editCreatePromise = createContestProblem(body, contestId);
+    } else if (!Number.isNaN(id)) {
+      editCreatePromise = updateProblem(id, body).then(() => {});
     } else {
-      createProblem(body);
+      editCreatePromise = createProblem(body).finally(() => push(Route.problems_overview));
+    }
+
+    if (!Number.isNaN(contestId)) {
+      editCreatePromise.finally(() => push(Route.contests_edit.replace(":id", params.contestId!)));
+    } else {
+      editCreatePromise.finally(() => push(Route.problems_overview));
     }
   };
 </script>

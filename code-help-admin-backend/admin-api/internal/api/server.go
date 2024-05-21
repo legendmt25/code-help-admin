@@ -113,13 +113,7 @@ func (it *ServerInterfaceImpl) UpdateContest(w http.ResponseWriter, r *http.Requ
 	var data = codeHelpAdminGen.UpdateContestJSONRequestBody{}
 	_ = json.NewDecoder(r.Body).Decode(&data)
 
-	res := it.coreService.UpdateContest(r.Context(), id, codeHelpAdminCoreGen.UpdateContestJSONRequestBody{
-		Duration: data.Duration,
-		Name:     data.Name,
-		StartsOn: data.StartsOn,
-		Status:   (*codeHelpAdminCoreGen.ContestStatus)(data.Status),
-		Problems: data.Problems,
-	})
+	res := it.coreService.UpdateContest(r.Context(), id, apimapper.MapContestEditRequestToClient(data))
 
 	if res {
 		w.WriteHeader(http.StatusOK)

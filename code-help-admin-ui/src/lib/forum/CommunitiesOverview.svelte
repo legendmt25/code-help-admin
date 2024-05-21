@@ -1,7 +1,9 @@
 <script lang="ts">
-  import Button from "../components/Button.svelte";
-  import Spinner from "../components/Spinner.svelte";
-  import { deleteCommunity, getAllCommunities } from "../services/ForumService";
+  import Button from "../../components/Button.svelte";
+  import Link from "../../components/Link.svelte";
+  import Spinner from "../../components/Spinner.svelte";
+  import { Route } from "../../routes";
+  import { deleteCommunity, getAllCommunities } from "../../services/forum/ForumService";
 
   const getAllCommunitiesPromise = getAllCommunities().then((data) => data.communities);
 
@@ -41,11 +43,12 @@
   <Spinner />
 {:then communities}
   <section>
+    <Link href={Route.communities_create}>Create</Link>
     <table>
       <thead>
         <tr>
           <th>Name</th>
-          <th>Language</th>
+          <th>Description</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -56,8 +59,9 @@
         {#each communities as communityEntry}
           <tr>
             <td>{communityEntry.name}</td>
-            <td>{JSON.stringify(communityEntry.categories)}</td>
+            <td>{JSON.stringify(communityEntry.description)}</td>
             <td>
+              <Link href={Route.communities_edit.replace(':name', communityEntry.name)}>Edit</Link>
               <Button on:click={() => handleDeleteCommunity(communityEntry.name)}>Delete</Button>
             </td>
           </tr>

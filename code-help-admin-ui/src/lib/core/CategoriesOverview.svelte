@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Button from "../components/Button.svelte";
-  import Spinner from "../components/Spinner.svelte";
-  import { getAllCategories, deleteCategory } from "../services/ProblemsService";
+  import Button from "../../components/Button.svelte";
+  import Spinner from "../../components/Spinner.svelte";
+  import { getAllCategories, deleteCategory } from "../../services/core/ProblemsService";
   import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
 
   let categoryValueToEdit: string | undefined = undefined;

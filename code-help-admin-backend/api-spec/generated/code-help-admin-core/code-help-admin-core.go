@@ -79,14 +79,11 @@ type ContestDetail struct {
 
 // ContestEditRequest defines model for ContestEditRequest.
 type ContestEditRequest struct {
-	Duration string `json:"duration"`
-	Name     string `json:"name"`
-	Problems *[]struct {
-		ContestProblemId *int64 `json:"contestProblemId,omitempty"`
-		Score            *int   `json:"score,omitempty"`
-	} `json:"problems,omitempty"`
-	StartsOn Date           `json:"startsOn"`
-	Status   *ContestStatus `json:"status,omitempty"`
+	Duration string                       `json:"duration"`
+	Name     string                       `json:"name"`
+	Problems *[]ContestProblemEditRequest `json:"problems,omitempty"`
+	StartsOn Date                         `json:"startsOn"`
+	Status   *ContestStatus               `json:"status,omitempty"`
 }
 
 // ContestProblem defines model for ContestProblem.
@@ -97,6 +94,12 @@ type ContestProblem struct {
 	Id               int64      `json:"id"`
 	Score            int        `json:"score"`
 	Title            string     `json:"title"`
+}
+
+// ContestProblemEditRequest defines model for ContestProblemEditRequest.
+type ContestProblemEditRequest struct {
+	ContestProblemId *int64 `json:"contestProblemId,omitempty"`
+	Score            *int   `json:"score,omitempty"`
 }
 
 // ContestRequest defines model for ContestRequest.
@@ -2097,33 +2100,33 @@ func ParseUpdateProblemResponse(rsp *http.Response) (*UpdateProblemResponse, err
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xa3W/bNhD/Vwh2DxugWk7S9cFvjp202dYkiFMMQxMMjHS22UqkSlHtvMD/+0BSH9Sn",
-	"5dZu0i5v/rgj73539zvypHvs8TDiDJiM8egeR0SQECQI/W1CJCy4WJ356htleIQjIpfYwYyEgEeY+tjB",
-	"Aj4mVICPR1Ik4ODYW0JIlMaci5BIJcfkyxfYwXIVgfkKCxB4vXbwhDMJsdznFpeC3wUQ7m+LtVKPI85i",
-	"0LgdE/8KPiYQy6v0Z/WrD7EnaCQpVyYcEx8JIzTAawefcnFHfR9Yu0ouohXOuYaOdexxzpFnZFINecoT",
-	"5ncpSDRXIlr+LSOJXHJB/4UOHVtqoPE20JUySOeW4BEISQ1G1O+FbRakewz/kDAK1J/HlBGxQlIAxIVK",
-	"LAVlC2yCkcXynQmuXuM2F+V378GTavHMvjRcdTO/cvceGxe4lnf2jEQGl4RQf/hJwByP8DO3KFw3BdzN",
-	"0V7nOxIhyKpmlrV2o3Hcrzg9T5in4o1+JmJx8Au6v2EIuS7yuA9owSFGSxBww9Y3rI5JXuR1J/1EEJNH",
-	"9m4Hy6NhiJ0iO3KxhrW/IpFSs5D+p2HpWBIh4wu2CfcpkZDKy2RzlMyuMyPcnq/5eo7tf25Tc+D00lOQ",
-	"hAbKDhIEF3M8etfLIrx2qvGJDHVukYJmqZRyNyZivn7dm9vCnxOfSqtCt3Iq0+vpW6UGS96c9c202ONC",
-	"p1pDM6rFrIZPOw4Zqr0xKMLwDTwrEUx1+Uy1M86tLLwDmvg+qj+1Zct672giRmDr+t3cQbKFO8ya5YAA",
-	"S0KldXF5co4dPLseX12fTLGDJ39czE6m1iIF/BrWUsAOh4eHz4e/Pj94WQq6kmvSp/M59ZJArmwLTsaz",
-	"v7CD35xMz96+wQ5+Pb7S2xe7pBK19U5pAKUqudMHgSZRq04be/pqm0bul/zoTMRCcpu+KKkM7JruOkgZ",
-	"2ZJRTQmQArBtH2qnq5CIDz7/XCGAZ8/Q9WeOZkk4GAxQyufIPp42BEckjIHIjjjdteBDTgTbqaj0n5AY",
-	"uppL7wDRjRR0nW6npHki+4v3akh2FuSBKMNSgtV2v5nv00C38v22dVI0+S8ulwfJMM0p22VYptKcYb00",
-	"S/G16r9wW/kcJ+HG600DHTg7SBErQdoa29YH0x2cSB2cF04JrfHxZIpOz86n6NXFDZtMjq1vjRDG4CWC",
-	"ytVM2Wb8Gad3aN32//7tz2v14x0QAeI0Ywj1a3q7Vguaf4sNllJGZhhB2ZxrQjeR1fc59BqCCI39kCqb",
-	"PoGIzfX9YDAcDDVvRMBIRPEIHw2GgwPs6CmJNs4lSs0t30gXoAtXBUUbrc6Q+BXIcRBMCsHKZORwOMyP",
-	"Jcwc5qMooJ5ewX0fmyNeMXvpV/xpkmjfy8OJi9+Vay+GB22L5da5jdMOrXy0Wbk+vdHUShaxdd1eYcV9",
-	"EY8bgJsIIBLyvm9yEmJ5zP3VHhBL6bI+ujo0UJVRNMaZodAjwnLt1DPTvaf+2ngQgDlAloGe6t8toO2R",
-	"Z8v5pBBxrZHo+raG3YvN3tXHdg8FqtLsZXBlatie2UlDYr+NfLJLvB+oKv7PkbXqzLpOdvF/JrZP9q9c",
-	"fRvJf4DGQYByqx8DfaX3642dIJXbU8pXZmPfYx/IgaynZ98mkGO8JSflj6yeWkA5o9s4YS9I75xL0nFF",
-	"C5NYk7EfIlZd3XpH4dobcdkPBJ7adS86dL2Am4trWqQValf/xlmrREsSRcAoWyDKkMd99WkJQaTvm5V+",
-	"pTSfqPTbBFEPVFqDONPPCr4kiFrzKYj7CqI9reo4N19mYnvsddXJ2qMdmqSYlU7KTcdRRPK5LGVILgHd",
-	"Ee8DML/OVFo+GwTWsly/GfQxAX1LTV8N8vLUtt8Iykd/h06Pt4M6W2GYBJJGREhXLfTcJ5J8QSw3HeN7",
-	"Z051VlnLjcd0BSgypF5pPa8ArcmwgfKKB9tPlFcu1TZ62wvSO6fFriuAwWq4GauG1/9+lOh2XBp2FeAH",
-	"Y8pvmEwGMf8po+ynYTpZGp6DvbtViRGD+JRlVKUyI2BofHmG4gg8Ok9Dhh2ciCB9LDZy3YB7JFjyWI6O",
-	"hsOhSyKK17fr/wIAAP//++u4AwAtAAA=",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

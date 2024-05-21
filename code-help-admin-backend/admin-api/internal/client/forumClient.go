@@ -1,4 +1,4 @@
-package forum
+package client
 
 import (
 	"admin-api/internal/api"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func CreateClient(server string, oidcService api.OidcService) (codeHelpForum.ClientInterface, error) {
+func CreateForumClient(server string, oidcService api.OidcService) (codeHelpForum.ClientInterface, error) {
 	return codeHelpForum.NewClient(server, codeHelpForum.WithRequestEditorFn(func(ctx context.Context, req *http.Request) error {
 		return oidcService.AttachAuthHeader(ctx, req)
 	}))

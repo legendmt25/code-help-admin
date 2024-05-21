@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { deleteProblem, getAllProblems } from "../services/ProblemsService";
+  import { deleteProblem, getAllProblems } from "../../services/core/ProblemsService";
   import { link } from "svelte-spa-router";
-  import Spinner from "../components/Spinner.svelte";
-  import { Route } from "../routes";
-  import Link from "../components/Link.svelte";
+  import Spinner from "../../components/Spinner.svelte";
+  import { Route } from "../../routes";
+  import Link from "../../components/Link.svelte";
 
   const getAllProblemsPromise = getAllProblems()
     .then((x) => x.problems)

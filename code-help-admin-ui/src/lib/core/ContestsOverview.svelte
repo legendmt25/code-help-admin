@@ -1,9 +1,9 @@
 <script lang="ts">
   import { link } from "svelte-spa-router";
-  import Spinner from "../components/Spinner.svelte";
-  import { Route } from "../routes";
-  import { deleteContest, getAllContests } from "../services/ContestService";
-  import Link from "../components/Link.svelte";
+  import Spinner from "../../components/Spinner.svelte";
+  import { Route } from "../../routes";
+  import { deleteContest, getAllContests } from "../../services/core/ContestService";
+  import Link from "../../components/Link.svelte";
 
   const handleGetAllContests = () =>
     getAllContests()
@@ -67,7 +67,7 @@
           <tr>
             <td>{contestEntry.id}</td>
             <td>{contestEntry.name}</td>
-            <td>{contestEntry.startsOn}</td>
+            <td>{contestEntry.startsOn.toLocaleString()}</td>
             <td>{contestEntry.duration}</td>
             <td>{contestEntry.status}</td>
             <td>
@@ -75,7 +75,6 @@
                 href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}
                 use:link>Edit</a>
               <a on:click={() => handleDeleteContest(contestEntry.id)}>Delete</a>
-              /
             </td>
           </tr>
         {/each}
