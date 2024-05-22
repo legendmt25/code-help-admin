@@ -14,6 +14,8 @@
   } from "../../services/forum/ForumService";
   import MessageBox from "../../components/MessageBox.svelte";
   import { FormSubmitStatus } from "../../types";
+  import { Icon } from "svelte-icons-pack";
+  import { AiOutlinePlusCircle } from "svelte-icons-pack/ai";
 
   export let params: { name?: string } = {};
 
@@ -89,6 +91,12 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  .icon-text {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
 </style>
 
 {#if loading}
@@ -125,29 +133,31 @@
       {/if}
     </form>
 
-    {#if communityEntry != undefined && params.name}
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>title</th>
-            <th>Score</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {#each communityEntry.posts as post}
-            <tr>
-              <td>{post.uid}</td>
-              <td>{post.title}</td>
-              <td>{post.user.username}</td>
-              <td>
-                <a href={post.uid ? Route.post_edit.replace(":uid", post.uid.toString()) : undefined} use:link>Edit</a>
-              </td>
-            </tr>
-          {/each}
-        </tbody>
-      </table>
-    {/if}
+    <!-- {#if communityEntry != undefined && params.name} -->
+    <span class="icon-text">Add new post <Icon src={AiOutlinePlusCircle} title="Add new post" size="24" /></span>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>Score</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <!-- <tbody>
+            {#each communityEntry.posts as post}
+              <tr>
+                <td>{post.uid}</td>
+                <td>{post.title}</td>
+                <td>{post.user.username}</td>
+                <td>
+                  <a href={post.uid ? Route.post_edit.replace(":uid", post.uid.toString()) : undefined} use:link
+                    >Edit</a>
+                </td>
+              </tr>
+            {/each}
+          </tbody> -->
+    </table>
+    <!-- {/if} -->
   </div>
 {/if}

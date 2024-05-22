@@ -23,6 +23,7 @@
     width: 100%;
     max-width: 200px;
     transition: all 200ms;
+    text-decoration: none;
   }
 
   a:hover {
