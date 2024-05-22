@@ -12,6 +12,8 @@
     getCommunityByName,
     updateCommunity
   } from "../../services/forum/ForumService";
+  import MessageBox from "../../components/MessageBox.svelte";
+  import { FormSubmitStatus } from "../../types";
 
   export let params: { name?: string } = {};
 
@@ -50,9 +52,11 @@
     }
   });
 
+  let formSubmitStatus: FormSubmitStatus;
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
+    formSubmitStatus = FormSubmitStatus.SUBMITTING;
     let editCreatePromise: Promise<Community>;
 
     if (params.name) {
@@ -61,7 +65,9 @@
       editCreatePromise = createCommunity(value as CommunityRequest);
     }
 
-    editCreatePromise.finally(() => push(Route.communities_overview));
+    editCreatePromise
+      .then(() => (formSubmitStatus = FormSubmitStatus.SUCCESS))
+      .catch(() => (formSubmitStatus = FormSubmitStatus.ERROR));
   };
 </script>
 
@@ -78,37 +84,10 @@
     padding: 10px;
   }
 
-  .p-1 {
-    padding: 1rem;
-  }
-
-  .input-container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  input,
-  select {
-    width: 100%;
-    max-width: 300px;
-    padding: 5px;
-    font-size: 1.05rem;
-    outline: none;
-  }
-
   form {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .gap-1 {
-    gap: 1rem;
-  }
-
-  .column {
-    display: flex;
-    flex-direction: column;
   }
 </style>
 
@@ -125,17 +104,25 @@
         <label for="description">Description</label>
         <input id="description" name="description" bind:value={value.description} />
       </div>
-      <select
-        name="categories"
-        multiple
-        on:change={(event) =>
-          (value.categories.uids = Array.from(event.currentTarget.selectedOptions).map((x) => x.value))}>
-        {#each categories as category}
-          <option value={category.uid} selected={!!value.categories.uids.find((uid) => category.uid === uid)}
-            >{category.name}</option>
-        {/each}
-      </select>
+      <div class="input-container">
+        <label for="categories">Categories:</label>
+        <select
+          name="categories"
+          multiple
+          on:change={(event) =>
+            (value.categories.uids = Array.from(event.currentTarget.selectedOptions).map((x) => x.value))}>
+          {#each categories as category}
+            <option value={category.uid} selected={!!value.categories.uids.find((uid) => category.uid === uid)}
+              >{category.name}</option>
+          {/each}
+        </select>
+      </div>
       <Button>Submit</Button>
+      {#if formSubmitStatus === FormSubmitStatus.SUCCESS}
+        <MessageBox type={FormSubmitStatus.SUCCESS}>Saved successfully!</MessageBox>
+      {:else if formSubmitStatus === FormSubmitStatus.ERROR}
+        <MessageBox type={FormSubmitStatus.ERROR}>Error happened while saving</MessageBox>
+      {/if}
     </form>
 
     {#if communityEntry != undefined && params.name}
@@ -143,7 +130,7 @@
         <thead>
           <tr>
             <th>#</th>
-            <th>Title</th>
+            <th>title</th>
             <th>Score</th>
             <th>Actions</th>
           </tr>
@@ -155,8 +142,7 @@
               <td>{post.title}</td>
               <td>{post.user.username}</td>
               <td>
-                <a href={post.uid ? Route.problems_edit.replace(":id", post.uid.toString()) : undefined} use:link
-                  >Edit</a>
+                <a href={post.uid ? Route.post_edit.replace(":uid", post.uid.toString()) : undefined} use:link>Edit</a>
               </td>
             </tr>
           {/each}

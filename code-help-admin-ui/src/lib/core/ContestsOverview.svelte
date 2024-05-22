@@ -1,9 +1,10 @@
 <script lang="ts">
-  import { link } from "svelte-spa-router";
+  import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
   import { Route } from "../../routes";
   import { deleteContest, getAllContests } from "../../services/core/ContestService";
   import Link from "../../components/Link.svelte";
+  import type { Contest } from "../../generated/admin-api";
 
   const handleGetAllContests = () =>
     getAllContests()
@@ -14,6 +15,16 @@
 
   const handleDeleteContest = (contestId: number) =>
     deleteContest(contestId).then(() => (getAllContestsPromise = handleGetAllContests()));
+
+  let search: string | undefined = undefined;
+  $: filter = (contests: Contest[]) =>
+    contests.filter(
+      (contest) =>
+        !search ||
+        contest.name.toLowerCase().includes(search.toLowerCase()) ||
+        contest.duration.toLowerCase().includes(search.toLowerCase()) ||
+        contest.id.toString().toLowerCase().includes(search.toLowerCase())
+    );
 </script>
 
 <style>
@@ -48,6 +59,11 @@
 {:then contests}
   <section>
     <Link href={Route.contests_create}>Create</Link>
+    <h2>Contests</h2>
+    <hr />
+    <div class="input-container">
+      <input id="search" placeholder="Search" name="search" bind:value={search} />
+    </div>
     <table>
       <thead>
         <tr>
@@ -63,7 +79,7 @@
         {#if contests.length === 0}
           <div class="no-entries">No entries!</div>
         {/if}
-        {#each contests as contestEntry}
+        {#each filter(contests) as contestEntry}
           <tr>
             <td>{contestEntry.id}</td>
             <td>{contestEntry.name}</td>
@@ -71,10 +87,9 @@
             <td>{contestEntry.duration}</td>
             <td>{contestEntry.status}</td>
             <td>
-              <a
-                href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}
-                use:link>Edit</a>
-              <a on:click={() => handleDeleteContest(contestEntry.id)}>Delete</a>
+              <Link href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}
+                >Edit</Link>
+              <Button on:click={() => handleDeleteContest(contestEntry.id)}>Delete</Button>
             </td>
           </tr>
         {/each}

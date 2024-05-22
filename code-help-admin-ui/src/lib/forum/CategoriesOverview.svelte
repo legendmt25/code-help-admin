@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
+  import type { ForumCategory } from "../../generated/admin-api";
   import { deleteCategory, getAllCategories } from "../../services/forum/ForumService";
   import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
 
@@ -26,6 +27,11 @@
     categoryUIdToEdit = categoryUd;
     categoryValueToEdit = categoryName;
     createEditCategoryDialog?.showModal();
+  };
+
+  let search: string | undefined = undefined;
+  $: filter = (categories: ForumCategory[]) => {
+    return categories.filter((category) => !search || category.name.includes(search) || category.uid.includes(search));
   };
 </script>
 
@@ -66,6 +72,11 @@
         categoryUIdToEdit = undefined;
         createEditCategoryDialog?.showModal();
       }}>Create</Button>
+    <h2>Categories</h2>
+    <hr />
+    <div class="input-container">
+      <input id="search" placeholder="Search" name="search" bind:value={search} />
+    </div>
     <table>
       <thead>
         <tr>
@@ -78,7 +89,7 @@
         {#if categories.length === 0}
           <div class="no-entries">No entries!</div>
         {/if}
-        {#each categories as categoryEntry}
+        {#each filter(categories) as categoryEntry}
           <tr>
             <td>{categoryEntry.uid}</td>
             <td>{categoryEntry.name}</td>

@@ -75,37 +75,10 @@
     padding: 10px;
   }
 
-  .p-1 {
-    padding: 1rem;
-  }
-
-  .input-container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  input,
-  select {
-    width: 100%;
-    max-width: 300px;
-    padding: 5px;
-    font-size: 1.05rem;
-    outline: none;
-  }
-
   form {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-  }
-
-  .gap-1 {
-    gap: 1rem;
-  }
-
-  .column {
-    display: flex;
-    flex-direction: column;
   }
 </style>
 

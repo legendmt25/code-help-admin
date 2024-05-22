@@ -36,23 +36,6 @@
 </script>
 
 <style>
-  .p-1 {
-    padding: 1rem;
-  }
-
-  .input-container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  input {
-    width: 100%;
-    max-width: 300px;
-    padding: 5px;
-    font-size: 1.05rem;
-    outline: none;
-  }
-
   form {
     display: flex;
     flex-direction: column;

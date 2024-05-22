@@ -1,6 +1,7 @@
 <script lang="ts">
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
+  import type { Category } from "../../generated/admin-api";
   import { getAllCategories, deleteCategory } from "../../services/core/ProblemsService";
   import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
 
@@ -27,6 +28,15 @@
     categoryValueToEdit = categoryName;
     createEditCategoryDialog?.showModal();
   };
+
+  let search: string | undefined = undefined;
+  $: filter = (categories: Category[]) =>
+    categories.filter(
+      (category) =>
+        !search ||
+        category.id.toString().toLowerCase().includes(search.toLowerCase()) ||
+        category.name.toLowerCase().includes(search.toLowerCase())
+    );
 </script>
 
 <style>
@@ -66,6 +76,11 @@
         categoryIdToEdit = undefined;
         createEditCategoryDialog?.showModal();
       }}>Create</Button>
+    <h2>Categories</h2>
+    <hr />
+    <div class="input-container">
+      <input id="search" placeholder="Search" name="search" bind:value={search} />
+    </div>
     <table>
       <thead>
         <tr>
@@ -78,7 +93,7 @@
         {#if categories.length === 0}
           <div class="no-entries">No entries!</div>
         {/if}
-        {#each categories as categoryEntry}
+        {#each filter(categories) as categoryEntry}
           <tr>
             <td>{categoryEntry.id}</td>
             <td>{categoryEntry.name}</td>

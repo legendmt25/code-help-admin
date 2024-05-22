@@ -9,6 +9,7 @@ import ProblemsOverview from "./lib/core/ProblemsOverview.svelte";
 import CommunitiesOverview from "./lib/forum/CommunitiesOverview.svelte";
 import CommunityEditCreate from "./lib/forum/CommunityEditCreate.svelte";
 import { default as ForumCategoriesOverview } from "./lib/forum/CategoriesOverview.svelte";
+import PostDetail from "./lib/forum/PostDetail.svelte";
 
 export const Route = {
   index: "/",
@@ -27,6 +28,7 @@ export const Route = {
   communities_overview: "/communities",
   communities_create: "/communities/create",
   communities_edit: "/communities/edit/:name",
+  post_edit: "/posts/edit/:uid",
 
   forum_categories_overview: "/forum-categories"
 } as const;
@@ -67,5 +69,8 @@ export const routes: RouteDefinition = {
   }),
   [Route.forum_categories_overview]: wrap({
     component: ForumCategoriesOverview
+  }),
+  [Route.post_edit]: wrap({
+    component: PostDetail
   })
 };

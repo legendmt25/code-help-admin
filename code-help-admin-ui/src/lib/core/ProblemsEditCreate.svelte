@@ -24,8 +24,6 @@
     contestId: new URLSearchParams($querystring).get("contestId") ?? undefined
   };
 
-  console.log(window.location.search);
-
   let previewEnabled: boolean = false;
   let testCaseSelected: number | undefined = undefined;
   let editCode: "starter-code" | "runner-code" = "starter-code";
@@ -98,36 +96,6 @@
 </script>
 
 <style>
-  .column {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .row {
-    display: flex;
-  }
-
-  .p-1 {
-    padding: 1rem;
-  }
-
-  .h-100 {
-    height: 100%;
-  }
-
-  .w-100 {
-    width: 100%;
-  }
-
-  .w-50 {
-    width: 50%;
-  }
-
-  .gap-1 {
-    gap: 1rem;
-  }
-
   /* Extra small devices (phones, 600px and down) */
   @media only screen and (max-width: 600px) {
     .sm-column,
@@ -135,20 +103,6 @@
       flex-direction: column;
       width: 100% !important;
     }
-  }
-
-  input,
-  select {
-    width: 100%;
-    max-width: 300px;
-    padding: 5px;
-    font-size: 1.05rem;
-    outline: none;
-  }
-
-  .input-container {
-    display: flex;
-    flex-direction: column;
   }
 
   form {
@@ -269,7 +223,7 @@
         </section>
       </div>
       <hr />
-      <div class="w-50 column">
+      <div class="w-50 column h-100">
         <section class="column gap-1 h-50">
           {#if !previewEnabled}
             <Button fullwidth on:click={() => (editCode = editCode === "runner-code" ? "starter-code" : "runner-code")}
@@ -289,7 +243,7 @@
           <section>
             <h2>Tests Editor</h2>
             <div class="row gap-1 w-100 h-50">
-              <div class="tests-tab-sidebar column w-100">
+              <div class="tests-tab-sidebar column h-100 w-100">
                 {#each formValue.testCases ?? [] as _, index}
                   <Button
                     fullwidth

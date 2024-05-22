@@ -8,27 +8,6 @@
 </script>
 
 <style>
-  .column {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .row {
-    display: flex;
-  }
-
-  .gap-1 {
-    gap: 1rem;
-  }
-
-  .p-1 {
-    padding: 1rem;
-  }
-
-  .h-100 {
-    height: 100%;
-  }
-
   .tile {
     width: 200px;
     height: 120px;
