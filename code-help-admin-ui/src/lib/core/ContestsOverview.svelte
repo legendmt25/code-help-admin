@@ -33,7 +33,7 @@
     padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 8rem;
+    gap: 4rem;
     position: relative;
   }
 
@@ -41,15 +41,26 @@
     padding: 10px;
     font-weight: bold;
   }
+
+  .page-heading {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .input-container {
+    width: 33%;
+  }
 </style>
 
 {#await getAllContestsPromise}
   <Spinner />
 {:then contests}
   <section>
-    <Link href={Route.contests_create}>Create</Link>
-    <h2>Contests</h2>
-    <hr />
+    <div class="page-heading">
+      <h2>Contests</h2>
+      <Link href={Route.contests_create}>Create</Link>
+    </div>
+
     <div class="input-container">
       <input id="search" placeholder="Search" name="search" bind:value={search} />
     </div>

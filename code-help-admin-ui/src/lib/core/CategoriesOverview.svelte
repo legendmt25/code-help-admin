@@ -40,12 +40,11 @@
 </script>
 
 <style>
-
   section {
     padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 8rem;
+    gap: 4rem;
     position: relative;
   }
 
@@ -53,22 +52,34 @@
     padding: 10px;
     font-weight: bold;
   }
+
+  .page-heading {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .input-container {
+    width: 33%;
+  }
 </style>
 
 {#await getAllCategoriesPromise}
   <Spinner />
 {:then categories}
   <section>
-    <Button
-      on:click={() => {
-        categoryValueToEdit = undefined;
-        categoryIdToEdit = undefined;
-        createEditCategoryDialog?.showModal();
-      }}>Create</Button>
-    <h2>Categories</h2>
-    <hr />
-    <div class="input-container">
-      <input id="search" placeholder="Search" name="search" bind:value={search} />
+    <div class="page-heading">
+      <h2>Categories</h2>
+      <Button
+        on:click={() => {
+          categoryValueToEdit = undefined;
+          categoryIdToEdit = undefined;
+          createEditCategoryDialog?.showModal();
+        }}>Create</Button>
+    </div>
+    <div>
+      <div class="input-container">
+        <input id="search" placeholder="Search" name="search" bind:value={search} />
+      </div>
     </div>
     <table>
       <thead>

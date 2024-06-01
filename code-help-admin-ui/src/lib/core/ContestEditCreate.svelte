@@ -129,9 +129,7 @@
       <Button>Submit</Button>
     </form>
 
-    {#if contestEntry != undefined && params.id}
-      <Link href={Route.contest_problems_create.replace(":contestId", params.id)}>Create problem</Link>
-
+    {#if contestEntry != undefined}
       <table>
         <thead>
           <tr>

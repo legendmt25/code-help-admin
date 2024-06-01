@@ -83,8 +83,6 @@ td {
   padding-inline: 0.5rem;
 }
 
-
-
 table,
 th {
   border-top: none;
@@ -142,14 +140,6 @@ td,th {
   flex-direction: column;
 }
 
-input,
-select {
-  width: 100%;
-  max-width: 300px;
-  padding: 5px;
-  font-size: 1.05rem;
-  outline: none;
-}
 
 hr {
   color: #d1d7dc;

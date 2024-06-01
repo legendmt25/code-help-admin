@@ -30,7 +30,7 @@
     padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 8rem;
+    gap: 4rem;
     position: relative;
   }
 
@@ -39,18 +39,28 @@
     font-weight: bold;
   }
 
+  .page-heading {
+    display: flex;
+    justify-content: space-between;
+  }
 
+  .input-container {
+    width: 33%;
+  }
 </style>
 
 {#await getAllProblemsPromise}
   <Spinner />
 {:then problems}
   <section>
-    <Link href={Route.problems_create}>Create</Link>
-    <h2>Problems</h2>
-    <hr />
-    <div class="input-container">
-      <input id="search" placeholder="Search" name="search" bind:value={search} />
+    <div class="page-heading">
+      <h2>Problems</h2>
+      <Link href={Route.problems_create}>Create</Link>
+    </div>
+    <div>
+      <div class="input-container">
+        <input id="search" placeholder="Search" name="search" bind:value={search} />
+      </div>
     </div>
     <table>
       <colgroup>
@@ -62,36 +72,31 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Title</th>
-          <th>Category</th>
+          <th>Name</th>
+          <th>Language</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         {#if problems.length === 0}
-          <!-- <div class="no-entries">No entries!</div> -->
+          <div class="no-entries">No entries!</div>
         {/if}
-        {#each filter(problems) as problemEntry}
+        {#each problems as problemEntry}
           <tr>
             <td>{problemEntry.id}</td>
             <td>{problemEntry.title}</td>
-            <td>{problemEntry.category?.name}</td>
             <td>
-              <Link href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
-                >Edit</Link>
+              <a
+                href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
+                use:link>Edit</a>
+              /
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-missing-attribute -->
-              <Button on:click={() => handleDeleteProblem(problemEntry.id)}>Delete</Button>
+              <a on:click={() => handleDeleteProblem(problemEntry.id)}>Delete</a>
             </td>
           </tr>
         {/each}
-        <tr>
-          <td>h1</td>
-          <td>h1</td>
-          <td>h1</td>
-          <td>h1</td>
-        </tr>
       </tbody>
     </table>
   </section>
