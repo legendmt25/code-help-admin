@@ -37,8 +37,8 @@
     flex-direction: column;
     gap: 0.2rem;
     box-shadow: rgba(0, 0, 0, 0.05) 1.95px 1px 2px 0px;
-    background-color: #18283b;
-    color: #8392a5;
+    background-color: #fafafa;
+    color: #757e8a;
     transition: all 200ms;
   }
 
@@ -56,21 +56,16 @@
     transition: all 200ms;
   }
 
-  a:hover {
+  a.link.title {
     color: #000;
   }
 
-  :global(a.active) {
+  a.link:not(.title):hover {
     color: #000;
   }
 
-  .link-1 {
+  .link {
     padding: 1rem;
-  }
-
-  .link-2 {
-    padding: 1rem;
-    background-color: #202e3f;
   }
 
   .nav-head {
@@ -107,6 +102,11 @@
     max-width: 60px;
     min-width: 0;
   }
+
+  .nav-head.link.title {
+    cursor: pointer;
+  }
+
 </style>
 
 <div class="container">
@@ -114,32 +114,34 @@
   <nav class:hide-nav={!menuOpened}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-missing-attribute -->
-    <a class="nav-head link-1" on:click={toggleMenu}>
+    <a class="nav-head link title" on:click={toggleMenu}>
       <span class:hide={!menuOpened}>CODE HELP ADMIN</span>
       <Icon src={AiOutlineMenu} size="32" />
     </a>
     <div class="h-100 column">
-      <a class="link-1" href={Route.index} use:link use:active>
+      <a class="link title" href={Route.index} use:link use:active={{ path: Route.index }}>
         <Icon src={AiFillHome} size="32" />
         <span class:hide={!menuOpened}>Home</span>
       </a>
       <div>
         <Accordion>
           <!-- svelte-ignore a11y-missing-attribute -->
-          <a class="link-1" slot="title" on:click={openMenu} on:keydown={undefined}>
-            <Icon src={RiLogosCoreosFill} size="32" />
-            <span class:hide={!menuOpened}>Core</span>
-          </a>
-          <div>
-            <a class="link-2" href={Route.categories_overview} use:link use:active>
-              <Icon src={BiCategory} size="32" />
-              <span class:hide={!menuOpened}>Categories</span>
+          <svelte:fragment slot="title">
+            <a class="link title" on:click={openMenu} on:keydown={undefined}>
+              <Icon src={RiLogosCoreosFill} size="32" />
+              <span class:hide={!menuOpened}>Core</span>
             </a>
-            <a class="link-2" href={Route.problems_overview} use:link use:active>
+          </svelte:fragment>
+          <div>
+            <a class="link" href={Route.categories_overview} use:link use:active={{ path: Route.categories_overview }}>
+                <Icon src={BiCategory} size="32" />
+                <span class:hide={!menuOpened}>Categories</span>
+            </a>
+            <a class="link" href={Route.problems_overview} use:link use:active={{ path: Route.problems_overview }}>
               <Icon src={AiFillQuestionCircle} size="32" />
               <span class:hide={!menuOpened}>Problems</span>
             </a>
-            <a class="link-2" href={Route.contests_overview} use:link use:active>
+            <a class="link" href={Route.contests_overview} use:link use:active={{ path: Route.contests_overview }}>
               <Icon src={AiOutlineBarChart} size="32" />
               <span class:hide={!menuOpened}>Contests</span>
             </a>
@@ -149,16 +151,14 @@
       <div>
         <Accordion>
           <!-- svelte-ignore a11y-missing-attribute -->
-          <a class="link-1" slot="title" on:click={openMenu} on:keydown={undefined}>
-            <Icon src={FaBrandsForumbee} size="32" />
-            <span class:hide={!menuOpened}>Forum</span>
-          </a>
-          <div>
-            <a class="link-2" href={Route.forum_categories_overview} use:link use:active>
-              <Icon src={BiCategory} size="32" />
-              <span class:hide={!menuOpened}>Categories</span>
+          <svelte:fragment slot="title">
+            <a class="link title" on:click={openMenu} on:keydown={undefined} >
+              <Icon src={FaBrandsForumbee} size="32" />
+              <span class:hide={!menuOpened}>Forum</span>
             </a>
-            <a class="link-2" href={Route.communities_overview} use:link use:active>
+          </svelte:fragment>
+          <div>
+            <a class="link" href={Route.communities_overview} use:link use:active={{ path: Route.communities_overview }}>
               <Icon src={RiCommunicationChat1Fill} size="32" />
               <span class:hide={!menuOpened}>Communities</span>
             </a>

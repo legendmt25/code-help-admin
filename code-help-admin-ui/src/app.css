@@ -10,8 +10,8 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: #213547;
+  background-color: #ffffff;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -38,19 +38,72 @@ h1 {
   min-height: 100vh;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.link:not(.title).active {
+  color: black;
 }
 
+input, select {
+  width: 100%;
+  color: black;
+  background: white;
+  padding-inline: 1em;
+  padding-block: 0.5rem;
+  border: 1px solid black;
+  border-radius: 0.3rem;
+}
+
+select::marker {
+  color: red;
+}
+
+textarea {
+  background: white;
+  color: black;
+  padding-inline: 1em;
+  padding-block: 0.5rem;
+  border: 1px solid black;
+  border-radius: 0.3rem;
+}
+
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+table,
+td {
+  padding-block: 0.75rem;
+}
+
+table,
+th,
+td {
+  border: 1px solid #b6b7b8;
+  padding-inline: 0.5rem;
+}
+
+
+
+table,
+th {
+  border-top: none;
+}
+
+table,
+th, td {
+  border-left: 0;
+  border-right: 0;
+}
+
+thead > tr {
+  line-height: 1.8em;
+  font-size: 0.9em;
+}
+
+td,th {
+  text-align: left;
+}
 .column {
   display: flex;
   flex-direction: column;

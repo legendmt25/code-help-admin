@@ -1,12 +1,18 @@
 <script lang="ts">
   import type { ButtonType } from "./types";
 
-  export let fullwidth: boolean | undefined = undefined;
+  export let fullWidth: boolean | undefined = undefined;
   export let active: boolean | undefined = undefined;
   export let type: ButtonType = "primary";
 
-  export let clazz: string = "";
-  export { clazz as class };
+
+  export let style = "";
+
+  export let className: string = "";
+  export { className as class };
+
+  export let toggleButton = false;
+  export let toggled = false;
 </script>
 
 <style>
@@ -14,6 +20,7 @@
     border: 1px solid transparent;
     padding: 0.6em 1.2em;
     font-size: 1em;
+    border-radius: 0.3rem;
     width: 100%;
     font-weight: 500;
     font-family: inherit;
@@ -42,15 +49,24 @@
     outline: 4px auto -webkit-focus-ring-color;
   }
 
-  .btn-fullwidth {
+  .btn-full-width {
     max-width: 100%;
   }
 
   .active.primary {
     background-color: #314257;
   }
+
+  button.toggle {
+    outline: none;
+  }
+
+  button.toggle:not(.toggled) {
+    background-color: #eaeaea;
+    color: black;
+  }
 </style>
 
-<button {...$$restProps} on:click class:btn-fullwidth={fullwidth} class={type + ' ' + clazz} class:active>
+<button {...$$restProps} on:click class:toggle={toggleButton} class:toggled class={type + ' ' + clazz} class:btn-full-width={fullWidth} {style} class={className} class:active>
   <slot />
 </button>

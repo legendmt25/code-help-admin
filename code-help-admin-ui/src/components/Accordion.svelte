@@ -1,6 +1,5 @@
 <script lang="ts">
   import { Icon } from "svelte-icons-pack";
-  import { BsArrowDown } from "svelte-icons-pack/bs";
   import { SlArrowUp } from "svelte-icons-pack/sl";
   import { SlArrowDown } from "svelte-icons-pack/sl";
 
@@ -23,6 +22,7 @@
 
   .opened {
     max-height: 300px !important;
+    margin-left: 0.25rem
   }
 
   .title-container {
@@ -33,6 +33,7 @@
     cursor: pointer;
     padding-right: 1rem;
   }
+
 </style>
 
 <div class="accordion">

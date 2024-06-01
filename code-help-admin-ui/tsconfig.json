@@ -5,6 +5,7 @@
     "useDefineForClassFields": true,
     "module": "ESNext",
     "resolveJsonModule": true,
+    "types": ["node", "vite/client"],
     "strict": true,
     "allowJs": true,
     "checkJs": true,
