@@ -67,6 +67,6 @@
   }
 </style>
 
-<button {...$$restProps} on:click class:toggle={toggleButton} class:toggled class={type + ' ' + clazz} class:btn-full-width={fullWidth} {style} class={className} class:active>
+<button {...$$restProps} on:click class:toggle={toggleButton} class:toggled class={type + ' ' + className} class:btn-full-width={fullWidth} {style}  class:active>
   <slot />
 </button>
