@@ -28,23 +28,12 @@
 </script>
 
 <style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  table,
-  th,
-  td {
-    border: 1px solid #eee;
-    padding: 10px;
-  }
 
   section {
-    padding: 1rem;
+    padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 8rem;
     position: relative;
   }
 

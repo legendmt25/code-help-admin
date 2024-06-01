@@ -24,6 +24,9 @@
     max-width: 200px;
     transition: all 200ms;
     text-decoration: none;
+    border-radius: 0.3rem;
+    text-align: center;
+    line-height: normal;
   }
 
   a:hover {

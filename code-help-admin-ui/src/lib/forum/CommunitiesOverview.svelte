@@ -23,23 +23,11 @@
 </script>
 
 <style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  table,
-  th,
-  td {
-    border: 1px solid #eee;
-    padding: 10px;
-  }
-
   section {
-    padding: 1rem;
+    padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 8rem;
     position: relative;
   }
 
@@ -68,19 +56,20 @@
         </tr>
       </thead>
       <tbody>
-        {#if communities.length === 0}
+        {#if !communities || communities.length === 0}
           <div class="no-entries">No entries!</div>
-        {/if}
-        {#each filter(communities) as communityEntry}
-          <tr>
-            <td>{communityEntry.name}</td>
-            <td>{communityEntry.description}</td>
-            <td>
+        {:else}
+          {#each filter(communities) as communityEntry}
+            <tr>
+              <td>{communityEntry.name}</td>
+              <td>{communityEntry.description}</td>
+              <td>
               <Link href={Route.communities_edit.replace(":name", communityEntry.name)}>Edit</Link>
-              <Button on:click={() => handleDeleteCommunity(communityEntry.name)}>Delete</Button>
-            </td>
-          </tr>
-        {/each}
+                <Button on:click={() => handleDeleteCommunity(communityEntry.name)}>Delete</Button>
+              </td>
+            </tr>
+          {/each}
+        {/if}
       </tbody>
     </table>
   </section>

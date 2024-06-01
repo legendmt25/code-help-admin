@@ -36,6 +36,21 @@
 </script>
 
 <style>
+  .p-1 {
+    padding: 1rem;
+  }
+
+  .input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  label {
+    font-size: 0.8em;
+    font-weight: bold;
+  }
+
   form {
     display: flex;
     flex-direction: column;

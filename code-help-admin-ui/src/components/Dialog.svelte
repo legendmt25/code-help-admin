@@ -12,17 +12,24 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: none;
     width: 100%;
     max-width: 500px;
+    border: 1px solid #b6b7b8;
   }
 
+  dialog[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+
   .header {
-    padding: 1rem 0;
-    margin: 0 0.5rem;
-    border-bottom: 1px solid black;
+    padding: 1rem 1rem;
+    box-sizing: border-box;
+    border-bottom: 1px solid #b6b7b8;
     display: flex;
     justify-content: space-between;
+    border-radius: 0.1rem;
   }
 
   .close-icon {
@@ -30,14 +37,28 @@
   }
 
   .footer {
-    padding: 1rem 0;
-    margin: 0 0.5rem;
-    border-top: 1px solid black;
+    padding: 1rem 1rem;
+    box-sizing: border-box;
+    border-top: 1px solid #b6b7b8;
+    border-radius: 0.1rem;
+    justify-content: end;
+    display: flex;
+  }
+
+  .modal-dialog {
+    background-color: white;
+    color: black;
+    border-radius: 0.3rem;
+  }
+
+  .modal-dialog-content {
+    flex-grow: 1;
+    padding-block: 1rem;
   }
 </style>
 
 <Portal>
-  <dialog bind:this={dialog} on:close>
+  <dialog class="modal-dialog" bind:this={dialog} on:close>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div class="header p-1">
@@ -48,7 +69,9 @@
         <Icon src={AiOutlineClose} size="20px" />
       </div>
     </div>
-    <slot />
+    <div class="modal-dialog-content">
+      <slot />
+    </div>
     <div class="footer">
       <slot name="footer" />
     </div>

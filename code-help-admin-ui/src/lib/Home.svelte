@@ -12,16 +12,31 @@
     width: 200px;
     height: 120px;
     background-color: #18283b;
-    color: #8392a5;
+    color: #ffffff;
     padding: 1rem;
     border-radius: 0.625rem;
     display: flex;
     gap: 0.5rem;
     text-decoration: none;
   }
+
+  .tile:hover {
+    opacity: 0.8;
+  }
+  .page-title {
+    padding-bottom: 5rem;
+    font-size: 2em;
+    font-weight: bold;
+  }
+
+  .page-content {
+    padding-inline: 2rem;
+    padding-block: 1.5rem;
+  }
 </style>
 
-<div class="p-1 column h-100 gap-1">
+<div class="p-1 column h-100 gap-1 page-content">
+  <h1 class="page-title">Code Help Admin</h1>
   <h2>Core</h2>
   <hr />
   <div class="row gap-1">

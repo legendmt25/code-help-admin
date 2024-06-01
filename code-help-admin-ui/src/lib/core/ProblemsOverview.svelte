@@ -26,23 +26,11 @@
 </script>
 
 <style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  table,
-  th,
-  td {
-    border: 1px solid #eee;
-    padding: 10px;
-  }
-
   section {
-    padding: 1rem;
+    padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 8rem;
     position: relative;
   }
 
@@ -50,6 +38,8 @@
     padding: 10px;
     font-weight: bold;
   }
+
+
 </style>
 
 {#await getAllProblemsPromise}
@@ -63,6 +53,12 @@
       <input id="search" placeholder="Search" name="search" bind:value={search} />
     </div>
     <table>
+      <colgroup>
+        <col style="width: 10%; text-align: right;" />
+        <col style="width: 40%; text-align: right;" />
+        <col style="width: 10%; text-align: right;" />
+        <col style="width: 40%; text-align: right;" />
+      </colgroup>
       <thead>
         <tr>
           <th>#</th>
@@ -73,7 +69,7 @@
       </thead>
       <tbody>
         {#if problems.length === 0}
-          <div class="no-entries">No entries!</div>
+          <!-- <div class="no-entries">No entries!</div> -->
         {/if}
         {#each filter(problems) as problemEntry}
           <tr>
@@ -90,6 +86,12 @@
             </td>
           </tr>
         {/each}
+        <tr>
+          <td>h1</td>
+          <td>h1</td>
+          <td>h1</td>
+          <td>h1</td>
+        </tr>
       </tbody>
     </table>
   </section>

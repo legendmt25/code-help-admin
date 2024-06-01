@@ -105,6 +105,11 @@
     }
   }
 
+  .input-container {
+    display: flex;
+    flex-direction: column;
+  }
+
   form {
     margin-top: 1rem;
     display: flex;
@@ -113,9 +118,9 @@
   }
 
   .tests-tab-sidebar {
-    gap: 0.3rem;
-    max-width: 250px;
-    max-height: 300px;
+    gap: 0.5rem;
+    max-width: 10rem;
+    height: 20rem;
     overflow-y: auto;
   }
 
@@ -165,12 +170,33 @@
   :global(.side-btn:hover > span) {
     max-width: 100px;
   }
+
+  .tab-control {
+    display: flex;
+  }
+
+  .button-close-icon {
+    padding-inline: 0.75rem;
+    /* font-weight: bold; */
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+    font-size: 1.5em;
+    padding-bottom: 0.1em;
+  }
+
+  .content-container {
+    background: #fdfdfd;
+  }
 </style>
 
 {#if loading}
   <Spinner />
 {:else}
-  <div class="column h-100 p-1 gap-1">
+  <div class="column h-100 p-1 gap-1 content-container">
     <div class="row sm-column h-100 gap-1">
       <div class="column h-100 w-50 gap-1">
         <form id="edit-problem-form" class="form" on:submit={handleEditCreate}>
@@ -221,39 +247,29 @@
               bind:value={formValue.markdown} />
           {/if}
         </section>
-      </div>
-      <hr />
-      <div class="w-50 column h-100">
-        <section class="column gap-1 h-50">
-          {#if !previewEnabled}
-            <Button fullwidth on:click={() => (editCode = editCode === "runner-code" ? "starter-code" : "runner-code")}
-              >Edit {editCode === "runner-code" ? "Runner code" : "Starter code"}</Button>
-          {/if}
-          {#if editCode === "runner-code" || previewEnabled}
-            <CodeMirror
-              bind:value={formValue.starterCode}
-              readonly={previewEnabled}
-              placeholder="Starter code"
-              lang={javascript()} />
-          {:else}
-            <CodeMirror bind:value={formValue.runnerCode} placeholder="Runner code" lang={javascript()} />
-          {/if}
-        </section>
         {#if !previewEnabled}
           <section>
-            <h2>Tests Editor</h2>
+            <h2 style="padding-bottom: 0.4rem ;">Tests Editor</h2>
             <div class="row gap-1 w-100 h-50">
               <div class="tests-tab-sidebar column h-100 w-100">
+                <Button
+                  class="test-case-add-btn"
+                  fullwidth
+                  on:click={() => (formValue.testCases = [...(formValue.testCases ?? []), {}])}>
+                  <span style="font-size: 1.4em; font-weight:bold; line-height: 90%">+</span>
+                </Button>
                 {#each formValue.testCases ?? [] as _, index}
                   <Button
                     fullwidth
                     on:click={() => (testCaseSelected = index)}
                     class="test-case-btn"
+                    style="position: relative;"
                     active={testCaseSelected === index}
                     ><div>Test case {index}</div>
                     <!-- svelte-ignore a11y-interactive-supports-focus -->
                     <div
                       role="button"
+                      class="button-close-icon"
                       on:keydown={undefined}
                       on:click={(event) => {
                         event.preventDefault();
@@ -263,13 +279,9 @@
                           ...(formValue.testCases ?? []).filter((_, arrIndex) => arrIndex !== index)
                         ];
                       }}>
-                      x
+                      ×
                     </div></Button>
                 {/each}
-                <Button
-                  class="test-case-add-btn"
-                  fullwidth
-                  on:click={() => (formValue.testCases = [...(formValue.testCases ?? []), {}])}>+</Button>
               </div>
               {#if testCaseSelected != undefined && formValue.testCases}
                 <div class="input-container w-100 h-100">
@@ -279,6 +291,7 @@
                     id="testcase-input"
                     name="testcase-input"
                     placeholder="INPUT"
+                    style="resize: none; max-height: 20rem; min-height: 18rem;"
                     bind:value={formValue.testCases[testCaseSelected]._in} />
                 </div>
                 <div class="input-container w-100 h-100">
@@ -288,12 +301,47 @@
                     id="testcase-output"
                     name="testcase-input"
                     placeholder="OUTPUT"
+                    style="resize: none; max-height: 20rem; min-height: 18rem;"
                     bind:value={formValue.testCases[testCaseSelected].out} />
                 </div>
               {/if}
             </div>
           </section>
         {/if}
+      </div>
+      <hr />
+      <div class="w-50 column">
+        <section class="column gap-1 h-50">
+          {#if !previewEnabled}
+            <div class="tab-control">
+              <Button
+                fullWidth
+                toggleButton
+                toggled={editCode === "starter-code"}
+                style={"border-top-right-radius: 0; border-bottom-right-radius: 0;"}
+                on:click={() => (editCode = "starter-code")}>Edit {"Starter code"}</Button>
+              <Button
+                fullWidth
+                toggleButton
+                toggled={editCode === "runner-code"}
+                on:click={() => (editCode = "runner-code")}
+                style={"border-top-left-radius: 0; border-bottom-left-radius: 0;"}>Edit {"Runner code"}</Button>
+            </div>
+          {/if}
+          {#if editCode === "starter-code" || previewEnabled}
+            <div style="background-color: white; height: 100%">
+              <CodeMirror
+                bind:value={formValue.starterCode}
+                readonly={previewEnabled}
+                placeholder="Starter code"
+                lang={javascript()} />
+            </div>
+          {:else}
+            <div style="background-color: white; height: 100%">
+              <CodeMirror bind:value={formValue.runnerCode} placeholder="Runner code" lang={javascript()} />
+            </div>
+          {/if}
+        </section>
       </div>
     </div>
     <Button class="side-btn" form="edit-problem-form"><Icon src={BiSave} size={24} /> <span>Save</span></Button>

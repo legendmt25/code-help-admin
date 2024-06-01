@@ -63,29 +63,43 @@
 </script>
 
 <style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
+  .p-1 {
+    padding: 1rem;
   }
 
-  table,
-  th,
-  td {
-    border: 1px solid #eee;
-    padding: 10px;
+  .input-container {
+    display: flex;
+    flex-direction: column;
   }
 
   form {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 1rem;
+    max-width: 40rem;
+    width: 100%;
+  }
+
+  label {
+    font-size: 0.9em;
+    font-weight: bold;
+  }
+
+  .form-container {
+
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 2rem;
+    gap: 4rem;
   }
 </style>
 
 {#if loading}
   <Spinner />
 {:else}
-  <div class="column p-1 gap-1">
+  <div class="form-container p-1">
+    <h2>Create new contest</h2>
     <form on:submit={handleFormSubmit} class="form">
       <div class="input-container">
         <label for="name">Name</label>
