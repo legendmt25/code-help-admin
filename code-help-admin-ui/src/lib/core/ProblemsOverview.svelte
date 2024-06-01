@@ -72,8 +72,8 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Name</th>
-          <th>Language</th>
+          <th>Title</th>
+          <th>Category</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -81,22 +81,27 @@
         {#if problems.length === 0}
           <div class="no-entries">No entries!</div>
         {/if}
-        {#each problems as problemEntry}
+        {#each filter(problems) as problemEntry}
           <tr>
             <td>{problemEntry.id}</td>
             <td>{problemEntry.title}</td>
+            <td>{problemEntry.category?.name}</td>
             <td>
-              <a
-                href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
-                use:link>Edit</a>
-              /
+              <Link href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
+                >Edit</Link>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-missing-attribute -->
-              <a on:click={() => handleDeleteProblem(problemEntry.id)}>Delete</a>
+              <Button on:click={() => handleDeleteProblem(problemEntry.id)}>Delete</Button>
             </td>
           </tr>
         {/each}
+        <tr>
+          <td>h1</td>
+          <td>h1</td>
+          <td>h1</td>
+          <td>h1</td>
+        </tr>
       </tbody>
     </table>
   </section>
