@@ -19,18 +19,22 @@ type OidcService interface {
 	AttachAuthHeader(ctx context.Context, req *http.Request) error
 }
 
-func NewOidcService(environment environment.Environment) OidcService {
+func NewOidcService(environment environment.Environment) (OidcService, error) {
 	ctx := context.Background()
 	issuerUri := environment.Oauth2Jwt.IssuerUri
+	discoveryIssuerUrl := environment.Oauth2Jwt.DiscoveryIssuerUri
 
-	provider, err := oidc.NewProvider(ctx, issuerUri)
+	ctx = oidc.InsecureIssuerURLContext(ctx, issuerUri)
+	provider, err := oidc.NewProvider(ctx, discoveryIssuerUrl)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Error: ", err)
+		return nil, err
 	}
 
 	oidcConfig := &oidc.Config{
 		SkipClientIDCheck: true,
+		SkipIssuerCheck:   true,
 	}
 
 	verifier := provider.Verifier(oidcConfig)
@@ -38,7 +42,7 @@ func NewOidcService(environment environment.Environment) OidcService {
 	return &oidcServiceImpl{
 		provider: provider,
 		verifier: verifier,
-	}
+	}, nil
 }
 
 func (it *oidcServiceImpl) Verify(ctx context.Context, token string) (*oidc.IDToken, error) {

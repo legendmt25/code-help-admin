@@ -1,8 +1,15 @@
-FROM node:16-alpine as builder
+FROM node:20-alpine AS base
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+COPY . /app
+WORKDIR /app
 
-WORKDIR /admin-ui
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-COPY ./code-help-admin-ui .
+
+FROM base AS build
 
 ARG VITE_ADMIN_API_URL
 ENV VITE_ADMIN_API_URL=$VITE_ADMIN_API_URL
@@ -15,14 +22,14 @@ ENV VITE_KEYCLOAK_CLIENTID=$VITE_KEYCLOAK_CLIENTID
 ARG VITE_BASE_ROUTE
 ENV VITE_BASE_ROUTE=$VITE_BASE_ROUTE
 
-RUN npm install
-RUN npm run build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
-FROM nginx:stable as build
+FROM nginx:stable
 
 RUN rm -rf /usr/share/nginx/html/*
 
-COPY --from=builder /admin-ui/dist/ /usr/share/nginx/html/admin-ui/
+COPY --from=build /app/dist  /usr/share/nginx/html/admin-ui/
 
 EXPOSE 80
 EXPOSE 443

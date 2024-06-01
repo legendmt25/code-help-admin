@@ -12,8 +12,9 @@ type Environment struct {
 }
 
 type Oauth2Jwt struct {
-	IssuerUri string
-	JwkSetUri string
+	IssuerUri          string
+	DiscoveryIssuerUri string
+	JwkSetUri          string
 }
 
 func Load() Environment {
@@ -46,13 +47,24 @@ func getForumApiServerUrl() string {
 
 func getOauth2JwtData() Oauth2Jwt {
 	return Oauth2Jwt{
-		IssuerUri: getIssuerUri(),
-		JwkSetUri: getJwkSetUri(),
+		IssuerUri:          getIssuerUri(),
+		JwkSetUri:          getJwkSetUri(),
+		DiscoveryIssuerUri: getDiscoveryIssuerUri(),
 	}
 }
 
 func getIssuerUri() string {
 	issuerUri := os.Getenv("OAUTH2_RESOURCESERVER_JWT_ISSUERURI")
+
+	if isNotBlank(issuerUri) {
+		return issuerUri
+	}
+
+	return "http://localhost/iam/realms/code-help"
+}
+
+func getDiscoveryIssuerUri() string {
+	issuerUri := os.Getenv("OAUTH2_RESOURCESERVER_JWT__DISCOVERYISSUERURI")
 
 	if isNotBlank(issuerUri) {
 		return issuerUri
