@@ -191,6 +191,24 @@ func (it *ServerInterfaceImpl) CreateForumCategory(w http.ResponseWriter, r *htt
 	w.WriteHeader(statusCode)
 }
 
+func (it *ServerInterfaceImpl) DeleteForumCategory(w http.ResponseWriter, r *http.Request, uid string) {
+	statusCode, _ := it.forumService.Category().DeleteCategory(r.Context(), uid)
+
+	w.WriteHeader(statusCode)
+}
+
+func (it *ServerInterfaceImpl) UpdateForumCategory(w http.ResponseWriter, r *http.Request, uid string) {
+	var data codeHelpAdminGen.UpdateForumCategoryJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	res, statusCode, _ := it.forumService.Category().UpdateCategory(r.Context(), uid, codeHelpForumGen.UpdateCategoryJSONRequestBody{
+		Name: data.Name,
+	})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(res)
+}
+
 func (it *ServerInterfaceImpl) GetCommentsForPost(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.GetCommentsForPostParams) {
 	res, statusCode, _ := it.forumService.Comment().GetComments(r.Context(), codeHelpForumGen.GetCommentsForPostParams{
 		Post: params.Post,
@@ -300,8 +318,13 @@ func (it *ServerInterfaceImpl) RemoveModerator(w http.ResponseWriter, r *http.Re
 }
 
 func (it *ServerInterfaceImpl) GetCommunityModerators(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.GetCommunityModeratorsParams) {
-	//TODO implement me
-	panic("implement me")
+
+	moderators, statusCode, _ := it.forumService.Community().GetModerators(
+		r.Context(),
+		codeHelpForumGen.GetCommunityModeratorsParams{Name: params.Name})
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(moderators)
 }
 
 func (it *ServerInterfaceImpl) AddModerator(w http.ResponseWriter, r *http.Request, params codeHelpAdminGen.AddModeratorParams) {

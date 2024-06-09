@@ -11,6 +11,10 @@ type ForumCategoryService interface {
 	GetCategories(ctx context.Context) (*codeHelpForumGen.Categories, int, error)
 
 	CreateCategory(ctx context.Context, body codeHelpForumGen.CreateCategoryJSONRequestBody) (int, error)
+
+	UpdateCategory(ctx context.Context, uid string, body codeHelpForumGen.UpdateCategoryJSONRequestBody) (*codeHelpForumGen.Category, int, error)
+
+	DeleteCategory(ctx context.Context, uid string) (int, error)
 }
 
 type forumCategoryServiceImpl struct {
@@ -42,6 +46,26 @@ func (it *forumCategoryServiceImpl) GetCategories(ctx context.Context) (*codeHel
 
 func (it *forumCategoryServiceImpl) CreateCategory(ctx context.Context, body codeHelpForumGen.CreateCategoryJSONRequestBody) (int, error) {
 	res, err := it.client.CreateCategory(ctx, body)
+	if err != nil {
+		log.Error(err)
+		return http.StatusInternalServerError, err
+	}
+
+	return res.StatusCode, nil
+}
+
+func (it *forumCategoryServiceImpl) UpdateCategory(ctx context.Context, uid string, body codeHelpForumGen.UpdateCategoryJSONRequestBody) (*codeHelpForumGen.Category, int, error) {
+	res, err := it.client.UpdateCategory(ctx, uid, body)
+	if err != nil {
+		log.Error(err)
+		return nil, http.StatusInternalServerError, err
+	}
+
+	return it.decoder.Decode(res), res.StatusCode, nil
+}
+
+func (it *forumCategoryServiceImpl) DeleteCategory(ctx context.Context, uid string) (int, error) {
+	res, err := it.client.DeleteCategory(ctx, uid)
 	if err != nil {
 		log.Error(err)
 		return http.StatusInternalServerError, err

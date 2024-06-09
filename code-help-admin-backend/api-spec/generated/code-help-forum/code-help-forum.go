@@ -200,6 +200,9 @@ type CreateCommunityPostParams struct {
 // CreateCategoryJSONRequestBody defines body for CreateCategory for application/json ContentType.
 type CreateCategoryJSONRequestBody = CategoryCreate
 
+// UpdateCategoryJSONRequestBody defines body for UpdateCategory for application/json ContentType.
+type UpdateCategoryJSONRequestBody = CategoryCreate
+
 // CommentOnPostJSONRequestBody defines body for CommentOnPost for application/json ContentType.
 type CommentOnPostJSONRequestBody = CommentRequest
 
@@ -304,6 +307,14 @@ type ClientInterface interface {
 	CreateCategoryWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateCategory(ctx context.Context, body CreateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteCategory request
+	DeleteCategory(ctx context.Context, uid string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// UpdateCategoryWithBody request with any body
+	UpdateCategoryWithBody(ctx context.Context, uid string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	UpdateCategory(ctx context.Context, uid string, body UpdateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetCommentsForPost request
 	GetCommentsForPost(ctx context.Context, params *GetCommentsForPostParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -411,6 +422,42 @@ func (c *Client) CreateCategoryWithBody(ctx context.Context, contentType string,
 
 func (c *Client) CreateCategory(ctx context.Context, body CreateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateCategoryRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteCategory(ctx context.Context, uid string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteCategoryRequest(c.Server, uid)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateCategoryWithBody(ctx context.Context, uid string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateCategoryRequestWithBody(c.Server, uid, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) UpdateCategory(ctx context.Context, uid string, body UpdateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateCategoryRequest(c.Server, uid, body)
 	if err != nil {
 		return nil, err
 	}
@@ -827,6 +874,87 @@ func NewCreateCategoryRequestWithBody(server string, contentType string, body io
 	}
 
 	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewDeleteCategoryRequest generates requests for DeleteCategory
+func NewDeleteCategoryRequest(server string, uid string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "uid", runtime.ParamLocationPath, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/category/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewUpdateCategoryRequest calls the generic UpdateCategory builder with application/json body
+func NewUpdateCategoryRequest(server string, uid string, body UpdateCategoryJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewUpdateCategoryRequestWithBody(server, uid, "application/json", bodyReader)
+}
+
+// NewUpdateCategoryRequestWithBody generates requests for UpdateCategory with any type of body
+func NewUpdateCategoryRequestWithBody(server string, uid string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "uid", runtime.ParamLocationPath, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/category/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -1806,6 +1934,14 @@ type ClientWithResponsesInterface interface {
 
 	CreateCategoryWithResponse(ctx context.Context, body CreateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCategoryResponse, error)
 
+	// DeleteCategoryWithResponse request
+	DeleteCategoryWithResponse(ctx context.Context, uid string, reqEditors ...RequestEditorFn) (*DeleteCategoryResponse, error)
+
+	// UpdateCategoryWithBodyWithResponse request with any body
+	UpdateCategoryWithBodyWithResponse(ctx context.Context, uid string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateCategoryResponse, error)
+
+	UpdateCategoryWithResponse(ctx context.Context, uid string, body UpdateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCategoryResponse, error)
+
 	// GetCommentsForPostWithResponse request
 	GetCommentsForPostWithResponse(ctx context.Context, params *GetCommentsForPostParams, reqEditors ...RequestEditorFn) (*GetCommentsForPostResponse, error)
 
@@ -1923,6 +2059,49 @@ func (r CreateCategoryResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r CreateCategoryResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type DeleteCategoryResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteCategoryResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteCategoryResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type UpdateCategoryResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Category
+}
+
+// Status returns HTTPResponse.Status
+func (r UpdateCategoryResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r UpdateCategoryResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -2410,6 +2589,32 @@ func (c *ClientWithResponses) CreateCategoryWithResponse(ctx context.Context, bo
 	return ParseCreateCategoryResponse(rsp)
 }
 
+// DeleteCategoryWithResponse request returning *DeleteCategoryResponse
+func (c *ClientWithResponses) DeleteCategoryWithResponse(ctx context.Context, uid string, reqEditors ...RequestEditorFn) (*DeleteCategoryResponse, error) {
+	rsp, err := c.DeleteCategory(ctx, uid, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseDeleteCategoryResponse(rsp)
+}
+
+// UpdateCategoryWithBodyWithResponse request with arbitrary body returning *UpdateCategoryResponse
+func (c *ClientWithResponses) UpdateCategoryWithBodyWithResponse(ctx context.Context, uid string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateCategoryResponse, error) {
+	rsp, err := c.UpdateCategoryWithBody(ctx, uid, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateCategoryResponse(rsp)
+}
+
+func (c *ClientWithResponses) UpdateCategoryWithResponse(ctx context.Context, uid string, body UpdateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCategoryResponse, error) {
+	rsp, err := c.UpdateCategory(ctx, uid, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseUpdateCategoryResponse(rsp)
+}
+
 // GetCommentsForPostWithResponse request returning *GetCommentsForPostResponse
 func (c *ClientWithResponses) GetCommentsForPostWithResponse(ctx context.Context, params *GetCommentsForPostParams, reqEditors ...RequestEditorFn) (*GetCommentsForPostResponse, error) {
 	rsp, err := c.GetCommentsForPost(ctx, params, reqEditors...)
@@ -2700,6 +2905,48 @@ func ParseCreateCategoryResponse(rsp *http.Response) (*CreateCategoryResponse, e
 	response := &CreateCategoryResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseDeleteCategoryResponse parses an HTTP response from a DeleteCategoryWithResponse call
+func ParseDeleteCategoryResponse(rsp *http.Response) (*DeleteCategoryResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteCategoryResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseUpdateCategoryResponse parses an HTTP response from a UpdateCategoryWithResponse call
+func ParseUpdateCategoryResponse(rsp *http.Response) (*UpdateCategoryResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &UpdateCategoryResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Category
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -3184,31 +3431,32 @@ func ParseUpdatePostResponse(rsp *http.Response) (*UpdatePostResponse, error) {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"ieWnxeLSJyn13y5x8VT8GwAA//9kPjI8li4AAA==",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
