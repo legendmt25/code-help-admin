@@ -653,6 +653,50 @@ paths:
       responses:
         200:
           description: OK
+  /forum/category/{uid}:
+    delete:
+      tags: [ forum category ]
+      operationId: deleteForumCategory
+      description: Deletes forum category by uid
+      parameters:
+        - in: path
+          name: uid
+          description: Forum category uid
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: No content.
+    put:
+      tags: [ forum category ]
+      operationId: updateForumCategory
+      description: Updates forum category by uid
+      parameters:
+        - in: path
+          name: uid
+          description: Forum category uid
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: Forum category update body
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryCreate'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForumCategory'
+        304:
+          description: Not Modified
+        400:
+          description: Bad Request
 
 components:
   parameters:
