@@ -3,7 +3,6 @@
   import Spinner from "../../components/Spinner.svelte";
   import { Route } from "../../routes";
   import { deleteContest, getAllContests } from "../../services/core/ContestService";
-  import Link from "../../components/Link.svelte";
   import type { Contest } from "../../generated/admin-api";
 
   const handleGetAllContests = () =>
@@ -58,7 +57,7 @@
   <section>
     <div class="page-heading">
       <h2>Contests</h2>
-      <Link href={Route.contests_create}>Create</Link>
+      <Button href={Route.contests_create}>Create</Button>
     </div>
 
     <div class="input-container">
@@ -87,8 +86,8 @@
             <td>{contestEntry.duration}</td>
             <td>{contestEntry.status}</td>
             <td>
-              <Link href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}
-                >Edit</Link>
+              <Button href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}
+                >Edit</Button>
               <Button on:click={() => handleDeleteContest(contestEntry.id)}>Delete</Button>
             </td>
           </tr>

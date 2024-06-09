@@ -1,9 +1,7 @@
 <script lang="ts">
   import { deleteProblem, getAllProblems } from "../../services/core/ProblemsService";
-  import { link } from "svelte-spa-router";
   import Spinner from "../../components/Spinner.svelte";
   import { Route } from "../../routes";
-  import Link from "../../components/Link.svelte";
   import type { Problem } from "../../generated/admin-api";
   import Button from "../../components/Button.svelte";
 
@@ -55,7 +53,7 @@
   <section>
     <div class="page-heading">
       <h2>Problems</h2>
-      <Link href={Route.problems_create}>Create</Link>
+      <Button href={Route.problems_create}>Create</Button>
     </div>
     <div>
       <div class="input-container">
@@ -87,8 +85,8 @@
             <td>{problemEntry.title}</td>
             <td>{problemEntry.category?.name}</td>
             <td>
-              <Link href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
-                >Edit</Link>
+              <Button href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
+                >Edit</Button>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-missing-attribute -->

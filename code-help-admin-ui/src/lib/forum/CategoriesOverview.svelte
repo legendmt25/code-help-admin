@@ -31,7 +31,10 @@
 
   let search: string | undefined = undefined;
   $: filter = (categories: ForumCategory[]) => {
-    return categories.filter((category) => !search || category.name.includes(search) || category.uid.includes(search));
+    return categories.filter(
+      (category) =>
+        !search || category.name.toLowerCase().includes(search) || category.uid.toLowerCase().includes(search)
+    );
   };
 </script>
 

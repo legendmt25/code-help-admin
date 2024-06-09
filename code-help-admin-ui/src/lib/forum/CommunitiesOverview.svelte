@@ -1,10 +1,11 @@
 <script lang="ts">
+  import { Icon } from "svelte-icons-pack";
   import Button from "../../components/Button.svelte";
-  import Link from "../../components/Link.svelte";
   import Spinner from "../../components/Spinner.svelte";
-  import type { Community, ShortCommunity } from "../../generated/admin-api";
+  import type { ShortCommunity } from "../../generated/admin-api";
   import { Route } from "../../routes";
   import { deleteCommunity, getAllCommunities } from "../../services/forum/ForumService";
+  import { AiOutlinePlus } from "svelte-icons-pack/ai";
 
   const getAllCommunitiesPromise = getAllCommunities().then((data) => data.communities);
 
@@ -27,7 +28,7 @@
     padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 8rem;
+    gap: 4rem;
     position: relative;
   }
 
@@ -35,18 +36,31 @@
     padding: 10px;
     font-weight: bold;
   }
+
+  .page-heading {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .input-container {
+    width: 33%;
+  }
 </style>
 
 {#await getAllCommunitiesPromise}
   <Spinner />
 {:then communities}
   <section>
-    <Link href={Route.communities_create}>Create</Link>
-    <h2>Communities</h2>
-    <hr />
-    <div class="input-container">
-      <input id="search" placeholder="Search" name="search" bind:value={search} />
+    <div class="page-heading">
+      <h2>Communities</h2>
+      <Button type="primary-outline" href={Route.communities_create} maxContent circled>Create <Icon src={AiOutlinePlus} size="18" /></Button>
     </div>
+    <div>
+      <div class="input-container">
+        <input id="search" placeholder="Search" name="search" bind:value={search} />
+      </div>
+    </div>
+    <hr />
     <table>
       <thead>
         <tr>
@@ -64,7 +78,7 @@
               <td>{communityEntry.name}</td>
               <td>{communityEntry.description}</td>
               <td>
-              <Link href={Route.communities_edit.replace(":name", communityEntry.name)}>Edit</Link>
+                <Button href={Route.communities_edit.replace(":name", communityEntry.name)}>Edit</Button>
                 <Button on:click={() => handleDeleteCommunity(communityEntry.name)}>Delete</Button>
               </td>
             </tr>

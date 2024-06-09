@@ -3,7 +3,6 @@
   import { link, push } from "svelte-spa-router";
   import type { ChangeEventHandler, FormEventHandler } from "svelte/elements";
   import Button from "../../components/Button.svelte";
-  import Link from "../../components/Link.svelte";
   import Spinner from "../../components/Spinner.svelte";
   import {
     ContestStatus,

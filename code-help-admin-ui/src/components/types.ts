@@ -1,2 +1,4 @@
 export type MessageBoxType = "info" | "error" | "success";
-export type ButtonType = "outline" | "primary" | 'secondary';
+export type ButtonType = "primary-outline" | "primary" | "secondary";
+
+export type TabOption = { label: string; key: string };

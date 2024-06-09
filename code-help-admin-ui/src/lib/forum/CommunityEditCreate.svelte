@@ -1,21 +1,37 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { link, push } from "svelte-spa-router";
-  import type { FormEventHandler } from "svelte/elements";
-  import Button from "../../components/Button.svelte";
-  import Spinner from "../../components/Spinner.svelte";
-  import { type Community, type CommunityRequest, type ForumCategory } from "../../generated/admin-api";
-  import { Route } from "../../routes";
-  import {
-    createCommunity,
-    getAllCategories,
-    getCommunityByName,
-    updateCommunity
-  } from "../../services/forum/ForumService";
-  import MessageBox from "../../components/MessageBox.svelte";
-  import { FormSubmitStatus } from "../../types";
   import { Icon } from "svelte-icons-pack";
   import { AiOutlinePlusCircle } from "svelte-icons-pack/ai";
+  import type { FormEventHandler } from "svelte/elements";
+  import Button from "../../components/Button.svelte";
+  import MessageBox from "../../components/MessageBox.svelte";
+  import Spinner from "../../components/Spinner.svelte";
+  import Tabbar from "../../components/Tabbar.svelte";
+  import { type Community, type CommunityRequest, type ForumCategory } from "../../generated/admin-api";
+  import {
+    addCommunityModerator,
+    createCommunity,
+    deletePost,
+    getAllCategories,
+    getCommunityByName,
+    removeCommunityModerator,
+    updateCommunity
+  } from "../../services/forum/ForumService";
+  import { FormSubmitStatus } from "../../types";
+  import type { TabOption } from "../../components/types";
+  import { Route } from "../../routes";
+
+  const tabs: TabOption[] = [
+    {
+      key: "moderators",
+      label: "Moderators"
+    },
+    {
+      key: "posts",
+      label: "Posts"
+    }
+  ];
+  let activeTab: string = tabs[0].key;
 
   export let params: { name?: string } = {};
 
@@ -71,6 +87,30 @@
       .then(() => (formSubmitStatus = FormSubmitStatus.SUCCESS))
       .catch(() => (formSubmitStatus = FormSubmitStatus.ERROR));
   };
+
+  const handleRemoveModerator = (username: string) => {
+    if (!params.name) {
+      return;
+    }
+
+    removeCommunityModerator(params.name, username);
+  };
+
+  const handleDeletePost = (postUid: string) => {
+    if (!params.name) {
+      return;
+    }
+
+    deletePost(postUid);
+  };
+
+  // const handleAddModerator = (username: string) => {
+  //   if (!params.name) {
+  //     return;
+  //   }
+
+  //   addCommunityModerator(params.name, username);
+  // };
 </script>
 
 <style>
@@ -92,10 +132,9 @@
     gap: 0.5rem;
   }
 
-  .icon-text {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+  .no-entries {
+    padding: 10px;
+    font-weight: bold;
   }
 </style>
 
@@ -133,31 +172,68 @@
       {/if}
     </form>
 
-    <!-- {#if communityEntry != undefined && params.name} -->
-    <span class="icon-text">Add new post <Icon src={AiOutlinePlusCircle} title="Add new post" size="24" /></span>
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Title</th>
-          <th>Score</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <!-- <tbody>
+    <div class="row gap-1">
+      <Button type="primary-outline" class="icon-text"
+        >Add new post <Icon src={AiOutlinePlusCircle} title="Add new post" size="24" /></Button>
+      <Button type="primary-outline" class="icon-text"
+        >Add new moderator <Icon src={AiOutlinePlusCircle} title="Add new moderator" size="24" /></Button>
+    </div>
+
+    <Tabbar options={tabs} defaultActive={activeTab} on:change={(x) => (activeTab = x.detail)} />
+    {#if communityEntry && params.name}
+      <table>
+        <thead>
+          <colgroup>
+            <col style="width: 10%; text-align: right;" />
+            <col style="width: 40%; text-align: right;" />
+            <col style="width: 10%; text-align: right;" />
+            <col style="width: 40%; text-align: right;" />
+          </colgroup>
+          <tr>
+            {#if activeTab === "moderators"}
+              <th>Moderator username</th>
+              <th>Actions</th>
+            {/if}
+            {#if activeTab === "posts"}
+              <th>#</th>
+              <th>Title</th>
+              <th>User</th>
+              <th>Actions</th>
+            {/if}
+          </tr>
+        </thead>
+
+        <tbody>
+          {#if activeTab === "moderators"}
+            {#each communityEntry.moderators as moderator}
+              <tr>
+                <td>{moderator.username}</td>
+                <td>
+                  <Button on:click={() => handleRemoveModerator(moderator.username)}>Remove</Button>
+                </td>
+              </tr>
+            {:else}
+              <div class="no-entries">No entries!</div>
+            {/each}
+          {/if}
+          {#if activeTab === "posts"}
             {#each communityEntry.posts as post}
               <tr>
                 <td>{post.uid}</td>
                 <td>{post.title}</td>
                 <td>{post.user.username}</td>
                 <td>
-                  <a href={post.uid ? Route.post_edit.replace(":uid", post.uid.toString()) : undefined} use:link
-                    >Edit</a>
+                  <Button maxContent href={post.uid ? Route.post_edit.replace(":uid", post.uid.toString()) : undefined}
+                    >Edit</Button>
+                  <Button maxContent on:click={() => handleDeletePost(post.uid)}>Delete</Button>
                 </td>
               </tr>
+            {:else}
+              <div class="no-entries">No entries!</div>
             {/each}
-          </tbody> -->
-    </table>
-    <!-- {/if} -->
+          {/if}
+        </tbody>
+      </table>
+    {/if}
   </div>
 {/if}
