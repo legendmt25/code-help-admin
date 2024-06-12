@@ -98,6 +98,21 @@
     background-color: #eaeaea;
     color: black;
   }
+
+  .link {
+    max-width: max-content;
+    background-color: white;
+    border: none;
+    color: #18283b;
+  }
+
+  .link:hover {
+    color: #314257;
+  }
+
+  .link:active {
+    color: #354457;
+  }
 </style>
 
 {#if href && href.trim().length > 0}

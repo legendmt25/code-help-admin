@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { Icon } from "svelte-icons-pack";
+  import { BiEdit, BiPlus, BiTrash } from "svelte-icons-pack/bi";
+  import AlertBox from "../../components/AlertBox.svelte";
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
-  import type { ForumCategory } from "../../generated/admin-api";
   import { deleteCategory, getAllCategories } from "../../services/forum/ForumService";
+  import { filterForumCategories } from "../../util";
   import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
 
   let categoryValueToEdit: string | undefined = undefined;
@@ -30,38 +33,16 @@
   };
 
   let search: string | undefined = undefined;
-  $: filter = (categories: ForumCategory[]) => {
-    return categories.filter(
-      (category) =>
-        !search || category.name.toLowerCase().includes(search) || category.uid.toLowerCase().includes(search)
-    );
-  };
+  $: filter = filterForumCategories.bind(undefined, search);
 </script>
 
 <style>
-  table {
-    border-collapse: collapse;
-    width: 100%;
-  }
-
-  table,
-  th,
-  td {
-    border: 1px solid #eee;
-    padding: 10px;
-  }
-
   section {
-    padding: 1rem;
+    padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 4rem;
     position: relative;
-  }
-
-  .no-entries {
-    padding: 10px;
-    font-weight: bold;
   }
 </style>
 
@@ -69,16 +50,22 @@
   <Spinner />
 {:then categories}
   <section>
-    <Button
-      on:click={() => {
-        categoryValueToEdit = undefined;
-        categoryUIdToEdit = undefined;
-        createEditCategoryDialog?.showModal();
-      }}>Create</Button>
-    <h2>Categories</h2>
-    <hr />
-    <div class="input-container">
-      <input id="search" placeholder="Search" name="search" bind:value={search} />
+    <h2>Forum Categories</h2>
+    <div class="row justify-space-between">
+      <div class="input-container">
+        <input id="search" placeholder="Search" name="search" bind:value={search} />
+      </div>
+      <Button
+        maxContent
+        type="primary-outline"
+        on:click={() => {
+          categoryValueToEdit = undefined;
+          categoryUIdToEdit = undefined;
+          createEditCategoryDialog?.showModal();
+        }}>
+        <Icon src={BiPlus} size="24" />
+        <span>Create</span>
+      </Button>
     </div>
     <table>
       <thead>
@@ -89,23 +76,30 @@
         </tr>
       </thead>
       <tbody>
-        {#if categories.length === 0}
-          <div class="no-entries">No entries!</div>
-        {/if}
         {#each filter(categories) as categoryEntry}
           <tr>
             <td>{categoryEntry.uid}</td>
             <td>{categoryEntry.name}</td>
             <td>
-              <Button on:click={() => handleEditCategory(categoryEntry.uid, categoryEntry.name)}>Edit</Button>
+              <Button maxContent on:click={() => handleDeleteCategory(categoryEntry.uid)}>
+                <Icon src={BiTrash} size="24" />
+                <span>Delete</span>
+              </Button>
+              <Button maxContent on:click={() => handleEditCategory(categoryEntry.uid, categoryEntry.name)}>
+                <Icon src={BiEdit} size="24" />
+                <span>Edit</span>
+              </Button>
             </td>
           </tr>
         {/each}
       </tbody>
     </table>
+    {#if categories.length === 0}
+      <AlertBox type="info" message="No entries!" />
+    {/if}
   </section>
 {:catch err}
-  <div>An error occured! ({err})</div>
+  <AlertBox type="error" message="An error occured! ({err})" />
 {/await}
 
 <CategoryEditCreateDialog

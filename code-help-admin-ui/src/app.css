@@ -42,7 +42,8 @@ h1 {
   color: black;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   color: black;
   background: white;
@@ -50,6 +51,7 @@ input, select {
   padding-block: 0.5rem;
   border: 1px solid black;
   border-radius: 0.3rem;
+  min-width: 300px;
 }
 
 select::marker {
@@ -65,7 +67,6 @@ textarea {
   border-radius: 0.3rem;
 }
 
-
 table {
   border-collapse: collapse;
   width: 100%;
@@ -74,13 +75,13 @@ table {
 table,
 td {
   padding-block: 0.75rem;
+  /* padding-inline: 0.5rem; */
 }
 
 table,
 th,
 td {
   border: 1px solid #b6b7b8;
-  padding-inline: 0.5rem;
 }
 
 table,
@@ -89,7 +90,8 @@ th {
 }
 
 table,
-th, td {
+th,
+td {
   border-left: 0;
   border-right: 0;
 }
@@ -99,7 +101,8 @@ thead > tr {
   font-size: 0.9em;
 }
 
-td,th {
+td,
+th {
   text-align: left;
 }
 .column {
@@ -123,6 +126,11 @@ td,th {
   padding: 1rem;
 }
 
+.py-1 {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
 .h-100 {
   height: 100%;
 }
@@ -140,6 +148,9 @@ td,th {
   flex-direction: column;
 }
 
+.justify-space-between {
+  justify-content: space-between;
+}
 
 hr {
   color: #d1d7dc;

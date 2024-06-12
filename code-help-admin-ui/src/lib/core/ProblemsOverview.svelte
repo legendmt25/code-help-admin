@@ -1,9 +1,12 @@
 <script lang="ts">
-  import { deleteProblem, getAllProblems } from "../../services/core/ProblemsService";
+  import { Icon } from "svelte-icons-pack";
+  import { BiEdit, BiPlus, BiTrash } from "svelte-icons-pack/bi";
+  import AlertBox from "../../components/AlertBox.svelte";
+  import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
   import { Route } from "../../routes";
-  import type { Problem } from "../../generated/admin-api";
-  import Button from "../../components/Button.svelte";
+  import { deleteProblem, getAllProblems } from "../../services/core/ProblemsService";
+  import { filterProblems } from "../../util";
 
   const getAllProblemsPromise = getAllProblems()
     .then((x) => x.problems)
@@ -12,15 +15,7 @@
   const handleDeleteProblem = (problemId: number) => deleteProblem(problemId);
 
   let search: string | undefined = undefined;
-  $: filter = (problems: Problem[]) =>
-    problems.filter(
-      (problem) =>
-        !search ||
-        problem.title.toLowerCase().includes(search.toLowerCase()) ||
-        problem.difficulty.toLowerCase().includes(search.toLowerCase()) ||
-        problem.id.toString().toLowerCase().includes(search.toLowerCase()) ||
-        problem.category?.name.toLowerCase().includes(search.toLowerCase())
-    );
+  $: filter = filterProblems.bind(undefined, search);
 </script>
 
 <style>
@@ -30,11 +25,6 @@
     flex-direction: column;
     gap: 4rem;
     position: relative;
-  }
-
-  .no-entries {
-    padding: 10px;
-    font-weight: bold;
   }
 
   .page-heading {
@@ -53,7 +43,10 @@
   <section>
     <div class="page-heading">
       <h2>Problems</h2>
-      <Button href={Route.problems_create}>Create</Button>
+      <Button maxContent type="primary-outline" href={Route.problems_create}>
+        <Icon src={BiPlus} size="24" />
+        <span>Create</span>
+      </Button>
     </div>
     <div>
       <div class="input-container">
@@ -76,33 +69,33 @@
         </tr>
       </thead>
       <tbody>
-        {#if problems.length === 0}
-          <div class="no-entries">No entries!</div>
-        {/if}
         {#each filter(problems) as problemEntry}
           <tr>
             <td>{problemEntry.id}</td>
             <td>{problemEntry.title}</td>
             <td>{problemEntry.category?.name}</td>
             <td>
-              <Button href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}
-                >Edit</Button>
+              <Button
+                href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}>
+                <Icon src={BiEdit} size="24" />
+                <span>Edit</span>
+              </Button>
               <!-- svelte-ignore a11y-click-events-have-key-events -->
               <!-- svelte-ignore a11y-no-static-element-interactions -->
               <!-- svelte-ignore a11y-missing-attribute -->
-              <Button on:click={() => handleDeleteProblem(problemEntry.id)}>Delete</Button>
+              <Button on:click={() => handleDeleteProblem(problemEntry.id)}>
+                <Icon src={BiTrash} size="24" />
+                <span>Delete</span>
+              </Button>
             </td>
           </tr>
         {/each}
-        <tr>
-          <td>h1</td>
-          <td>h1</td>
-          <td>h1</td>
-          <td>h1</td>
-        </tr>
       </tbody>
     </table>
+    {#if problems.length === 0}
+      <AlertBox type="info" message="No entries!" />
+    {/if}
   </section>
 {:catch err}
-  <div>An error occured!</div>
+  <AlertBox type="error" message="An error occured! ({err})" />
 {/await}

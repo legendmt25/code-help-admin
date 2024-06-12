@@ -28,7 +28,7 @@ export const Route = {
   communities_overview: "/communities",
   communities_create: "/communities/create",
   communities_edit: "/communities/edit/:name",
-  post_edit: "/posts/edit/:uid",
+  post_detail: "/posts/:uid",
 
   forum_categories_overview: "/forum-categories"
 } as const;
@@ -70,7 +70,7 @@ export const routes: RouteDefinition = {
   [Route.forum_categories_overview]: wrap({
     component: ForumCategoriesOverview
   }),
-  [Route.post_edit]: wrap({
+  [Route.post_detail]: wrap({
     component: PostDetail
   })
 };

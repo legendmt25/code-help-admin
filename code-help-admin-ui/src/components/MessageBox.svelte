@@ -1,15 +1,11 @@
 <script lang="ts">
   import { Icon } from "svelte-icons-pack";
-  import { AiFillExclamationCircle } from "svelte-icons-pack/ai";
   import type { MessageBoxType } from "./types";
+  import { colors, messageBoxFillIcons } from "./utils";
 
+  export let style: string | undefined = undefined;
   export let type: MessageBoxType = "info";
-
-  const colors: Record<MessageBoxType, string> = {
-    error: "red",
-    success: "green",
-    info: "blue"
-  };
+  export let fullwidth: boolean | undefined = undefined;
 </script>
 
 <style>
@@ -22,9 +18,13 @@
     max-width: 500px;
     width: 100%;
   }
+
+  .fullwidth {
+    max-width: 100%;
+  }
 </style>
 
-<div>
-  <Icon src={AiFillExclamationCircle} size="24" color={colors[type]} />
+<div {style} class:fullwidth>
+  <Icon src={messageBoxFillIcons[type]} size="24" color={colors[type]} />
   <slot />
 </div>

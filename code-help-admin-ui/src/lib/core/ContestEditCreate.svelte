@@ -12,6 +12,9 @@
   } from "../../generated/admin-api";
   import { Route } from "../../routes";
   import { createContest, getContestById, updateContest } from "../../services/core/ContestService";
+  import { deleteProblem } from "../../services/core/ProblemsService";
+  import { Icon } from "svelte-icons-pack";
+  import { BiEdit, BiTrash } from "svelte-icons-pack/bi";
 
   export let params: { id?: string } = {};
 
@@ -59,6 +62,10 @@
   const handleDateChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     value.startsOn = new Date(event.currentTarget.value);
   };
+
+  const handleDeleteProblem = (id: number) => {
+    deleteProblem(id);
+  };
 </script>
 
 <style>
@@ -85,7 +92,6 @@
   }
 
   .form-container {
-
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -125,7 +131,7 @@
           {/each}
         </select>
       </div>
-      <Button>Submit</Button>
+      <Button maxContent>Submit</Button>
     </form>
 
     {#if contestEntry != undefined}
@@ -145,8 +151,16 @@
               <td>{problem.title}</td>
               <td>{problem.score}</td>
               <td>
-                <a href={problem.id ? Route.problems_edit.replace(":id", problem.id.toString()) : undefined} use:link
-                  >Edit</a>
+                <Button maxContent on:click={() => handleDeleteProblem(problem.id)}>
+                  <Icon src={BiTrash} size="24" />
+                  <span>Delete</span>
+                </Button>
+                <Button
+                  maxContent
+                  href={problem.id ? Route.problems_edit.replace(":id", problem.id.toString()) : undefined}>
+                  <Icon src={BiEdit} size="24" />
+                  <span>Edit</span>
+                </Button>
               </td>
             </tr>
           {/each}

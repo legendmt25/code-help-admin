@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { Icon } from "svelte-icons-pack";
+  import { BiEdit, BiPlus, BiTrash } from "svelte-icons-pack/bi";
+  import AlertBox from "../../components/AlertBox.svelte";
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
-  import type { Category } from "../../generated/admin-api";
-  import { getAllCategories, deleteCategory } from "../../services/core/ProblemsService";
+  import { deleteCategory, getAllCategories } from "../../services/core/ProblemsService";
+  import { filterCategories } from "../../util";
   import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
 
   let categoryValueToEdit: string | undefined = undefined;
@@ -30,13 +33,7 @@
   };
 
   let search: string | undefined = undefined;
-  $: filter = (categories: Category[]) =>
-    categories.filter(
-      (category) =>
-        !search ||
-        category.id.toString().toLowerCase().includes(search.toLowerCase()) ||
-        category.name.toLowerCase().includes(search.toLowerCase())
-    );
+  $: filter = filterCategories.bind(undefined, search);
 </script>
 
 <style>
@@ -46,11 +43,6 @@
     flex-direction: column;
     gap: 4rem;
     position: relative;
-  }
-
-  .no-entries {
-    padding: 10px;
-    font-weight: bold;
   }
 
   .page-heading {
@@ -70,11 +62,16 @@
     <div class="page-heading">
       <h2>Categories</h2>
       <Button
+        maxContent
+        type="primary-outline"
         on:click={() => {
           categoryValueToEdit = undefined;
           categoryIdToEdit = undefined;
           createEditCategoryDialog?.showModal();
-        }}>Create</Button>
+        }}>
+        <Icon src={BiPlus} size="24" />
+        <span>Create</span>
+      </Button>
     </div>
     <div>
       <div class="input-container">
@@ -90,24 +87,30 @@
         </tr>
       </thead>
       <tbody>
-        {#if categories.length === 0}
-          <div class="no-entries">No entries!</div>
-        {/if}
         {#each filter(categories) as categoryEntry}
           <tr>
             <td>{categoryEntry.id}</td>
             <td>{categoryEntry.name}</td>
             <td>
-              <Button on:click={() => handleEditCategory(categoryEntry.id, categoryEntry.name)}>Edit</Button>
-              <Button on:click={() => handleDeleteCategory(categoryEntry.id)}>Delete</Button>
+              <Button on:click={() => handleEditCategory(categoryEntry.id, categoryEntry.name)}>
+                <Icon src={BiEdit} size="24" />
+                <span>Edit</span>
+              </Button>
+              <Button on:click={() => handleDeleteCategory(categoryEntry.id)}>
+                <Icon src={BiTrash} size="24" />
+                <span>Delete</span>
+              </Button>
             </td>
           </tr>
         {/each}
       </tbody>
     </table>
+    {#if categories.length === 0}
+      <AlertBox type="info" message="No entries!" />
+    {/if}
   </section>
 {:catch err}
-  <div>An error occured! ({err})</div>
+  <AlertBox type="error" message="An error occured! ({err})" />
 {/await}
 
 <CategoryEditCreateDialog

@@ -1,11 +1,13 @@
 <script lang="ts">
   import { Icon } from "svelte-icons-pack";
+  import { AiOutlinePlus } from "svelte-icons-pack/ai";
+  import { BiEdit, BiTrash } from "svelte-icons-pack/bi";
+  import AlertBox from "../../components/AlertBox.svelte";
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
-  import type { ShortCommunity } from "../../generated/admin-api";
   import { Route } from "../../routes";
   import { deleteCommunity, getAllCommunities } from "../../services/forum/ForumService";
-  import { AiOutlinePlus } from "svelte-icons-pack/ai";
+  import { filterCommunities } from "../../util";
 
   const getAllCommunitiesPromise = getAllCommunities().then((data) => data.communities);
 
@@ -14,13 +16,7 @@
   };
 
   let search: string | undefined = undefined;
-  $: filter = (communities: ShortCommunity[]) =>
-    communities.filter(
-      (community) =>
-        !search ||
-        community.name.toLowerCase().includes(search.toLowerCase()) ||
-        community.description.toLowerCase().includes(search.toLowerCase())
-    );
+  $: filter = filterCommunities.bind(undefined, search);
 </script>
 
 <style>
@@ -30,11 +26,6 @@
     flex-direction: column;
     gap: 4rem;
     position: relative;
-  }
-
-  .no-entries {
-    padding: 10px;
-    font-weight: bold;
   }
 
   .page-heading {
@@ -53,7 +44,10 @@
   <section>
     <div class="page-heading">
       <h2>Communities</h2>
-      <Button type="primary-outline" href={Route.communities_create} maxContent circled>Create <Icon src={AiOutlinePlus} size="18" /></Button>
+      <Button type="primary-outline" href={Route.communities_create} maxContent circled>
+        <span>Create</span>
+        <Icon src={AiOutlinePlus} size="18" />
+      </Button>
     </div>
     <div>
       <div class="input-container">
@@ -70,23 +64,28 @@
         </tr>
       </thead>
       <tbody>
-        {#if !communities || communities.length === 0}
-          <div class="no-entries">No entries!</div>
-        {:else}
-          {#each filter(communities) as communityEntry}
-            <tr>
-              <td>{communityEntry.name}</td>
-              <td>{communityEntry.description}</td>
-              <td>
-                <Button href={Route.communities_edit.replace(":name", communityEntry.name)}>Edit</Button>
-                <Button on:click={() => handleDeleteCommunity(communityEntry.name)}>Delete</Button>
-              </td>
-            </tr>
-          {/each}
-        {/if}
+        {#each filter(communities) as communityEntry}
+          <tr>
+            <td>{communityEntry.name}</td>
+            <td>{communityEntry.description}</td>
+            <td>
+              <Button maxContent href={Route.communities_edit.replace(":name", communityEntry.name)}>
+                <Icon src={BiEdit} size="24" />
+                <span>Edit</span>
+              </Button>
+              <Button maxContent on:click={() => handleDeleteCommunity(communityEntry.name)}>
+                <Icon src={BiTrash} size="24" />
+                <span>Delete</span>
+              </Button>
+            </td>
+          </tr>
+        {/each}
       </tbody>
     </table>
+    {#if communities.length === 0}
+      <AlertBox type="info" message="No entries!" />
+    {/if}
   </section>
 {:catch err}
-  <div>An error occured! ({err})</div>
+  <AlertBox type="error" message="An error occured! ({err})" />
 {/await}

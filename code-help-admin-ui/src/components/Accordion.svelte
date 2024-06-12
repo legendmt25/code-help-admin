@@ -22,7 +22,7 @@
 
   .opened {
     max-height: 300px !important;
-    margin-left: 0.25rem
+    margin-left: 0.25rem;
   }
 
   .title-container {
@@ -31,9 +31,12 @@
     justify-content: space-between;
 
     cursor: pointer;
-    padding-right: 1rem;
-  }
 
+    padding-right: 1rem;
+
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+  }
 </style>
 
 <div class="accordion">
@@ -46,6 +49,7 @@
       <Icon src={SlArrowDown} />
     {/if}
   </div>
+  <hr />
   <div class:opened>
     <slot></slot>
   </div>

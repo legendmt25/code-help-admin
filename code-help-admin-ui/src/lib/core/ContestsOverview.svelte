@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { Icon } from "svelte-icons-pack";
+  import { BiEdit, BiPlus, BiTrash } from "svelte-icons-pack/bi";
+  import AlertBox from "../../components/AlertBox.svelte";
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
   import { Route } from "../../routes";
   import { deleteContest, getAllContests } from "../../services/core/ContestService";
-  import type { Contest } from "../../generated/admin-api";
+  import { filterContests } from "../../util";
 
   const handleGetAllContests = () =>
     getAllContests()
@@ -16,29 +19,16 @@
     deleteContest(contestId).then(() => (getAllContestsPromise = handleGetAllContests()));
 
   let search: string | undefined = undefined;
-  $: filter = (contests: Contest[]) =>
-    contests.filter(
-      (contest) =>
-        !search ||
-        contest.name.toLowerCase().includes(search.toLowerCase()) ||
-        contest.duration.toLowerCase().includes(search.toLowerCase()) ||
-        contest.id.toString().toLowerCase().includes(search.toLowerCase())
-    );
+  $: filter = filterContests.bind(undefined, search);
 </script>
 
 <style>
-
   section {
     padding: 3rem 2rem;
     display: flex;
     flex-direction: column;
     gap: 4rem;
     position: relative;
-  }
-
-  .no-entries {
-    padding: 10px;
-    font-weight: bold;
   }
 
   .page-heading {
@@ -57,7 +47,10 @@
   <section>
     <div class="page-heading">
       <h2>Contests</h2>
-      <Button href={Route.contests_create}>Create</Button>
+      <Button maxContent type="primary-outline" href={Route.contests_create}>
+        <Icon src={BiPlus} size="24" />
+        <span>Create</span>
+      </Button>
     </div>
 
     <div class="input-container">
@@ -75,9 +68,6 @@
         </tr>
       </thead>
       <tbody>
-        {#if contests.length === 0}
-          <div class="no-entries">No entries!</div>
-        {/if}
         {#each filter(contests) as contestEntry}
           <tr>
             <td>{contestEntry.id}</td>
@@ -86,15 +76,25 @@
             <td>{contestEntry.duration}</td>
             <td>{contestEntry.status}</td>
             <td>
-              <Button href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}
-                >Edit</Button>
-              <Button on:click={() => handleDeleteContest(contestEntry.id)}>Delete</Button>
+              <Button
+                maxContent
+                href={contestEntry.id ? Route.contests_edit.replace(":id", contestEntry.id.toString()) : undefined}>
+                <Icon src={BiEdit} size="24" />
+                <span>Edit</span>
+              </Button>
+              <Button maxContent on:click={() => handleDeleteContest(contestEntry.id)}>
+                <Icon src={BiTrash} size="24" />
+                <span>Delete</span>
+              </Button>
             </td>
           </tr>
         {/each}
       </tbody>
     </table>
+    {#if contests.length === 0}
+      <AlertBox type="info" message="No entries!" />
+    {/if}
   </section>
 {:catch err}
-  <div>An error occured!</div>
+  <AlertBox type="error" message="An error occured! ({err})" />
 {/await}

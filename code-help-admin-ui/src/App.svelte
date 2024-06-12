@@ -106,7 +106,6 @@
   .nav-head.link.title {
     cursor: pointer;
   }
-
 </style>
 
 <div class="container">
@@ -134,8 +133,8 @@
           </svelte:fragment>
           <div>
             <a class="link" href={Route.categories_overview} use:link use:active={{ path: Route.categories_overview }}>
-                <Icon src={BiCategory} size="32" />
-                <span class:hide={!menuOpened}>Categories</span>
+              <Icon src={BiCategory} size="32" />
+              <span class:hide={!menuOpened}>Categories</span>
             </a>
             <a class="link" href={Route.problems_overview} use:link use:active={{ path: Route.problems_overview }}>
               <Icon src={AiFillQuestionCircle} size="32" />
@@ -152,13 +151,25 @@
         <Accordion>
           <!-- svelte-ignore a11y-missing-attribute -->
           <svelte:fragment slot="title">
-            <a class="link title" on:click={openMenu} on:keydown={undefined} >
+            <a class="link title" on:click={openMenu} on:keydown={undefined}>
               <Icon src={FaBrandsForumbee} size="32" />
               <span class:hide={!menuOpened}>Forum</span>
             </a>
           </svelte:fragment>
           <div>
-            <a class="link" href={Route.communities_overview} use:link use:active={{ path: Route.communities_overview }}>
+            <a
+              class="link"
+              href={Route.forum_categories_overview}
+              use:link
+              use:active={{ path: Route.forum_categories_overview }}>
+              <Icon src={BiCategory} size="32" />
+              <span class:hide={!menuOpened}>Categories</span>
+            </a>
+            <a
+              class="link"
+              href={Route.communities_overview}
+              use:link
+              use:active={{ path: Route.communities_overview }}>
               <Icon src={RiCommunicationChat1Fill} size="32" />
               <span class:hide={!menuOpened}>Communities</span>
             </a>
