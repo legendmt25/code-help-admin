@@ -54,7 +54,6 @@
         <input id="search" placeholder="Search" name="search" bind:value={search} />
       </div>
     </div>
-    <hr />
     <table>
       <thead>
         <tr>
