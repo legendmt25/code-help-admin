@@ -5,6 +5,14 @@ export const ID_TOKEN_KEY = "id_token";
 
 export type KeycloakType = Keycloak;
 
+const onAuthSuccess = (keycloak: KeycloakType) => {
+  localStorage.setItem(ID_TOKEN_KEY, keycloak.idToken!);
+};
+
+const onAuthLogout = (keycloak: KeycloakType) => {
+  localStorage.removeItem(ID_TOKEN_KEY);
+};
+
 export const initKeycloak = async (): Promise<KeycloakType> => {
   const keycloak = new Keycloak({
     url: env.KEYCLOAK_URL,
@@ -15,7 +23,8 @@ export const initKeycloak = async (): Promise<KeycloakType> => {
   try {
     await keycloak.init({ onLoad: "login-required", checkLoginIframe: false });
 
-    localStorage.setItem(ID_TOKEN_KEY, keycloak.idToken!);
+    onAuthSuccess(keycloak);
+
     keycloak.updateToken(3600000);
   } catch {}
 
@@ -38,7 +47,9 @@ export const getPrefferedUsername = (keycloak: KeycloakType): string | undefined
 };
 
 export const logout = (keycloak: KeycloakType) => {
-  keycloak?.logout();
+  keycloak?.logout().then(() => onAuthLogout(keycloak));
+};
 
-  localStorage.removeItem(ID_TOKEN_KEY);
+export const login = (keycloak: KeycloakType) => {
+  keycloak.login().then(() => onAuthLogout(keycloak));
 };

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Icon } from "svelte-icons-pack";
   import { AiFillHome, AiFillQuestionCircle, AiOutlineBarChart, AiOutlineMenu } from "svelte-icons-pack/ai";
-  import { BiCategory } from "svelte-icons-pack/bi";
+  import { BiCategory, BiDoorOpen } from "svelte-icons-pack/bi";
   import { BsDoorOpenFill } from "svelte-icons-pack/bs";
   import { FaBrandsForumbee } from "svelte-icons-pack/fa";
   import { RiCommunicationChat1Fill, RiLogosCoreosFill } from "svelte-icons-pack/ri";
@@ -11,7 +11,7 @@
   import AlertBox from "./components/AlertBox.svelte";
   import Button from "./components/Button.svelte";
   import { Route, routes } from "./routes";
-  import { getPrefferedUsername, isAuthenticated, logout } from "./services/KeycloakService";
+  import { getPrefferedUsername, isAuthenticated, login, logout } from "./services/KeycloakService";
 
   let menuOpened: boolean = false;
   const keycloak = window.keycloak!;
@@ -181,9 +181,10 @@
           </Accordion>
         </div>
       {:else}
-        <a class="link" href={Route.communities_overview} use:link use:active={{ path: Route.communities_overview }}>
-          <Icon src={RiCommunicationChat1Fill} size="32" />
-          <span class:hide={!menuOpened}>Communities</span>
+        <!-- svelte-ignore a11y-missing-attribute -->
+        <a class="link" on:click={() => login(keycloak)} on:keyup={undefined}>
+          <Icon src={BiDoorOpen} size="32" />
+          <span class:hide={!menuOpened}>Login</span>
         </a>
       {/if}
 
