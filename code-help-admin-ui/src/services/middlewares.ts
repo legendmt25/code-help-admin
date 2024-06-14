@@ -1,11 +1,11 @@
 import type { Middleware } from "../generated/admin-api";
-import { getInstance } from "./KeycloakService";
+import { getIdToken } from "./KeycloakService";
 
 export const authMiddleware: Middleware["pre"] = (requestContext) => {
-  const keycloak = getInstance();
+  const idToken = getIdToken();
 
-  if (keycloak?.token) {
-    (requestContext.init.headers as any)["Authorization"] = "Bearer " + keycloak?.token;
+  if (idToken) {
+    (requestContext.init.headers as any)["Authorization"] = "Bearer " + idToken;
   }
   return Promise.resolve();
 };

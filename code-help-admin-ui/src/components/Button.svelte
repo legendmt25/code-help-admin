@@ -101,7 +101,7 @@
 
   .link {
     max-width: max-content;
-    background-color: white;
+    background-color: inherit;
     border: none;
     color: #18283b;
   }
