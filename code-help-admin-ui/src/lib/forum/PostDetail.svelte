@@ -28,36 +28,15 @@
     position: relative;
   }
 
-  :global(.side-btn:nth-of-type(2)) {
-    top: 150px;
-  }
-
-  :global(.side-btn) {
+  .floating-actions {
     position: absolute;
+    width: 100%;
     right: 0;
-    top: 80px;
+    top: 6rem;
     display: flex;
-    align-items: center;
-
-    overflow: hidden;
-    transition: all 200ms;
-    max-width: 70px !important;
-    opacity: 0.5;
-    white-space: nowrap;
-  }
-
-  :global(.side-btn:hover) {
-    max-width: 250px !important;
-    opacity: 1;
-  }
-
-  :global(.side-btn > span) {
-    max-width: 0;
-    overflow: hidden;
-  }
-
-  :global(.side-btn:hover > span) {
-    max-width: 250px;
+    flex-direction: column;
+    align-items: end;
+    gap: 2rem;
   }
 </style>
 
@@ -83,10 +62,12 @@
     <h2>Comments</h2>
     <CommentReplies replies={postEntry.comments} />
   </section>
-  <Button maxContent class="side-btn">
-    <Icon src={AiOutlineClose} size={24} on:click={handleMarkPostAsInnapropriate} />
-    <span>Mark as innapropriate</span>
-  </Button>
+  <div class="floating-actions">
+    <Button maxContent class="side-btn">
+      <Icon src={AiOutlineClose} size={24} on:click={handleMarkPostAsInnapropriate} />
+      <span>Mark as innapropriate</span>
+    </Button>
+  </div>
 {:catch err}
   <AlertBox type="error" message="An error occured! ({err})" />
 {/await}

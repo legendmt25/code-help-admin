@@ -21,6 +21,7 @@
   import { push, querystring } from "svelte-spa-router";
   import { Route } from "../../routes";
   import MessageBox from "../../components/MessageBox.svelte";
+  import { AiFillCaretRight } from "svelte-icons-pack/ai";
 
   export let params: { id?: string; contestId?: string } = {
     contestId: new URLSearchParams($querystring).get("contestId") ?? undefined
@@ -160,35 +161,16 @@
     bottom: 0;
   }
 
-  :global(.side-btn:nth-of-type(2)) {
-    top: 150px;
-  }
-
-  :global(.side-btn) {
+  .floating-actions {
     position: absolute;
+    width: 20rem;
+    max-width: 80%;
     right: 0;
-    top: 80px;
+    top: 6rem;
     display: flex;
-    align-items: center;
-
-    overflow: hidden;
-    transition: all 200ms;
-    max-width: 70px !important;
-    opacity: 0.5;
-  }
-
-  :global(.side-btn:hover) {
-    max-width: 200px !important;
-    opacity: 1;
-  }
-
-  :global(.side-btn > span) {
-    max-width: 0;
-    overflow: hidden;
-  }
-
-  :global(.side-btn:hover > span) {
-    max-width: 100px;
+    flex-direction: column;
+    align-items: end;
+    gap: 2rem;
   }
 
   .tab-control {
@@ -331,7 +313,6 @@
                 {#if runCodeMessage}
                   <MessageBox type="info" fullwidth>{runCodeMessage}</MessageBox>
                 {/if}
-                <Button on:click={handleTestProblem}>Test problem</Button>
               </div>
             {/if}
           </section>
@@ -372,8 +353,19 @@
         </section>
       </div>
     </div>
-    <Button class="side-btn" form="edit-problem-form"><Icon src={BiSave} size={24} /> <span>Save</span></Button>
-    <Button class="side-btn" on:click={() => (previewEnabled = !previewEnabled)}
-      ><Icon src={VscPreview} size={24} /> <span>Preview</span></Button>
+
+    <div class="floating-actions">
+      <Button class="side-btn" form="edit-problem-form">
+        <Icon src={BiSave} size={24} />
+        <span>Save</span>
+      </Button>
+      <Button class="side-btn" on:click={handleTestProblem}>
+        <Icon src={AiFillCaretRight} size={24} />
+        <span>Test problem</span>
+      </Button>
+      <Button class="side-btn" on:click={() => (previewEnabled = !previewEnabled)}>
+        <Icon src={VscPreview} size={24} />
+        <span>Preview</span></Button>
+    </div>
   </div>
 {/if}

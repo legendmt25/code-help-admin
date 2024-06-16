@@ -160,3 +160,29 @@ th {
 hr {
   color: #d1d7dc;
 }
+
+.side-btn {
+  align-items: center;
+  overflow: hidden;
+  transition: all 200ms;
+  max-width: 70px !important;
+  opacity: 0.5;
+  
+  white-space: nowrap;
+  text-overflow: clip;
+}
+
+.side-btn:hover {
+  max-width: 250px !important;
+  opacity: 1;
+}
+
+.side-btn > span {
+  max-width: 0;
+  overflow: hidden;
+}
+
+.side-btn:hover > span {
+  max-width: 250px;
+}
+
