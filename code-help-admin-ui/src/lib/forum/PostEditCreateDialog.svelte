@@ -55,7 +55,11 @@
   form {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 2rem;
+  }
+
+  .form {
+    padding-inline: 2rem;
   }
 </style>
 
@@ -72,7 +76,7 @@
     </div>
     <div class="input-container">
       <label for="content">Content</label>
-      <input required id="content" name="content" bind:value={postRequest.content} />
+      <textarea style:height="100px" style:resize="none" required id="content" name="content" bind:value={postRequest.content} />
     </div>
   </form>
   <div slot="footer">

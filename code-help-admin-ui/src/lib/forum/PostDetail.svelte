@@ -2,11 +2,10 @@
   import { Icon } from "svelte-icons-pack";
   import AlertBox from "../../components/AlertBox.svelte";
   import Spinner from "../../components/Spinner.svelte";
-  import { deleteComment, getPost } from "../../services/forum/ForumService";
+  import { getPost } from "../../services/forum/ForumService";
   import Button from "../../components/Button.svelte";
   import { AiOutlineClose } from "svelte-icons-pack/ai";
   import { formatDate } from "../../util";
-  import CommentDetail from "./CommentDetail.svelte";
   import CommentReplies from "./CommentReplies.svelte";
 
   export let params: { uid: string };

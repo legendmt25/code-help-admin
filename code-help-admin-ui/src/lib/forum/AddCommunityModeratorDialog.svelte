@@ -33,6 +33,10 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+  
+  .form {
+    padding-inline: 2rem;
+  }
 </style>
 
 <Dialog bind:dialog {title}>

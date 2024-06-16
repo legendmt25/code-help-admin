@@ -20,12 +20,29 @@ export const initKeycloak = async (): Promise<KeycloakType> => {
     clientId: env.KEYCLOAK_CLIENTID
   });
 
+  keycloak.onTokenExpired = () => {
+    console.log("token expired");
+    keycloak
+      .updateToken(60)
+      .then((refreshed) => {
+        if (refreshed) {
+          console.info("Token was successfully refreshed");
+          onAuthSuccess(keycloak);
+        } else {
+          console.info("Token is still valid");
+        }
+      })
+      .catch((err) => {
+        const errorMessage = "Failed to refresh the token, or the session has expired";
+        console.error(errorMessage, err);
+        keycloak.clearToken();
+        keycloak.logout();
+      });
+  };
+
   try {
     await keycloak.init({ onLoad: "login-required", checkLoginIframe: false });
-
     onAuthSuccess(keycloak);
-
-    keycloak.updateToken(3600000);
   } catch {}
 
   return keycloak;

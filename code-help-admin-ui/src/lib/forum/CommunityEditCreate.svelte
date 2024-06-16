@@ -4,7 +4,6 @@
   import { AiOutlinePlusCircle } from "svelte-icons-pack/ai";
   import { BiEdit, BiTrash } from "svelte-icons-pack/bi";
   import { BsEye } from "svelte-icons-pack/bs";
-  import type { FormEventHandler } from "svelte/elements";
   import Accordion from "../../components/Accordion.svelte";
   import AlertBox from "../../components/AlertBox.svelte";
   import Button from "../../components/Button.svelte";
@@ -21,10 +20,10 @@
     removeCommunityModerator,
     updateCommunity
   } from "../../services/forum/ForumService";
-  import { FormSubmitStatus } from "../../types";
   import { filterCommunityModerators, filterPosts } from "../../util";
   import PostEditCreateDialog from "./PostEditCreateDialog.svelte";
   import AddCommunityModeratorDialog from "./AddCommunityModeratorDialog.svelte";
+  import CommunityForm from "./CommunityForm.svelte";
 
   export let params: { name?: string } = {};
 
@@ -46,46 +45,45 @@
 
   let categories: ForumCategory[] = [];
   onMount(() => {
+    const promiseArray: Promise<void>[] = [
+      getAllCategories().then((resp) => {
+        categories = resp.categories;
+      })
+    ];
+
     if (params.name) {
       loading = true;
-      const promiseArray: Promise<void>[] = [
-        getAllCategories().then((resp) => {
-          categories = resp.categories;
-        }),
-        getCommunityByName(params.name).then((community) => {
-          communityEntry = community;
-          value = {
-            ...value,
-            name: community.name,
-            description: community.description,
-            categories: { uids: community.categories.map((x) => x.uid) },
-            image: community.image
-          };
-        })
-      ];
-
-      Promise.all(promiseArray)
-        .catch((err) => (error = err))
-        .finally(() => (loading = false));
+      promiseArray.push(loadCommunity(params.name));
     }
+
+    Promise.all(promiseArray)
+      .catch((err) => (error = err))
+      .finally(() => (loading = false));
   });
 
-  let formSubmitStatus: FormSubmitStatus;
-  const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
-    event.preventDefault();
+  const loadCommunity = (name: string) => {
+    return getCommunityByName(name).then((community) => {
+      communityEntry = community;
+      value = {
+        ...value,
+        name: community.name,
+        description: community.description,
+        categories: { uids: community.categories.map((x) => x.uid) },
+        image: community.image
+      };
+    });
+  };
 
-    formSubmitStatus = FormSubmitStatus.SUBMITTING;
-    let editCreatePromise: Promise<Community>;
-
-    if (params.name) {
-      editCreatePromise = updateCommunity(params.name, value as CommunityRequest);
-    } else {
-      editCreatePromise = createCommunity(value as CommunityRequest);
+  const handleFormSubmit = ({
+    detail: { name, edit }
+  }: CustomEvent<{
+    name: string;
+    edit: boolean;
+  }>) => {
+    if (!edit) {
+      params.name = name;
+      loadCommunity(params.name);
     }
-
-    editCreatePromise
-      .then(() => (formSubmitStatus = FormSubmitStatus.SUCCESS))
-      .catch(() => (formSubmitStatus = FormSubmitStatus.ERROR));
   };
 
   const handleRemoveModerator = (username: string) => {
@@ -97,7 +95,7 @@
       communityEntry = {
         ...communityEntry,
         moderators: communityEntry?.moderators.filter((x) => x.username !== username) ?? []
-      };
+      } as Community;
     });
   };
 
@@ -119,13 +117,28 @@
     }
 
     deletePost(postUid).then(() => {
-      getPosts(params.name).then((resp) => {
-        communityEntry = { ...communityEntry, posts: resp.posts ?? [] };
+      getPosts(params.name!).then((resp) => {
+        communityEntry = { ...communityEntry, posts: resp.posts ?? [] } as Community;
       });
     });
   };
 
   const handleAddModerator = () => addCommunityModeratorDialog?.showModal();
+
+  const createPost = () => {
+    if (params.name && communityEntry) {
+      getPosts(params.name).then((allPosts) => {
+        communityEntry = { ...communityEntry, posts: allPosts.posts ?? [] } as Community;
+      });
+    }
+  };
+
+  const handleCommentCreate = (username: string) => {
+    communityEntry = {
+      ...communityEntry,
+      moderators: [...(communityEntry?.moderators ?? []), { username }]
+    } as Community;
+  };
 
   let moderatorsSearch: string | undefined = undefined;
   let postsSearch: string | undefined = undefined;
@@ -135,10 +148,8 @@
 </script>
 
 <style>
-  form {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+  .form-container {
+    padding: 2.5rem 10rem;
   }
 </style>
 
@@ -147,37 +158,8 @@
 {:else if error}
   <AlertBox type="error" message="An error occured while getting the community data" />
 {:else}
-  <div class="column p-1 gap-1">
-    <form on:submit={handleFormSubmit} class="form">
-      <div class="input-container">
-        <label for="name">Name</label>
-        <input id="name" name="name" bind:value={value.name} />
-      </div>
-      <div class="input-container">
-        <label for="description">Description</label>
-        <input id="description" name="description" bind:value={value.description} />
-      </div>
-      <div class="input-container">
-        <label for="categories">Categories:</label>
-        <select
-          name="categories"
-          multiple
-          on:change={(event) =>
-            (value.categories.uids = Array.from(event.currentTarget.selectedOptions).map((x) => x.value))}>
-          {#each categories as category}
-            <option value={category.uid} selected={!!value.categories.uids.find((uid) => category.uid === uid)}>
-              {category.name}
-            </option>
-          {/each}
-        </select>
-      </div>
-      <Button>Submit</Button>
-      {#if formSubmitStatus === FormSubmitStatus.SUCCESS}
-        <MessageBox type={FormSubmitStatus.SUCCESS}>Saved successfully!</MessageBox>
-      {:else if formSubmitStatus === FormSubmitStatus.ERROR}
-        <MessageBox type={FormSubmitStatus.ERROR}>Error happened while saving</MessageBox>
-      {/if}
-    </form>
+  <div class="column p-1 gap-1 form-container">
+    <CommunityForm bind:value name={params.name} {categories} on:submit={handleFormSubmit} />
     {#if communityEntry && params.name}
       <div class="gap-1">
         <Accordion>
@@ -286,21 +268,10 @@
     bind:communityName={params.name}
     bind:dialog={postEditCreateDialog}
     bind:postUid={postUidToEdit}
-    on:success={() => {
-      if (params.name && communityEntry) {
-        getPosts(params.name).then((allPosts) => {
-          communityEntry = { ...communityEntry, posts: allPosts.posts ?? [] };
-        });
-      }
-    }} />
+    on:success={createPost} />
 
   <AddCommunityModeratorDialog
     bind:communityName={params.name}
     bind:dialog={addCommunityModeratorDialog}
-    on:success={({ detail: username }) => {
-      communityEntry = {
-        ...communityEntry,
-        moderators: [...(communityEntry?.moderators ?? []), { username }]
-      };
-    }} />
+    on:success={({ detail: username }) => handleCommentCreate(username)} />
 {/if}

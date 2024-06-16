@@ -44,17 +44,19 @@
     gap: 4rem;
     position: relative;
   }
+
+  .page-heading {
+    display: flex;
+    justify-content: space-between;
+  }
 </style>
 
 {#await getAllCategoriesPromise}
   <Spinner />
 {:then categories}
   <section>
-    <h2>Forum Categories</h2>
-    <div class="row justify-space-between">
-      <div class="input-container">
-        <input id="search" placeholder="Search" name="search" bind:value={search} />
-      </div>
+    <div class="page-heading">
+      <h2>Forum Categories</h2>
       <Button
         maxContent
         type="primary-outline"
@@ -66,6 +68,11 @@
         <Icon src={BiPlus} size="24" />
         <span>Create</span>
       </Button>
+    </div>
+    <div class="row justify-space-between">
+      <div class="input-container">
+        <input id="search" placeholder="Search" name="search" bind:value={search} />
+      </div>
     </div>
     <table>
       <thead>
@@ -81,7 +88,7 @@
             <td>{categoryEntry.uid}</td>
             <td>{categoryEntry.name}</td>
             <td>
-              <Button maxContent on:click={() => handleDeleteCategory(categoryEntry.uid)}>
+              <Button maxContent style="width: max-content;" on:click={() => handleDeleteCategory(categoryEntry.uid)}>
                 <Icon src={BiTrash} size="24" />
                 <span>Delete</span>
               </Button>
