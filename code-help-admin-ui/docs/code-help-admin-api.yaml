@@ -188,7 +188,22 @@ paths:
       responses:
         204:
           description: No content
-
+  /code-runner:
+    post:
+      operationId: runCode
+      tags: [ code runner, admin ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeRunnerRequest'
+      responses:
+        200:
+          description: OK.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CodeRunnerResponse'
   /forum/community:
     get:
       tags:
@@ -722,6 +737,27 @@ components:
         type: integer
         format: int64
   schemas:
+    CodeLanguage:
+      type: string
+      example: 'javascript'
+    CodeRunnerRequest:
+      type: object
+      required: [ runnerCode, language, code, testCases ]
+      properties:
+        runnerCode:
+          $ref: '#/components/schemas/Code'
+        language:
+          $ref: '#/components/schemas/CodeLanguage'
+        code:
+          $ref: '#/components/schemas/Code'
+        testCases:
+          $ref: '#/components/schemas/TestCases'
+    CodeRunnerResponse:
+      type: object
+      required: [ message ]
+      properties:
+        message:
+          type: string
     ProblemResponse:
       type: object
       required: [ problems ]

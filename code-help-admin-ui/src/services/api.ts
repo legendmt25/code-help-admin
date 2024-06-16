@@ -1,6 +1,7 @@
 import env from "../env";
 import {
   CategoryApi,
+  CodeRunnerApi,
   CommentApi,
   CommunityApi,
   Configuration,
@@ -27,3 +28,4 @@ export const CONTEST_API = new ContestApi(baseConfiguration);
 export const COMMUNITY_API = new CommunityApi(baseConfiguration);
 export const POST_API = new PostApi(baseConfiguration);
 export const COMMENT_API = new CommentApi(baseConfiguration);
+export const CODE_RUNNER_API = new CodeRunnerApi(baseConfiguration);

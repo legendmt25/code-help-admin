@@ -58,6 +58,21 @@ func MapClientResponseToResponse(response codeHelpAdminCoreGen.ProblemDetail) co
 	}
 }
 
+func MapToClientRunCodeRequest(data codeHelpAdminGen.RunCodeJSONRequestBody) codeHelpAdminCoreGen.RunCodeMultipartRequestBody {
+	return codeHelpAdminCoreGen.RunCodeMultipartRequestBody{
+		Code:       data.Code,
+		Language:   data.Language,
+		RunnerCode: data.RunnerCode,
+		TestCases:  toMultipart(data.TestCases),
+	}
+}
+
+func MapClientRunCodeResponseToResponse(data codeHelpAdminCoreGen.CodeRunnerResponse) codeHelpAdminGen.CodeRunnerResponse {
+	return codeHelpAdminGen.CodeRunnerResponse{
+		Message: data.Message,
+	}
+}
+
 func MapToClientCreateReq(data codeHelpAdminGen.CreateProblemJSONRequestBody) codeHelpAdminCoreGen.CreateProblemMultipartRequestBody {
 	return mapToClientReq(data)
 }
@@ -119,7 +134,7 @@ func toMultipart(cases codeHelpAdminGen.TestCases) []codeHelpAdminCoreGen.File {
 		if inFileData := c.In; inFileData != nil {
 			files = append(files, *createFileFromBytes(*inFileData, "IN"+strconv.Itoa(i)))
 		}
-		if outFileData := c.In; outFileData != nil {
+		if outFileData := c.Out; outFileData != nil {
 			files = append(files, *createFileFromBytes(*outFileData, "OUT"+strconv.Itoa(i)))
 		}
 	}

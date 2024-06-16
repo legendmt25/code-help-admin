@@ -58,6 +58,22 @@ type CategoryResponse struct {
 // Code defines model for Code.
 type Code = string
 
+// CodeLanguage defines model for CodeLanguage.
+type CodeLanguage = string
+
+// CodeRunnerRequest defines model for CodeRunnerRequest.
+type CodeRunnerRequest struct {
+	Code       Code         `json:"code"`
+	Language   CodeLanguage `json:"language"`
+	RunnerCode Code         `json:"runnerCode"`
+	TestCases  []File       `json:"testCases"`
+}
+
+// CodeRunnerResponse defines model for CodeRunnerResponse.
+type CodeRunnerResponse struct {
+	Message string `json:"message"`
+}
+
 // Contest defines model for Contest.
 type Contest struct {
 	Duration string        `json:"duration"`
@@ -190,6 +206,9 @@ type CreateCategoryJSONRequestBody = CategoryRequest
 // UpdateCategoryJSONRequestBody defines body for UpdateCategory for application/json ContentType.
 type UpdateCategoryJSONRequestBody = CategoryRequest
 
+// RunCodeMultipartRequestBody defines body for RunCode for multipart/form-data ContentType.
+type RunCodeMultipartRequestBody = CodeRunnerRequest
+
 // CreateContestJSONRequestBody defines body for CreateContest for application/json ContentType.
 type CreateContestJSONRequestBody = ContestRequest
 
@@ -290,6 +309,9 @@ type ClientInterface interface {
 	UpdateCategoryWithBody(ctx context.Context, id CategoryId, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateCategory(ctx context.Context, id CategoryId, body UpdateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RunCodeWithBody request with any body
+	RunCodeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetAllContests request
 	GetAllContests(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -394,6 +416,18 @@ func (c *Client) UpdateCategoryWithBody(ctx context.Context, id CategoryId, cont
 
 func (c *Client) UpdateCategory(ctx context.Context, id CategoryId, body UpdateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateCategoryRequest(c.Server, id, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RunCodeWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRunCodeRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -711,6 +745,35 @@ func NewUpdateCategoryRequestWithBody(server string, id CategoryId, contentType 
 	}
 
 	req, err := http.NewRequest("PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRunCodeRequestWithBody generates requests for RunCode with any type of body
+func NewRunCodeRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/admin/code-runner")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
@@ -1211,6 +1274,9 @@ type ClientWithResponsesInterface interface {
 
 	UpdateCategoryWithResponse(ctx context.Context, id CategoryId, body UpdateCategoryJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateCategoryResponse, error)
 
+	// RunCodeWithBodyWithResponse request with any body
+	RunCodeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RunCodeResponse, error)
+
 	// GetAllContestsWithResponse request
 	GetAllContestsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAllContestsResponse, error)
 
@@ -1331,6 +1397,28 @@ func (r UpdateCategoryResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r UpdateCategoryResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RunCodeResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *CodeRunnerResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r RunCodeResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RunCodeResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1647,6 +1735,15 @@ func (c *ClientWithResponses) UpdateCategoryWithResponse(ctx context.Context, id
 	return ParseUpdateCategoryResponse(rsp)
 }
 
+// RunCodeWithBodyWithResponse request with arbitrary body returning *RunCodeResponse
+func (c *ClientWithResponses) RunCodeWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RunCodeResponse, error) {
+	rsp, err := c.RunCodeWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRunCodeResponse(rsp)
+}
+
 // GetAllContestsWithResponse request returning *GetAllContestsResponse
 func (c *ClientWithResponses) GetAllContestsWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetAllContestsResponse, error) {
 	rsp, err := c.GetAllContests(ctx, reqEditors...)
@@ -1840,6 +1937,32 @@ func ParseUpdateCategoryResponse(rsp *http.Response) (*UpdateCategoryResponse, e
 	response := &UpdateCategoryResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+
+	return response, nil
+}
+
+// ParseRunCodeResponse parses an HTTP response from a RunCodeWithResponse call
+func ParseRunCodeResponse(rsp *http.Response) (*RunCodeResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RunCodeResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest CodeRunnerResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	}
 
 	return response, nil
@@ -2100,33 +2223,35 @@ func ParseUpdateProblemResponse(rsp *http.Response) (*UpdateProblemResponse, err
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xa227bOBN+FYL9L/4FVMtJur3wnWMnbXa3SRCnWCyaYMFIY5utRKoU1a438LsvSOos",
-	"SpZTu0mL3PkwM5z55siR7rHHw4gzYDLGo3scEUFCkCD0twmRsOBidearb5ThEY6IXGIHMxICHmHqYwcL",
-	"+JxQAT4eSZGAg2NvCSFRHHMuQiIVHZOvX2EHy1UE5issQOD12sETziTEcp9HXAp+F0C4vyPWij2OOItB",
-	"43ZM/Cv4nEAsr9Kf1a8+xJ6gkaRcqXBMfCQM0QCvHXzKxR31fWDtLDmJZjjnGjrWccY5R56hSTnkKU+Y",
-	"38Ug0VyRaPr3jCRyyQX9Fzp4ylQDjbeBrhJBOrYEj0BIajCifi9sMyfdY/iHhFGg/jymjIgVkgIgLlhi",
-	"KShbYOOMzJcfjHO1jNuclN99BE8q4Zl+qbuaan7j6T0OLnCtnuwZigwuCaH+8D8BczzCL9wicd0UcDdH",
-	"e52fSIQgq4ZaJdlW5bhfM3qeME/5G/2fiMXBL+j+hiHkusjjPqAFhxgtQcANW9+wJiZ5kjeN9BNBTByV",
-	"TztYHg1D7BTRkZNZZH9DIKVqIf2PRXQsiZDxBduE+5RISOllstlL5tSZIW6P11yeU7Y/18nuOC16CpLQ",
-	"QOlBguBijkcfemmE107dP5EpnVuEoBGVltyNgZjLb1pzW9hz4lNZytCtjMr4dm5bWSmbme3mZOD0NqVA",
-	"s1EkKhLP+qZC7HGhc8HSLSt1oi4+Y73tYV/Na3tXvC0bWnXYQfH5MWpKqsuWVaSjNRmCrTNnc1/KBHeo",
-	"NcsBAZaEiuvi8uQcO3h2Pb66PpliB0/+uJidTEtCCvg1rBWHHQ4PD18Of3158LridEVn46fzOfWSQK7K",
-	"GpyMZ39hB787mZ69f4cd/HZ8pY8vTkkpGvJOaQCV2L/T44WNtFQ2rJPCapvxwK/Y0RmIBeU23VZSGZQz",
-	"tWs8M7QVpWwBkAKwbXdrr54hEZ98/rVWAF68QNdfOZol4WAwQGmXQOWh1+IckTAGIhucunPBh7wQbMei",
-	"wn9C4tpE+MC5mm4sQdfpcYqaJ7I/ua0Yd+Z97ogqLBVYy+bb20/q6Paes2WelLr7Q9PlUSJM15TtIixj",
-	"sUdYL86Kf0v5X5itbI6TcOOlyVIOnB2ESClA2hrb1iPhDuZcB+eJU0FrfDyZotOz8yl6c3HDJpPj0jcr",
-	"hDF4iaByNVO6GXvG6c1ct/2/f/vzWv14B0SAOM0qhPo1vbMrgebf4oCllJFZcVA257qgG8/qWyJ6C0GE",
-	"xn5IlU5fQMRmKXAwGA6Gum5EwEhE8QgfDYaDA+zo3YtWziWKza3ecxegE1c5RSutJkP8BuQ4CCYFYW3f",
-	"cjgc5mMJM1eEKAqopyW4H2Mz4hUbnX7JnwaJtr268rj4XZn2anjQJizXzrXuUDTz0Wbm5k5Il1ayiEuX",
-	"eJUcGkmsamDEYwuAEwFEwqRgSDdPx9xf7QG5tGw2F2OHBrIqmkY5s3J6gpiunWakuvfUXxtLAjADZRXw",
-	"qf69BHh5sdoyrxQkbmnxur5tYPhqs5XN5eBjgas4eylc201ujvTEEujvI5/sEvdHypJnD1fyrnTd7OoP",
-	"Gdk+u0PtamxtDgM0DgKUa/0Uylp6/+7dKXL6vaRAbTP3I/aJBqDNcO3bJHJRW9aq/MHZc4uwR3hbrdgL",
-	"4juvMemao6XClDZqP5XPurr6jty2t4JWeSLw3Na3KZOuF3BzAU6Ttlb61b9x1lLRkkQRMMoWiDLkcV99",
-	"WkIQ6XtrrZ8pzucS+32dqRc0rc6c6WcPD3Gm5nx25r6dWd6CdczblxnZHnthfWP3ZJcxKWbWCds2xiKS",
-	"730pQ3IJ6I54n4D5zQqm6S9z+bWo1+8zfU5A353SF5q8PNTL7zHlq8VDp8c7TZ2tMkwCSSMipKsEvfSJ",
-	"JA/w6abxv3cE1XehjRh5SleHZqQ0M6/n1aE1KDaUwuKp+3MptKduW9nbC+I7L5ddVweD2XAzZpaXGH82",
-	"L3dcNnbl6EeroN8xqAxi/nNk5QW99DROB43lOdyHWxUgMYgvWWTVMjUChsaXZyiOwKPz1HXYwYkI0sdy",
-	"I9cNuEeCJY/l6Gg4HLokonh9u/4vAAD//9Gdn6DWLQAA",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

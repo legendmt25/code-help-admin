@@ -12,6 +12,7 @@
     createProblem,
     getAllCategories,
     getProblemById,
+    runCode,
     updateProblem
   } from "../../services/core/ProblemsService";
   import { Icon } from "svelte-icons-pack";
@@ -19,6 +20,7 @@
   import { VscPreview } from "svelte-icons-pack/vsc";
   import { push, querystring } from "svelte-spa-router";
   import { Route } from "../../routes";
+  import MessageBox from "../../components/MessageBox.svelte";
 
   export let params: { id?: string; contestId?: string } = {
     contestId: new URLSearchParams($querystring).get("contestId") ?? undefined
@@ -67,7 +69,6 @@
       })
       .finally(() => (loading = false));
   });
-  console.log(params.contestId);
 
   const handleEditCreate: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -92,6 +93,25 @@
     } else {
       editCreatePromise.finally(() => push(Route.problems_overview));
     }
+  };
+
+  let runCodeMessage: string | undefined = undefined;
+  const handleTestProblem = () => {
+    if (!formValue.starterCode || !formValue.runnerCode || !formValue.testCases || !formValue.testCases.length) {
+      return;
+    }
+
+    runCode({
+      code: formValue.starterCode!,
+      runnerCode: formValue.runnerCode!,
+      testCases: formValue.testCases!
+    }).then((resp) => {
+      runCodeMessage = resp.message;
+
+      setTimeout(() => {
+        runCodeMessage = undefined;
+      }, 15000);
+    });
   };
 </script>
 
@@ -283,7 +303,7 @@
                     </div></Button>
                 {/each}
               </div>
-              {#if testCaseSelected != undefined && formValue.testCases}
+              {#if testCaseSelected != undefined && formValue.testCases?.length}
                 <div class="input-container w-100 h-100">
                   <label for="testcase-input">INPUT:</label>
                   <textarea
@@ -306,6 +326,14 @@
                 </div>
               {/if}
             </div>
+            {#if formValue.testCases?.length}
+              <div class="column py-1 gap-0">
+                {#if runCodeMessage}
+                  <MessageBox type="info" fullwidth>{runCodeMessage}</MessageBox>
+                {/if}
+                <Button on:click={handleTestProblem}>Test problem</Button>
+              </div>
+            {/if}
           </section>
         {/if}
       </div>

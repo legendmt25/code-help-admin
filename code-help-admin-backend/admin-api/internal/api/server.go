@@ -33,6 +33,16 @@ func NewServiceInterfaceImpl(coreService admin.ProblemCoreService, forumService 
 	}
 }
 
+func (it *ServerInterfaceImpl) RunCode(w http.ResponseWriter, r *http.Request) {
+	var data codeHelpAdminGen.RunCodeJSONRequestBody
+	_ = json.NewDecoder(r.Body).Decode(&data)
+
+	response, statusCode, _ := it.coreService.RunCode(r.Context(), apimapper.MapToClientRunCodeRequest(data))
+
+	w.WriteHeader(statusCode)
+	_ = json.NewEncoder(w).Encode(apimapper.MapClientRunCodeResponseToResponse(*response))
+}
+
 func (it *ServerInterfaceImpl) GetProblem(w http.ResponseWriter, r *http.Request, id codeHelpAdminGen.ProblemId) {
 	problem, _ := it.coreService.GetProblem(r.Context(), id)
 	if problem == nil {

@@ -1,5 +1,7 @@
-import { type CreateCategoryRequest, type ProblemRequest } from "../../generated/admin-api";
-import { CATEGORY_API, PROBLEM_API } from "../api";
+import { type CodeRunnerRequest, type CreateCategoryRequest, type ProblemRequest } from "../../generated/admin-api";
+import { CATEGORY_API, CODE_RUNNER_API, PROBLEM_API } from "../api";
+
+const DEFAULT_CODE_LANGUAGE = "javascript";
 
 export const getAllProblems = () => {
   return PROBLEM_API.getAllProblems();
@@ -42,4 +44,8 @@ export const createContestProblem = (body: ProblemRequest, contestId: number) =>
 
 export const updateProblem = (id: number, body: ProblemRequest) => {
   return PROBLEM_API.updateProblem({ id, problemRequest: body });
+};
+
+export const runCode = (body: Omit<CodeRunnerRequest, "language">) => {
+  return CODE_RUNNER_API.runCode({ codeRunnerRequest: { ...body, language: DEFAULT_CODE_LANGUAGE } });
 };

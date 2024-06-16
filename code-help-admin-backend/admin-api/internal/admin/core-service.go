@@ -38,6 +38,8 @@ type ProblemCoreService interface {
 	UpdateCategory(ctx context.Context, name codeHelpAdminCoreGen.CategoryId, body codeHelpAdminCoreGen.CreateCategoryJSONRequestBody) bool
 
 	DeleteCategory(ctx context.Context, category codeHelpAdminCoreGen.CategoryId) bool
+
+	RunCode(ctx context.Context, runCodeBody codeHelpAdminCoreGen.RunCodeMultipartRequestBody) (*codeHelpAdminCoreGen.CodeRunnerResponse, int, error)
 }
 
 type ProblemServiceContext struct {
@@ -50,19 +52,34 @@ type ProblemServiceWithContext struct {
 type problemCoreServiceImpl struct {
 	client codeHelpAdminCoreGen.ClientInterface
 
-	problemDecoder  ProblemDecoder
-	contestDecoder  ContestDecoder
-	categoryDecoder CategoryDecoder
+	codeRunnerDecoder CodeRunnerDecoder
+	problemDecoder    ProblemDecoder
+	contestDecoder    ContestDecoder
+	categoryDecoder   CategoryDecoder
 }
 
 func NewCoreService(client codeHelpAdminCoreGen.ClientInterface) ProblemCoreService {
 	return &problemCoreServiceImpl{
 		client: client,
 
-		problemDecoder:  NewProblemDecoder(),
-		contestDecoder:  NewContestDecoder(),
-		categoryDecoder: NewCategoryDecoder(),
+		codeRunnerDecoder: NewCodeRunnerDecoder(),
+		problemDecoder:    NewProblemDecoder(),
+		contestDecoder:    NewContestDecoder(),
+		categoryDecoder:   NewCategoryDecoder(),
 	}
+}
+
+func (it *problemCoreServiceImpl) RunCode(ctx context.Context, runCodeBody codeHelpAdminCoreGen.RunCodeMultipartRequestBody) (*codeHelpAdminCoreGen.CodeRunnerResponse, int, error) {
+	var body = &bytes.Buffer{}
+	_, contentType := multipartConverter.EncodeMultipartFormData(runCodeBody, body)
+
+	response, err := it.client.RunCodeWithBody(ctx, contentType, body)
+	if err != nil {
+		log.Fatal(err)
+		return nil, response.StatusCode, err
+	}
+
+	return it.codeRunnerDecoder.Decode(response), response.StatusCode, err
 }
 
 func (it *problemCoreServiceImpl) GetProblem(ctx context.Context, id codeHelpAdminCoreGen.ProblemId) (*codeHelpAdminCoreGen.ProblemDetail, error) {
