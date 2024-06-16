@@ -76,14 +76,13 @@
             <td>{problemEntry.category?.name}</td>
             <td>
               <Button
+              maxContent
                 href={problemEntry.id ? Route.problems_edit.replace(":id", problemEntry.id.toString()) : undefined}>
                 <Icon src={BiEdit} size="24" />
                 <span>Edit</span>
               </Button>
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <!-- svelte-ignore a11y-missing-attribute -->
-              <Button on:click={() => handleDeleteProblem(problemEntry.id)}>
+              
+              <Button maxContent on:click={() => handleDeleteProblem(problemEntry.id)}>
                 <Icon src={BiTrash} size="24" />
                 <span>Delete</span>
               </Button>

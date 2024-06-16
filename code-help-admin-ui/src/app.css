@@ -58,6 +58,11 @@ select::marker {
   color: red;
 }
 
+label {
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
 textarea {
   background: white;
   color: black;

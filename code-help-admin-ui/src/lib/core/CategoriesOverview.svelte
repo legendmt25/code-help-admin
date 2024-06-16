@@ -92,11 +92,11 @@
             <td>{categoryEntry.id}</td>
             <td>{categoryEntry.name}</td>
             <td>
-              <Button on:click={() => handleEditCategory(categoryEntry.id, categoryEntry.name)}>
+              <Button maxContent on:click={() => handleEditCategory(categoryEntry.id, categoryEntry.name)}>
                 <Icon src={BiEdit} size="24" />
                 <span>Edit</span>
               </Button>
-              <Button on:click={() => handleDeleteCategory(categoryEntry.id)}>
+              <Button maxContent on:click={() => handleDeleteCategory(categoryEntry.id)}>
                 <Icon src={BiTrash} size="24" />
                 <span>Delete</span>
               </Button>

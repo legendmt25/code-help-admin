@@ -14,6 +14,11 @@ import { authMiddleware } from "./middlewares";
 
 export const baseConfiguration: Configuration = new Configuration({
   basePath: env.ADMIN_API_URL,
+
+  headers: {
+    "Access-Control-Allow-Origin": "http://localhost:30000",
+    "Access-Control-Allow-Methods": "POST,PUT,PATCH,OPTIONS,GET,DELETE",
+  },
   middleware: [
     {
       pre: authMiddleware

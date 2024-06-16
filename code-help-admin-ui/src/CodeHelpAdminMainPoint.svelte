@@ -105,6 +105,10 @@
   .nav-head.link.title {
     cursor: pointer;
   }
+
+  .link {
+    user-select: none;
+  }
 </style>
 
 <div class="container">
@@ -112,13 +116,13 @@
   <nav class:hide-nav={!menuOpened}>
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-missing-attribute -->
-    <a class="nav-head link title" on:click={toggleMenu}>
+    <a class="nav-head link title" draggable={false} on:click={toggleMenu}>
       <span class:hide={!menuOpened}>CODE HELP ADMIN</span>
       <Icon src={AiOutlineMenu} size="32" />
     </a>
     <div class="h-100 column">
       {#if loggedIn}
-        <a class="link title" href={Route.index} use:link use:active={{ path: Route.index }}>
+        <a class="link title" draggable={false} href={Route.index} use:link use:active={{ path: Route.index }}>
           <Icon src={AiFillHome} size="32" />
           <span class:hide={!menuOpened}>Home</span>
         </a>
@@ -126,7 +130,7 @@
           <Accordion>
             <!-- svelte-ignore a11y-missing-attribute -->
             <svelte:fragment slot="title">
-              <a class="link title" on:click={openMenu} on:keydown={undefined}>
+              <a class="link title" draggable={false} on:click={openMenu} on:keydown={undefined}>
                 <Icon src={RiLogosCoreosFill} size="32" />
                 <span class:hide={!menuOpened}>Core</span>
               </a>
@@ -134,17 +138,28 @@
             <div>
               <a
                 class="link"
+                draggable={false}
                 href={Route.categories_overview}
                 use:link
                 use:active={{ path: Route.categories_overview }}>
                 <Icon src={BiCategory} size="32" />
                 <span class:hide={!menuOpened}>Categories</span>
               </a>
-              <a class="link" href={Route.problems_overview} use:link use:active={{ path: Route.problems_overview }}>
+              <a
+                class="link"
+                draggable={false}
+                href={Route.problems_overview}
+                use:link
+                use:active={{ path: Route.problems_overview }}>
                 <Icon src={AiFillQuestionCircle} size="32" />
                 <span class:hide={!menuOpened}>Problems</span>
               </a>
-              <a class="link" href={Route.contests_overview} use:link use:active={{ path: Route.contests_overview }}>
+              <a
+                class="link"
+                draggable={false}
+                href={Route.contests_overview}
+                use:link
+                use:active={{ path: Route.contests_overview }}>
                 <Icon src={AiOutlineBarChart} size="32" />
                 <span class:hide={!menuOpened}>Contests</span>
               </a>
@@ -155,7 +170,7 @@
           <Accordion>
             <!-- svelte-ignore a11y-missing-attribute -->
             <svelte:fragment slot="title">
-              <a class="link title" on:click={openMenu} on:keydown={undefined}>
+              <a class="link title" draggable={false} on:click={openMenu} on:keydown={undefined}>
                 <Icon src={FaBrandsForumbee} size="32" />
                 <span class:hide={!menuOpened}>Forum</span>
               </a>
@@ -164,6 +179,7 @@
               <a
                 class="link"
                 href={Route.forum_categories_overview}
+                draggable={false}
                 use:link
                 use:active={{ path: Route.forum_categories_overview }}>
                 <Icon src={BiCategory} size="32" />
@@ -172,6 +188,7 @@
               <a
                 class="link"
                 href={Route.communities_overview}
+                draggable={false}
                 use:link
                 use:active={{ path: Route.communities_overview }}>
                 <Icon src={RiCommunicationChat1Fill} size="32" />
@@ -182,7 +199,7 @@
         </div>
       {:else}
         <!-- svelte-ignore a11y-missing-attribute -->
-        <a class="link" on:click={() => login(keycloak)} on:keyup={undefined}>
+        <a class="link" draggable={false} on:click={() => login(keycloak)} on:keyup={undefined}>
           <Icon src={BiDoorOpen} size="32" />
           <span class:hide={!menuOpened}>Login</span>
         </a>
@@ -190,7 +207,7 @@
 
       {#if getPrefferedUsername(keycloak)}
         <div class="logged-in column gap-1">
-          <Button type="link" on:click={() => logout(keycloak)}>
+          <Button type="link" draggable={false} on:click={() => logout(keycloak)}>
             <Icon src={BsDoorOpenFill} size="32" />
             <div class="column">
               <span class:hide={!menuOpened}>Logged in as:</span>

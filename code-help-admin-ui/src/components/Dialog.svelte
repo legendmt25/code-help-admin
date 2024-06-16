@@ -13,7 +13,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     width: 100%;
-    max-width: 500px;
+    max-width: 40rem;
     border: 1px solid #b6b7b8;
   }
 
@@ -34,6 +34,8 @@
 
   .close-icon {
     margin-left: auto;
+    user-select:  none;
+    cursor: pointer;
   }
 
   .footer {
@@ -53,7 +55,7 @@
 
   .modal-dialog-content {
     flex-grow: 1;
-    padding-block: 1rem;
+    padding-block: 2rem;
   }
 </style>
 

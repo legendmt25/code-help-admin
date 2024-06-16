@@ -17,6 +17,9 @@
 
     max-width: 500px;
     width: 100%;
+    position: absolute;
+    right: 0;
+    bottom: 0;
   }
 
   .fullwidth {
