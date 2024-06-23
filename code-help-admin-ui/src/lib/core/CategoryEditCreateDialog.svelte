@@ -11,7 +11,10 @@
 
   const title = !categoryId ? "Create category" : `Update category - ${categoryId}`;
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    error: Error,
+    success: void
+  }>();
 
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();

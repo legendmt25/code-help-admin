@@ -11,7 +11,10 @@
 
   const title = "Add community moderator";
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{
+    error: Error,
+    success: string
+  }>();
 
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -22,7 +25,7 @@
 
     addCommunityModerator(communityName, username)
       .catch((err) => dispatch("error", err))
-      .then(() => dispatch("success", username))
+      .then(() => dispatch("success", username!))
       .finally(() => dialog?.close());
   };
 </script>

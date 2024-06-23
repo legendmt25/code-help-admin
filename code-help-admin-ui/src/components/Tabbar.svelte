@@ -3,7 +3,7 @@
   import Button from "./Button.svelte";
   import type { TabOption } from "./types";
 
-  const dispatch = createEventDispatcher();
+  const dispatch = createEventDispatcher<{ change: string }>();
 
   export let options: TabOption[];
   export let defaultActive: string | undefined = undefined;
