@@ -103,7 +103,7 @@ paths:
             example: 2
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/ProblemRequest'
       description: Create a problem in the backend
@@ -146,7 +146,7 @@ paths:
         - $ref: '#/components/parameters/ProblemId'
       requestBody:
         content:
-          multipart/form-data:
+          application/json:
             schema:
               $ref: '#/components/schemas/ProblemRequest'
       responses:
@@ -387,6 +387,14 @@ components:
           $ref: '#/components/schemas/Difficulty'
         category:
           $ref: '#/components/schemas/Category'
+    ProblemCode:
+      type: object
+      properties:
+        code:
+          $ref: "#/components/schemas/Code"
+        language:
+          type: string
+          example: "javascript"
     ProblemDetail:
       allOf:
         - $ref: '#/components/schemas/Problem'
@@ -397,9 +405,13 @@ components:
               type: string
               example: '## Two Sum... problem description'
             starterCode:
-              $ref: '#/components/schemas/Code'
+              type: array
+              items:
+                $ref: "#/components/schemas/ProblemCode"
             runnerCode:
-              $ref: '#/components/schemas/Code'
+              type: array
+              items:
+                $ref: "#/components/schemas/ProblemCode"
             testCases:
               type: array
               items:
@@ -438,13 +450,22 @@ components:
           type: string
           example: '## Two Sum... problem description'
         starterCode:
-          $ref: '#/components/schemas/File'
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemCode'
         runnerCode:
-          $ref: '#/components/schemas/File'
+          type: array
+          items:
+            $ref: '#/components/schemas/ProblemCode'
         testCases:
           type: array
           items:
-            $ref: '#/components/schemas/File'
+            type: object
+            properties:
+              in:
+                $ref: '#/components/schemas/TestCase'
+              out:
+                $ref: '#/components/schemas/TestCase'
     ContestResponse:
       type: object
       required: [ contests ]
