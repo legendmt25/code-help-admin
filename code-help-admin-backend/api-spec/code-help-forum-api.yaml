@@ -8,12 +8,16 @@ servers:
   - url: http://localhost:3001/api/v1
 
 paths:
-  /community:
+  /communities:
     get:
       tags:
         - community
       operationId: getAllCommunities
       description: Get communities by parameters
+      parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
       responses:
         200:
           description: OK
@@ -39,7 +43,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Community'
-  /community/{name}:
+  /communities/{name}:
     get:
       tags:
         - community
@@ -100,7 +104,7 @@ paths:
       responses:
         200:
           description: OK
-  /community/moderator:
+  /communities/moderators:
     get:
       tags:
         - community
@@ -109,7 +113,7 @@ paths:
       parameters:
         - in: query
           name: name
-          description: Community uid
+          description: Community name
           required: true
           schema:
             type: string
@@ -124,7 +128,7 @@ paths:
       tags:
         - community
       operationId: addModerator
-      description: Add a new moderator to the
+      description: Add a new moderator to the community
       requestBody:
         content:
           application/json:
@@ -161,7 +165,7 @@ paths:
       responses:
         200:
           description: OK
-  /community/member:
+  /communities/members:
     patch:
       tags:
         - community
@@ -197,13 +201,16 @@ paths:
         400:
           description: Bad Request
 
-  /post:
+  /posts:
     get:
       tags:
         - post
       operationId: getPosts
       description: Get certain posts
       parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
         - in: query
           name: community
           description: Community name
@@ -242,7 +249,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Post'
-  /post/{uid}:
+  /posts/{uid}:
     get:
       tags:
         - post
@@ -310,13 +317,16 @@ paths:
         400:
           description: Bad Request
 
-  /comment:
+  /comments:
     get:
       tags:
         - comment
       operationId: getCommentsForPost
       description: Get all comments for a post
       parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
         - in: query
           name: post
           description: Post uid
@@ -358,13 +368,16 @@ paths:
                 $ref: '#/components/schemas/Comment'
         400:
           description: Bad Request
-  /comment/{uid}:
+  /comments/{uid}:
     get:
       tags:
         - comment
       operationId: getCommentReplies
       description: Get all comment replies
       parameters:
+        - $ref: "#/components/parameters/Page"
+        - $ref: "#/components/parameters/Size"
+        - $ref: "#/components/parameters/Sort"
         - in: path
           name: uid
           description: Comment uid
@@ -446,7 +459,7 @@ paths:
         400:
           description: Bad Request
 
-  /category:
+  /categories:
     get:
       tags:
         - category
@@ -474,7 +487,7 @@ paths:
       responses:
         200:
           description: OK
-  /category/{uid}:
+  /categories/{uid}:
     delete:
       tags:
         - category
@@ -523,6 +536,23 @@ paths:
 
 components:
   schemas:
+    PageInfo:
+      type: object
+      required: [ totalElements, totalPages, page, size ]
+      properties:
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 20
+        totalElements:
+          type: integer
+          format: int64
+          example: 500
+        totalPages:
+          type: integer
+          example: 20
     Community:
       allOf:
         - $ref: '#/components/schemas/ShortCommunity'
@@ -571,13 +601,15 @@ components:
           items:
             $ref: '#/components/schemas/Category'
     ShortCommunities:
-      type: object
-      required: [ communities ]
-      properties:
-        communities:
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortCommunity'
+      allOf:
+        - $ref: "#/components/schemas/PageInfo"
+        - type: object
+          required: [ communities ]
+          properties:
+            communities:
+              type: array
+              items:
+                $ref: '#/components/schemas/ShortCommunity'
     CommunityRequest:
       type: object
       required: [ name, description ]
@@ -595,7 +627,6 @@ components:
               type: array
               items:
                 type: string
-
     ShortPost:
       type: object
       required: [ uid, title, created, user ]
@@ -610,12 +641,15 @@ components:
         user:
           $ref: '#/components/schemas/User'
     ShortPosts:
-      type: object
-      properties:
-        posts:
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortPost'
+      allOf:
+        - $ref: "#/components/schemas/PageInfo"
+        - type: object
+          required: [ posts ]
+          properties:
+            posts:
+              type: array
+              items:
+                $ref: '#/components/schemas/ShortPost'
     Post:
       type: object
       allOf:
@@ -667,13 +701,14 @@ components:
         user:
           $ref: '#/components/schemas/User'
     Comments:
-      type: object
-      properties:
-        comments:
-          type: array
-          items:
-            $ref: '#/components/schemas/Comment'
-
+      allOf:
+        - $ref: "#/components/schemas/PageInfo"
+        - type: object
+          properties:
+            comments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Comment'
     User:
       type: object
       required: [ username ]
@@ -736,4 +771,49 @@ components:
       properties:
         name:
           type: string
+  parameters:
+    Authorization:
+      description: Authorization header
+      name: Authorization
+      in: header
+      schema:
+        type: string
+        example: "Bearer {token}"
+    Page:
+      in: query
+      name: page
+      description: Page number
+      required: false
+      schema:
+        type: integer
+        example: 1
+        default: 0
+    Size:
+      in: query
+      name: size
+      description: Page size
+      required: false
+      schema:
+        type: integer
+        default: 10
+        example: 10
+    Sort:
+      in: query
+      name: sortBy
+      description: Sort by properties
+      required: false
+      schema:
+        type: array
+        default: [ ]
+        items:
+          type: string
+          example: "id=asc,title=desc"
+    Accept-Language:
+      name: Accept-Language
+      in: header
+      description: Accept language header
+      example: "en"
+      required: false
+      schema:
+        type: string
 
