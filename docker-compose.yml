@@ -1,13 +1,14 @@
 version: '3'
 services:
-  code-help-admin-backend:
-    image: code-help-admin-backend
-    container_name: code-help-admin-backend
+  code-help-admin-proxy:
+    image: code-help-admin-proxy
+    container_name: code-help-admin-proxy
     build:
-      context: code-help-admin-backend
+      context: code-help-admin-proxy
       dockerfile: ./@global/deploy/Dockerfile
     environment:
-      - CORE_ADMIN_API_SERVER_URL=http://code-help-core:3000/api
+      - FORUM_API_SERVER_URL=http://code-help-forum:3000
+      - CORE_ADMIN_API_SERVER_URL=http://code-help-core:3000
       - OAUTH2_RESOURCESERVER_JWT_ISSUERURI=http://localhost/iam/realms/code-help
       - OAUTH2_RESOURCESERVER_JWT__DISCOVERYISSUERURI=http://code-help-keycloak-iam:8080/iam/realms/code-help
       - OAUTH2_RESOURCESERVER_JWT_JWKSETURI=http://code-help-keycloak-iam:8080/iam/realms/code-help/protocol/openid-connect/certs
@@ -34,7 +35,7 @@ services:
       - 433:433
     depends_on:
       - code-help-keycloak-iam
-      - code-help-admin-backend
+      - code-help-admin-proxy
 
   code-help-keycloak-iam:
     image: keycloak/keycloak:21.0
