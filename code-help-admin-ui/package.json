@@ -9,7 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "generate-types:admin-api": "openapi-generator-cli generate -i docs/code-help-admin-api.yaml -g typescript-fetch -o src/generated/admin-api --additional-properties=withInterfaces=true --skip-validate-spec",
+    "generate-types:admin-core-api": "openapi-generator-cli generate -i docs/code-help-admin-core-api.yaml -g typescript-fetch -o src/generated/admin-core-api --additional-properties=withInterfaces=true",
+    "generate-types:admin-forum-api": "openapi-generator-cli generate -i docs/code-help-admin-forum-api.yaml -g typescript-fetch -o src/generated/admin-forum-api --additional-properties=withInterfaces=true",
     "generate-types": "rimraf -rf /src/generated && run-p generate-types:*"
   },
   "devDependencies": {

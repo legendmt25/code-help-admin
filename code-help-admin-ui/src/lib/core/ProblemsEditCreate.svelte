@@ -6,7 +6,14 @@
   import type { FormEventHandler } from "svelte/elements";
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
-  import { Difficulty, type Category, type CategoryRequest, type ProblemRequest } from "../../generated/admin-api";
+  import {
+    Difficulty,
+    type Category,
+    type CategoryRequest,
+    type ProblemCode,
+    type ProblemRequest,
+    type TestCase
+  } from "../../generated/admin-core-api";
   import {
     createContestProblem,
     createProblem,
@@ -23,17 +30,32 @@
   import MessageBox from "../../components/MessageBox.svelte";
   import { AiFillCaretRight } from "svelte-icons-pack/ai";
 
+  type ProblemFormData = Omit<Partial<ProblemRequest>, "testCases" | "runnerCode" | "starterCode"> & {
+    testCases: Partial<TestCase>[];
+    runnerCode: Partial<ProblemCode>[];
+    starterCode: Partial<ProblemCode>[];
+  };
+
   export let params: { id?: string; contestId?: string } = {
     contestId: new URLSearchParams($querystring).get("contestId") ?? undefined
   };
 
   let previewEnabled: boolean = false;
   let testCaseSelected: number | undefined = undefined;
+  let codeSelected: number | undefined = undefined;
   let editCode: "starter-code" | "runner-code" = "starter-code";
 
   let loading = false;
-  let formValue: Partial<ProblemRequest> = {
-    testCases: []
+  let formValue: ProblemFormData = {
+    testCases: [],
+    runnerCode: [],
+    starterCode: []
+  };
+
+  $: () => {
+    if (codeSelected) {
+      formValue.runnerCode[codeSelected].language = formValue.starterCode[codeSelected].language;
+    }
   };
 
   let categories: Category[] = [];
@@ -82,11 +104,13 @@
     const contestId = Number(params.contestId);
 
     if (!Number.isNaN(contestId) && Number.isNaN(id)) {
-      editCreatePromise = createContestProblem(body, contestId);
+      editCreatePromise = createContestProblem(body, contestId).then(() => {});
     } else if (!Number.isNaN(id)) {
       editCreatePromise = updateProblem(id, body).then(() => {});
     } else {
-      editCreatePromise = createProblem(body).finally(() => push(Route.problems_overview));
+      editCreatePromise = createProblem(body)
+        .finally(() => push(Route.problems_overview))
+        .then(() => {});
     }
 
     if (!Number.isNaN(contestId)) {
@@ -102,17 +126,17 @@
       return;
     }
 
-    runCode({
-      code: formValue.starterCode!,
-      runnerCode: formValue.runnerCode!,
-      testCases: formValue.testCases!
-    }).then((resp) => {
-      runCodeMessage = resp.message;
+    // runCode({
+    //   code: formValue.starterCode!,
+    //   runnerCode: formValue.runnerCode!,
+    //   testCases: formValue.testCases!
+    // }).then((resp) => {
+    //   runCodeMessage = resp.message;
 
-      setTimeout(() => {
-        runCodeMessage = undefined;
-      }, 15000);
-    });
+    //   setTimeout(() => {
+    //     runCodeMessage = undefined;
+    //   }, 15000);
+    // });
   };
 </script>
 
@@ -251,6 +275,49 @@
         </section>
         {#if !previewEnabled}
           <section>
+            <Button
+              class="test-case-add-btn"
+              fullwidth
+              on:click={() => {
+                formValue.runnerCode = [...(formValue.runnerCode ?? []), {}];
+                formValue.starterCode = [...(formValue.starterCode ?? []), {}];
+              }}>
+              <span style="font-size: 1.4em; font-weight:bold; line-height: 90%">+</span>
+            </Button>
+            {#each formValue.runnerCode ?? [] as _, index}
+              <Button
+                fullwidth
+                on:click={() => (codeSelected = index)}
+                class="test-case-btn"
+                style="position: relative;"
+                active={codeSelected === index}>
+                <div>
+                  {codeSelected != undefined && formValue.starterCode[codeSelected].language
+                    ? formValue.starterCode[codeSelected].language
+                    : "No language"}
+                </div>
+                <!-- svelte-ignore a11y-interactive-supports-focus -->
+                <div
+                  role="button"
+                  class="button-close-icon"
+                  on:keydown={undefined}
+                  on:click={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    codeSelected = undefined;
+                    formValue.runnerCode = [
+                      ...(formValue.runnerCode ?? []).filter((_, arrIndex) => arrIndex !== index)
+                    ];
+                    formValue.starterCode = [
+                      ...(formValue.runnerCode ?? []).filter((_, arrIndex) => arrIndex !== index)
+                    ];
+                  }}>
+                  ×
+                </div>
+              </Button>
+            {/each}
+          </section>
+          <section>
             <h2 style="padding-bottom: 0.4rem ;">Tests Editor</h2>
             <div class="row gap-1 w-100 h-50">
               <div class="tests-tab-sidebar column h-100 w-100">
@@ -266,8 +333,8 @@
                     on:click={() => (testCaseSelected = index)}
                     class="test-case-btn"
                     style="position: relative;"
-                    active={testCaseSelected === index}
-                    ><div>Test case {index}</div>
+                    active={testCaseSelected === index}>
+                    <div>Test case {index}</div>
                     <!-- svelte-ignore a11y-interactive-supports-focus -->
                     <div
                       role="button"
@@ -282,7 +349,8 @@
                         ];
                       }}>
                       ×
-                    </div></Button>
+                    </div>
+                  </Button>
                 {/each}
               </div>
               {#if testCaseSelected != undefined && formValue.testCases?.length}
@@ -321,34 +389,47 @@
       <hr />
       <div class="w-50 column">
         <section class="column gap-1 h-50">
-          {#if !previewEnabled}
-            <div class="tab-control">
-              <Button
-                fullWidth
-                toggleButton
-                toggled={editCode === "starter-code"}
-                style={"border-top-right-radius: 0; border-bottom-right-radius: 0;"}
-                on:click={() => (editCode = "starter-code")}>Edit {"Starter code"}</Button>
-              <Button
-                fullWidth
-                toggleButton
-                toggled={editCode === "runner-code"}
-                on:click={() => (editCode = "runner-code")}
-                style={"border-top-left-radius: 0; border-bottom-left-radius: 0;"}>Edit {"Runner code"}</Button>
-            </div>
-          {/if}
-          {#if editCode === "starter-code" || previewEnabled}
-            <div style="background-color: white; height: 100%">
-              <CodeMirror
-                bind:value={formValue.starterCode}
-                readonly={previewEnabled}
-                placeholder="Starter code"
-                lang={javascript()} />
-            </div>
-          {:else}
-            <div style="background-color: white; height: 100%">
-              <CodeMirror bind:value={formValue.runnerCode} placeholder="Runner code" lang={javascript()} />
-            </div>
+          {#if codeSelected != undefined}
+            {#if !previewEnabled}
+              <input
+                id="language"
+                name="language"
+                placeholder="Language"
+                bind:value={formValue.starterCode[codeSelected].language}
+                on:change={(event) => event.target} />
+              <div class="tab-control">
+                <Button
+                  fullWidth
+                  toggleButton
+                  toggled={editCode === "starter-code"}
+                  style={"border-top-right-radius: 0; border-bottom-right-radius: 0;"}
+                  on:click={() => (editCode = "starter-code")}>Edit {"Starter code"}</Button>
+                <Button
+                  fullWidth
+                  toggleButton
+                  toggled={editCode === "runner-code"}
+                  on:click={() => (editCode = "runner-code")}
+                  style={"border-top-left-radius: 0; border-bottom-left-radius: 0;"}>Edit {"Runner code"}</Button>
+              </div>
+            {:else}
+              {formValue.starterCode[codeSelected].language}
+            {/if}
+            {#if editCode === "starter-code" || previewEnabled}
+              <div style="background-color: white; height: 100%">
+                <CodeMirror
+                  bind:value={formValue.starterCode[codeSelected].code}
+                  readonly={previewEnabled}
+                  placeholder="Starter code"
+                  lang={javascript()} />
+              </div>
+            {:else}
+              <div style="background-color: white; height: 100%">
+                <CodeMirror
+                  bind:value={formValue.runnerCode[codeSelected].code}
+                  placeholder="Runner code"
+                  lang={javascript()} />
+              </div>
+            {/if}
           {/if}
         </section>
       </div>

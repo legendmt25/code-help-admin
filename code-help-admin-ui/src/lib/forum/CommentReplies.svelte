@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Comment } from "../../generated/admin-api";
+  import type { Comment } from "../../generated/admin-forum-api";
   import CommentDetail from "./CommentDetail.svelte";
 
   export let replies: Comment[] = [];

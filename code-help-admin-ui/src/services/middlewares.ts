@@ -1,4 +1,4 @@
-import type { Middleware } from "../generated/admin-api";
+import type { Middleware } from "../generated/admin-core-api";
 import { getIdToken } from "./KeycloakService";
 
 export const authMiddleware: Middleware["pre"] = (requestContext) => {

@@ -9,7 +9,7 @@
   import Button from "../../components/Button.svelte";
   import MessageBox from "../../components/MessageBox.svelte";
   import Spinner from "../../components/Spinner.svelte";
-  import { type Community, type CommunityRequest, type ForumCategory } from "../../generated/admin-api";
+  import { type Community, type CommunityRequest, type Category } from "../../generated/admin-forum-api";
   import { Route } from "../../routes";
   import {
     createCommunity,
@@ -43,7 +43,7 @@
 
   let addCommunityModeratorDialog: HTMLDialogElement | undefined = undefined;
 
-  let categories: ForumCategory[] = [];
+  let categories: Category[] = [];
   onMount(() => {
     const promiseArray: Promise<void>[] = [
       getAllCategories().then((resp) => {

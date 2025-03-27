@@ -9,7 +9,7 @@
     type ContestDetail,
     type ContestEditRequest,
     type ContestRequest
-  } from "../../generated/admin-api";
+  } from "../../generated/admin-core-api";
   import { Route } from "../../routes";
   import { createContest, getContestById, updateContest } from "../../services/core/ContestService";
   import { deleteProblem } from "../../services/core/ProblemsService";
@@ -53,7 +53,7 @@
     if (!Number.isNaN(id)) {
       editCreatePromise = updateContest(id, value as ContestEditRequest);
     } else {
-      editCreatePromise = createContest(value as ContestRequest);
+      editCreatePromise = createContest(value as ContestRequest).then(() => {});
     }
 
     editCreatePromise.finally(() => push(Route.contests_overview));

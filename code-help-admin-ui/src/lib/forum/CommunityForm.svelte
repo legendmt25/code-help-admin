@@ -3,7 +3,7 @@
   import Button from "../../components/Button.svelte";
   import MessageBox from "../../components/MessageBox.svelte";
   import { FormSubmitStatus } from "../../types";
-  import type { Community, CommunityRequest, ForumCategory } from "../../generated/admin-api";
+  import type { Community, CommunityRequest, Category } from "../../generated/admin-forum-api";
   import { createCommunity, updateCommunity } from "../../services/forum/ForumService";
   import { createEventDispatcher, onDestroy } from "svelte";
 
@@ -22,7 +22,7 @@
       uids: []
     }
   };
-  export let categories: ForumCategory[] = [];
+  export let categories: Category[] = [];
 
   let formSubmitStatus: FormSubmitStatus | undefined;
   let clearFormSubmitStatusTimeout: (() => void) | undefined = undefined;

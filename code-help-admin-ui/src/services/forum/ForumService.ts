@@ -1,4 +1,4 @@
-import { type CommunityRequest, type PostRequest } from "../../generated/admin-api";
+import { type CommunityRequest, type PostRequest } from "../../generated/admin-forum-api";
 import { COMMENT_API, COMMUNITY_API, FORUM_CATEGORY_API, POST_API } from "../api";
 
 export const getPosts = (communityName: string) => POST_API.getPosts({ community: communityName });
@@ -27,12 +27,12 @@ export const deleteCommunity = (communityName: string) => COMMUNITY_API.deleteCo
 export const getCommunityModerators = (communityName: string) =>
   COMMUNITY_API.getCommunityModerators({ name: communityName });
 export const addCommunityModerator = (communityName: string, username: string) =>
-  COMMUNITY_API.addModerator({ community: communityName, moderatorRequest: { username } });
+  COMMUNITY_API.addModerator({ name: communityName, moderatorRequest: { username } });
 export const removeCommunityModerator = (communityName: string, username: string) =>
-  COMMUNITY_API.removeModerator({ community: communityName, username });
+  COMMUNITY_API.removeModerator({ name: communityName, username });
 
-export const getAllCategories = () => FORUM_CATEGORY_API.getAllForumCategories();
-export const createCategory = (name: string) => FORUM_CATEGORY_API.createForumCategory({ categoryCreate: { name } });
-export const deleteCategory = (uid: string) => FORUM_CATEGORY_API.deleteForumCategory({ uid });
+export const getAllCategories = () => FORUM_CATEGORY_API.getAllCategories();
+export const createCategory = (name: string) => FORUM_CATEGORY_API.createCategory({ categoryCreate: { name } });
+export const deleteCategory = (uid: string) => FORUM_CATEGORY_API.deleteCategory({ uid });
 export const updateCategory = (uid: string, newCategoryName: string) =>
-  FORUM_CATEGORY_API.updateForumCategory({ categoryCreate: { name: newCategoryName }, uid });
+  FORUM_CATEGORY_API.updateCategory({ categoryCreate: { name: newCategoryName }, uid });

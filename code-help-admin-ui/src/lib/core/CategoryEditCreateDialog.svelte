@@ -28,7 +28,7 @@
     if (!Number.isNaN(Number(categoryId))) {
       createEditCategoryPromise = updateCategory(categoryId!, { categoryRequest: { name: categoryNameValue } });
     } else {
-      createEditCategoryPromise = createCategory({ categoryRequest: { name: categoryNameValue } });
+      createEditCategoryPromise = createCategory({ categoryRequest: { name: categoryNameValue } }).then(() => {});
     }
 
     createEditCategoryPromise

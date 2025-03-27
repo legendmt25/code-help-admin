@@ -6,7 +6,7 @@
   import Dialog from "../../components/Dialog.svelte";
   import Spinner from "../../components/Spinner.svelte";
   import { createPost, getPost, updatePost } from "../../services/forum/ForumService";
-  import type { PostRequest } from "../../generated/admin-api";
+  import type { PostRequest } from "../../generated/admin-forum-api";
 
   export let postUid: string | undefined = undefined;
   let postRequest: Partial<PostRequest> = {};

@@ -28,7 +28,7 @@
     if (categoryUid) {
       createEditCategoryPromise = updateCategory(categoryUid!, categoryNameValue).then(() => undefined);
     } else {
-      createEditCategoryPromise = createCategory(categoryNameValue);
+      createEditCategoryPromise = createCategory(categoryNameValue).then(()=>{});
     }
 
     createEditCategoryPromise

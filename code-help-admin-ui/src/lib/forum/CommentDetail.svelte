@@ -1,7 +1,7 @@
 <script lang="ts">
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
-  import type { Comment } from "../../generated/admin-api";
+  import type { Comment } from "../../generated/admin-forum-api";
   import { deleteComment, getCommentReplies } from "../../services/forum/ForumService";
   import { formatDate } from "../../util";
   import CommentReplies from "./CommentReplies.svelte";

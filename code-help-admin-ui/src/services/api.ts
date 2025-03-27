@@ -2,17 +2,20 @@ import env from "../env";
 import {
   CategoryApi,
   CodeRunnerApi,
+  Configuration as AdminCoreApiConfugiration,
+  ContestApi,
+  ProblemApi
+} from "../generated/admin-core-api";
+import {
   CommentApi,
   CommunityApi,
-  Configuration,
-  ContestApi,
-  ForumCategoryApi,
+  CategoryApi as ForumCategoryApi,
+  Configuration as AdminForumApiConfugiration,
   PostApi,
-  ProblemApi
-} from "../generated/admin-api";
+} from "../generated/admin-forum-api";
 import { authMiddleware } from "./middlewares";
 
-export const baseConfiguration: Configuration = new Configuration({
+const confiugration = {
   basePath: env.ADMIN_API_URL,
 
   headers: {
@@ -24,13 +27,17 @@ export const baseConfiguration: Configuration = new Configuration({
       pre: authMiddleware
     }
   ]
-});
+};
 
-export const PROBLEM_API = new ProblemApi(baseConfiguration);
-export const CATEGORY_API = new CategoryApi(baseConfiguration);
-export const FORUM_CATEGORY_API = new ForumCategoryApi(baseConfiguration);
-export const CONTEST_API = new ContestApi(baseConfiguration);
-export const COMMUNITY_API = new CommunityApi(baseConfiguration);
-export const POST_API = new PostApi(baseConfiguration);
-export const COMMENT_API = new CommentApi(baseConfiguration);
-export const CODE_RUNNER_API = new CodeRunnerApi(baseConfiguration);
+export const adminCoreApiConfiguration: AdminCoreApiConfugiration = new AdminCoreApiConfugiration(confiugration);
+export const adminForumApiConfiguration: AdminForumApiConfugiration = new AdminForumApiConfugiration(confiugration);
+
+export const PROBLEM_API = new ProblemApi(adminCoreApiConfiguration);
+export const CATEGORY_API = new CategoryApi(adminCoreApiConfiguration);
+export const CONTEST_API = new ContestApi(adminCoreApiConfiguration);
+export const CODE_RUNNER_API = new CodeRunnerApi(adminCoreApiConfiguration);
+
+export const FORUM_CATEGORY_API = new ForumCategoryApi(adminForumApiConfiguration);
+export const COMMUNITY_API = new CommunityApi(adminForumApiConfiguration);
+export const POST_API = new PostApi(adminForumApiConfiguration);
+export const COMMENT_API = new CommentApi(adminForumApiConfiguration);

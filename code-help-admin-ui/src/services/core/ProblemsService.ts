@@ -1,23 +1,21 @@
-import { type CodeRunnerRequest, type CreateCategoryRequest, type ProblemRequest } from "../../generated/admin-api";
+import {
+  type CodeRunnerRequest,
+  type CreateCategoryRequest,
+  type ProblemRequest
+} from "../../generated/admin-core-api";
 import { CATEGORY_API, CODE_RUNNER_API, PROBLEM_API } from "../api";
 
 const DEFAULT_CODE_LANGUAGE = "javascript";
 
-export const getAllProblems = () => {
-  return PROBLEM_API.getAllProblems();
-};
+export const getAllProblems = (page?: number, size?: number, sortBy?: string[]) =>
+  PROBLEM_API.getAllProblems({ page, size, sortBy });
 
-export const getAllCategories = () => {
-  return CATEGORY_API.getAllCategories();
-};
+export const getAllCategories = () => CATEGORY_API.getAllCategories();
 
-export const getProblemById = (id: number) => {
-  return PROBLEM_API.getProblem({ id });
-};
+export const getProblemById = (id: number) => PROBLEM_API.getProblem({ id });
 
-export const createCategory = (body: CreateCategoryRequest) => {
-  return CATEGORY_API.createCategory({ categoryRequest: body.categoryRequest });
-};
+export const createCategory = (body: CreateCategoryRequest) =>
+  CATEGORY_API.createCategory({ categoryRequest: body.categoryRequest });
 
 export const updateCategory = (id: number, body: CreateCategoryRequest) => {
   return CATEGORY_API.updateCategory({
