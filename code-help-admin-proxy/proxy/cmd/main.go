@@ -22,7 +22,7 @@ func main() {
 		})
 	}
 
-	api.NewProxyServer(oidcService).Serve()
+	api.NewProxyServer(env, oidcService).Serve()
 }
 
 func retry(task func(), condition func() bool) {

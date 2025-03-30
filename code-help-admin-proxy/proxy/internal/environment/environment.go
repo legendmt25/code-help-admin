@@ -1,14 +1,14 @@
 package environment
 
 import (
+	"fmt"
 	"os"
 	"strings"
 )
 
 type Environment struct {
-	CoreServerUrl  string
-	ForumServerUrl string
-	Oauth2Jwt      Oauth2Jwt
+	Oauth2Jwt     Oauth2Jwt
+	ProxyMappings []string
 }
 
 type Oauth2Jwt struct {
@@ -19,10 +19,13 @@ type Oauth2Jwt struct {
 
 func Load() Environment {
 	return Environment{
-		CoreServerUrl:  getEnv("CORE_ADMIN_API_SERVER_URL"),
-		ForumServerUrl: getEnv("FORUM_API_SERVER_URL"),
-		Oauth2Jwt:      getOauth2JwtData(),
+		Oauth2Jwt:     getOauth2JwtData(),
+		ProxyMappings: getProxyMappings(),
 	}
+}
+
+func getProxyMappings() []string {
+	return strings.Split(getEnv("PROXY_MAPPINGS"), ",")
 }
 
 func getOauth2JwtData() Oauth2Jwt {
@@ -36,16 +39,17 @@ func getOauth2JwtData() Oauth2Jwt {
 func getEnv(key string) string {
 	env := make(map[string]string)
 
-	env["CORE_ADMIN_API_SERVER_URL"] = "http://localhost:3000"
-	env["FORUM_API_SERVER_URL"] = "http://localhost:3001"
+	env["PROXY_MAPPINGS"] = ".*/api/v1/admin/forum->http://localhost:3001/api/v1,.*/api/v1/admin->http://localhost:3000/api/admin"
 	env["OAUTH2_RESOURCESERVER_JWT_ISSUERURI"] = "http://localhost/iam/realms/code-help"
 	env["OAUTH2_RESOURCESERVER_JWT__DISCOVERYISSUERURI"] = "http://localhost/iam/realms/code-help"
 	env["OAUTH2_RESOURCESERVER_JWT_JWKSETURI"] = "http://localhost/iam/realms/code-help/protocol/openid-connect/certs"
 
 	if isNotBlank(os.Getenv(key)) {
+		fmt.Printf("Getting environment variable: %s - %s\n", key, os.Getenv(key))
 		return os.Getenv(key)
 	}
 
+	fmt.Printf("Getting environment variable: %s - %s\n", key, env[key])
 	return env[key]
 }
 

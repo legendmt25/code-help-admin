@@ -1,5 +1,6 @@
 <script lang="ts">
   import { javascript } from "@codemirror/lang-javascript";
+  import { java } from "@codemirror/lang-java";
   import { marked } from "marked";
   import { onMount } from "svelte";
   import CodeMirror from "svelte-codemirror-editor";
@@ -50,6 +51,11 @@
     testCases: [],
     runnerCode: [],
     starterCode: []
+  };
+
+  const languageParsers = {
+    javascript: javascript(),
+    java: java()
   };
 
   $: () => {
@@ -279,12 +285,15 @@
               class="test-case-add-btn"
               fullwidth
               on:click={() => {
-                formValue.runnerCode = [...(formValue.runnerCode ?? []), {}];
-                formValue.starterCode = [...(formValue.starterCode ?? []), {}];
+                formValue.runnerCode = [...(formValue.runnerCode ?? []), { language: Object.keys(languageParsers)[0] }];
+                formValue.starterCode = [
+                  ...(formValue.starterCode ?? []),
+                  { language: Object.keys(languageParsers)[0] }
+                ];
               }}>
               <span style="font-size: 1.4em; font-weight:bold; line-height: 90%">+</span>
             </Button>
-            {#each formValue.runnerCode ?? [] as _, index}
+            {#each formValue.runnerCode ?? [] as runnerCode, index}
               <Button
                 fullwidth
                 on:click={() => (codeSelected = index)}
@@ -292,9 +301,7 @@
                 style="position: relative;"
                 active={codeSelected === index}>
                 <div>
-                  {codeSelected != undefined && formValue.starterCode[codeSelected].language
-                    ? formValue.starterCode[codeSelected].language
-                    : "No language"}
+                  {runnerCode.language ?? "No language"}
                 </div>
                 <!-- svelte-ignore a11y-interactive-supports-focus -->
                 <div
@@ -391,12 +398,14 @@
         <section class="column gap-1 h-50">
           {#if codeSelected != undefined}
             {#if !previewEnabled}
-              <input
+              <select
                 id="language"
                 name="language"
                 placeholder="Language"
-                bind:value={formValue.starterCode[codeSelected].language}
-                on:change={(event) => event.target} />
+                bind:value={formValue.starterCode[codeSelected].language}>
+                {#each Object.keys(languageParsers) as language}
+                  <option value={language}>{language}</option>
+                {/each}</select>
               <div class="tab-control">
                 <Button
                   fullWidth
@@ -414,21 +423,23 @@
             {:else}
               {formValue.starterCode[codeSelected].language}
             {/if}
-            {#if editCode === "starter-code" || previewEnabled}
-              <div style="background-color: white; height: 100%">
-                <CodeMirror
-                  bind:value={formValue.starterCode[codeSelected].code}
-                  readonly={previewEnabled}
-                  placeholder="Starter code"
-                  lang={javascript()} />
-              </div>
-            {:else}
-              <div style="background-color: white; height: 100%">
-                <CodeMirror
-                  bind:value={formValue.runnerCode[codeSelected].code}
-                  placeholder="Runner code"
-                  lang={javascript()} />
-              </div>
+            {#if formValue.starterCode[codeSelected].language && formValue.runnerCode[codeSelected].language}
+              {#if editCode === "starter-code" || previewEnabled}
+                <div style="background-color: white; height: 100%">
+                  <CodeMirror
+                    bind:value={formValue.starterCode[codeSelected].code}
+                    readonly={previewEnabled}
+                    placeholder="Starter code"
+                    lang={languageParsers[formValue.starterCode[codeSelected].language]} />
+                </div>
+              {:else}
+                <div style="background-color: white; height: 100%">
+                  <CodeMirror
+                    bind:value={formValue.runnerCode[codeSelected].code}
+                    placeholder="Runner code"
+                    lang={languageParsers[formValue.runnerCode[codeSelected].language]} />
+                </div>
+              {/if}
             {/if}
           {/if}
         </section>

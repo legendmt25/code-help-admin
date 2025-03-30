@@ -7,8 +7,7 @@ services:
       context: code-help-admin-proxy
       dockerfile: ./@global/deploy/Dockerfile
     environment:
-      - FORUM_API_SERVER_URL=http://code-help-forum:3000
-      - CORE_ADMIN_API_SERVER_URL=http://code-help-core:3000
+      - PROXY_MAPPINGS=*/admin/forum::http://code-help-forum:3001,.*/admin::http://code-help-core:3000
       - OAUTH2_RESOURCESERVER_JWT_ISSUERURI=http://localhost/iam/realms/code-help
       - OAUTH2_RESOURCESERVER_JWT__DISCOVERYISSUERURI=http://code-help-keycloak-iam:8080/iam/realms/code-help
       - OAUTH2_RESOURCESERVER_JWT_JWKSETURI=http://code-help-keycloak-iam:8080/iam/realms/code-help/protocol/openid-connect/certs
