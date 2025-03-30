@@ -15,8 +15,8 @@ import {
 } from "../generated/admin-forum-api";
 import { authMiddleware } from "./middlewares";
 
-const confiugration = {
-  basePath: env.ADMIN_API_URL,
+const createConfiguration = (basePath: string) => ({
+  basePath: basePath,
 
   headers: {
     "Access-Control-Allow-Origin": "http://localhost:30000",
@@ -27,10 +27,10 @@ const confiugration = {
       pre: authMiddleware
     }
   ]
-};
+});
 
-export const adminCoreApiConfiguration: AdminCoreApiConfugiration = new AdminCoreApiConfugiration(confiugration);
-export const adminForumApiConfiguration: AdminForumApiConfugiration = new AdminForumApiConfugiration(confiugration);
+export const adminCoreApiConfiguration: AdminCoreApiConfugiration = new AdminCoreApiConfugiration(createConfiguration(env.ADMIN_API_URL));
+export const adminForumApiConfiguration: AdminForumApiConfugiration = new AdminForumApiConfugiration(createConfiguration(env.ADMIN_API_URL + "/forum"));
 
 export const PROBLEM_API = new ProblemApi(adminCoreApiConfiguration);
 export const CATEGORY_API = new CategoryApi(adminCoreApiConfiguration);

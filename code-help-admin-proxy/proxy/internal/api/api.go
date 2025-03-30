@@ -7,31 +7,54 @@ import (
 	auth "proxy/internal/auth"
 	"proxy/internal/environment"
 	"regexp"
+	"strings"
 	"time"
 )
 
-func NewProxyServer(oidcService auth.OidcService) ProxyServer {
+func parseProxyMappings(environment environment.Environment) (map[string]string, []string) {
+	mappingsArray := environment.ProxyMappings
+	keys := make([]string, 0)
+	mappings := make(map[string]string)
 
-	regexString := [2]string{".*/admin/forum", ".*/admin"}
-	forumAppRegex, _ := regexp.Compile(regexString[0])
-	coreAppRegex, _ := regexp.Compile(regexString[1])
+	for _, mapping := range mappingsArray {
+		split := strings.SplitN(mapping, "->", 2)
+		from := split[0]
+		to := split[1]
+		keys = append(keys, from)
 
-	regexMap := make(map[string]*regexp.Regexp)
-	regexMap[regexString[0]] = forumAppRegex
-	regexMap[regexString[1]] = coreAppRegex
+		mappings[from] = to
+	}
 
-	relocateMap := make(map[string]string)
-	relocateMap[regexString[0]] = environment.Load().ForumServerUrl
-	relocateMap[regexString[1]] = environment.Load().CoreServerUrl
+	return mappings, keys
+}
+
+func NewProxyServer(environment environment.Environment, oidcService auth.OidcService) ProxyServer {
+
+	regexes := make(map[string]*regexp.Regexp)
+	relocators := make(map[string]string)
+
+	mappings, keys := parseProxyMappings(environment)
+
+	for _, key := range keys {
+		from := key
+		to := mappings[key]
+		regexMapFrom, _ := regexp.Compile(from)
+		regexes[from] = regexMapFrom
+		relocators[from] = to
+
+		fmt.Printf("Proxy mapping: %s -> %s\n", from, to)
+	}
 
 	reverseProxyHandler := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
 		fmt.Printf("[reverse proxy server] received request at: %s\n", time.Now())
 
 		targetUrl := req.URL.String()
-		fmt.Printf("[reverse proxy server] url: %s\n", targetUrl)
-		for key, regex := range regexMap {
+		fmt.Printf("[reverse proxy server] url: %s %s\n", req.Method, targetUrl)
+		for _, key := range keys {
+			regex := regexes[key]
+
 			if regex.MatchString(targetUrl) {
-				targetUrl = regex.ReplaceAllString(targetUrl, relocateMap[key])
+				targetUrl = regex.ReplaceAllString(targetUrl, relocators[key])
 				fmt.Printf("[reverse proxy server] relocating to: %s\n", targetUrl)
 			}
 		}
@@ -41,6 +64,8 @@ func NewProxyServer(oidcService auth.OidcService) ProxyServer {
 			rw.WriteHeader(http.StatusInternalServerError)
 			_, _ = fmt.Fprint(rw, err)
 		}
+
+		proxyReq.Header = req.Header
 
 		// save the response from the origin server
 		originServerResponse, err := http.DefaultClient.Do(proxyReq)

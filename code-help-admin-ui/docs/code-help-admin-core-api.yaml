@@ -4,12 +4,12 @@ info:
   version: 1.0.0
 
 servers:
-  - url: http://localhost:3000/api
+  - url: http://localhost:4000/admin/api/v1
     description: Open API specification
 security:
   - Authorization_JWT: [ ]
 paths:
-  /admin/categories:
+  /categories:
     get:
       tags: [ category, admin ]
       operationId: getAllCategories
@@ -39,7 +39,7 @@ paths:
           $ref: "code-help-common-api.yaml#/components/responses/UnauthorizedResponse"
         403:
           $ref: "code-help-common-api.yaml#/components/responses/ForbiddenResponse"
-  /admin/categories/{id}:
+  /categories/{id}:
     put:
       tags: [ category, admin ]
       operationId: updateCategory
@@ -73,7 +73,7 @@ paths:
           $ref: "code-help-common-api.yaml#/components/responses/ForbiddenResponse"
         404:
           $ref: "code-help-common-api.yaml#/components/responses/NotFoundResponse"
-  /admin/problems:
+  /problems:
     get:
       tags: [ problem, admin ]
       operationId: getAllProblems
@@ -114,7 +114,7 @@ paths:
           $ref: "code-help-common-api.yaml#/components/responses/UnauthorizedResponse"
         403:
           $ref: "code-help-common-api.yaml#/components/responses/ForbiddenResponse"
-  /admin/problems/{id}:
+  /problems/{id}:
     get:
       tags: [ problem, admin ]
       operationId: getProblem
@@ -174,7 +174,7 @@ paths:
           $ref: "code-help-common-api.yaml#/components/responses/ForbiddenResponse"
         404:
           $ref: "code-help-common-api.yaml#/components/responses/NotFoundResponse"
-  /admin/contests:
+  /contests:
     get:
       tags: [ contest, admin ]
       operationId: getAllContests
@@ -208,7 +208,7 @@ paths:
           $ref: "code-help-common-api.yaml#/components/responses/UnauthorizedResponse"
         403:
           $ref: "code-help-common-api.yaml#/components/responses/ForbiddenResponse"
-  /admin/contests/{id}:
+  /contests/{id}:
     get:
       tags: [ contest, admin ]
       operationId: getContest
@@ -260,7 +260,7 @@ paths:
           $ref: "code-help-common-api.yaml#/components/responses/ForbiddenResponse"
         404:
           $ref: "code-help-common-api.yaml#/components/responses/NotFoundResponse"
-  /admin/contests/{id}/start:
+  /contests/{id}/start:
     get:
       parameters:
         - $ref: "code-help-common-api.yaml#/components/parameters/ContestId"
@@ -276,7 +276,7 @@ paths:
           $ref: "code-help-common-api.yaml#/components/responses/ForbiddenResponse"
         404:
           $ref: "code-help-common-api.yaml#/components/responses/NotFoundResponse"
-  /admin/contests/{id}/close:
+  /contests/{id}/close:
     get:
       parameters:
         - $ref: "code-help-common-api.yaml#/components/parameters/ContestId"
@@ -292,7 +292,7 @@ paths:
           $ref: "code-help-common-api.yaml#/components/responses/ForbiddenResponse"
         400:
           $ref: "code-help-common-api.yaml#/components/responses/BadRequestResponse"
-  /admin/code-runner:
+  /code-runner:
     post:
       operationId: runCode
       tags: [code runner, admin]

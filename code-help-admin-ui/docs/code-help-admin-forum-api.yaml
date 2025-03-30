@@ -5,7 +5,7 @@ info:
   version: 0.1.0
 
 servers:
-  - url: http://localhost:4000/api/v1/admin/forum
+  - url: http://localhost:4000/admin/api/v1/forum
 paths:
   /communities:
     get:
@@ -881,7 +881,6 @@ components:
       required: false
       schema:
         type: array
-        default: [ ]
         items:
           type: string
           example: "id=asc,title=desc"
