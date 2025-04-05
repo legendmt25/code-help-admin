@@ -44,6 +44,6 @@ export const updateProblem = (id: number, body: ProblemRequest) => {
   return PROBLEM_API.updateProblem({ id, problemRequest: body });
 };
 
-export const runCode = (body: Omit<CodeRunnerRequest, "language">) => {
-  return CODE_RUNNER_API.runCode({ codeRunnerRequest: { ...body, language: DEFAULT_CODE_LANGUAGE } });
+export const runCode = (body: CodeRunnerRequest) => {
+  return CODE_RUNNER_API.runCode({ codeRunnerRequest: { ...body } });
 };

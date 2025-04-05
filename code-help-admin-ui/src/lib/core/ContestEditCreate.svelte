@@ -33,6 +33,7 @@
           contestEntry = contest;
           value = {
             name: contest.name,
+            description: contest.description,
             duration: contest.duration,
             startsOn: contest.startsOn,
             status: contest.status,
@@ -42,6 +43,10 @@
         .finally(() => (loading = false));
     }
   });
+
+  const form = {
+
+  }
 
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -111,6 +116,10 @@
         <input id="name" name="name" bind:value={value.name} />
       </div>
       <div class="input-container">
+        <label for="description">Description</label>
+        <input id="description" name="description" bind:value={value.description} />
+      </div>
+      <div class="input-container">
         <label for="duration">Duration</label>
         <input id="duration" name="duration" bind:value={value.duration} />
       </div>
@@ -134,7 +143,7 @@
       <Button maxContent>Submit</Button>
     </form>
 
-    {#if contestEntry != undefined}
+    {#if contestEntry}
       <table>
         <thead>
           <tr>

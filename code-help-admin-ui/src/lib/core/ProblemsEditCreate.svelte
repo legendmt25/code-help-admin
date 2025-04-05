@@ -2,7 +2,7 @@
   import { javascript } from "@codemirror/lang-javascript";
   import { java } from "@codemirror/lang-java";
   import { marked } from "marked";
-  import { onMount } from "svelte";
+  import {type ComponentProps, onMount} from "svelte";
   import CodeMirror from "svelte-codemirror-editor";
   import type { FormEventHandler } from "svelte/elements";
   import Button from "../../components/Button.svelte";
@@ -13,7 +13,7 @@
     type CategoryRequest,
     type ProblemCode,
     type ProblemRequest,
-    type TestCase
+    type TestCase, type ProblemCodeResponse
   } from "../../generated/admin-core-api";
   import {
     createContestProblem,
@@ -30,11 +30,11 @@
   import { Route } from "../../routes";
   import MessageBox from "../../components/MessageBox.svelte";
   import { AiFillCaretRight } from "svelte-icons-pack/ai";
+  import { nonNullAssert } from "../../util";
 
-  type ProblemFormData = Omit<Partial<ProblemRequest>, "testCases" | "runnerCode" | "starterCode"> & {
+  type ProblemFormData = Omit<Partial<ProblemRequest>, "testCases" | "codes"> & {
     testCases: Partial<TestCase>[];
-    runnerCode: Partial<ProblemCode>[];
-    starterCode: Partial<ProblemCode>[];
+    codes: Partial<ProblemCodeResponse>[];
   };
 
   export let params: { id?: string; contestId?: string } = {
@@ -49,19 +49,12 @@
   let loading = false;
   let formValue: ProblemFormData = {
     testCases: [],
-    runnerCode: [],
-    starterCode: []
+    codes: [],
   };
 
-  const languageParsers = {
+  const languageParsers: Record<string, ComponentProps<CodeMirror>['lang']> = {
     javascript: javascript(),
     java: java()
-  };
-
-  $: () => {
-    if (codeSelected) {
-      formValue.runnerCode[codeSelected].language = formValue.starterCode[codeSelected].language;
-    }
   };
 
   let categories: Category[] = [];
@@ -84,8 +77,7 @@
             difficulty: problem.difficulty,
             markdown: problem.markdown,
             title: problem.title,
-            starterCode: problem.starterCode,
-            runnerCode: problem.runnerCode,
+            codes: problem.codes,
             testCases: problem.testCases
           };
         })
@@ -128,22 +120,34 @@
 
   let runCodeMessage: string | undefined = undefined;
   const handleTestProblem = () => {
-    if (!formValue.starterCode || !formValue.runnerCode || !formValue.testCases || !formValue.testCases.length) {
+    if (Number.isNaN(codeSelected) || !formValue.codes.length || !formValue.testCases.length) {
       return;
     }
 
-    // runCode({
-    //   code: formValue.starterCode!,
-    //   runnerCode: formValue.runnerCode!,
-    //   testCases: formValue.testCases!
-    // }).then((resp) => {
-    //   runCodeMessage = resp.message;
+    const problemCode = formValue.codes[codeSelected!];
 
-    //   setTimeout(() => {
-    //     runCodeMessage = undefined;
-    //   }, 15000);
-    // });
+    runCode({
+      code: problemCode.starter! + "\n" + problemCode.runner!,
+      language: problemCode.language!,
+      testCases: formValue.testCases as TestCase[]
+    }).then((resp) => {
+      runCodeMessage = resp.message;
+
+      setTimeout(() => {
+        runCodeMessage = undefined;
+      }, 15000);
+    });
   };
+
+  const findNotInitializedLanguages = (codes: typeof formValue['codes'], codeSelected?: number) => {
+    const languages = Object.keys(languageParsers).filter(key => !codes.find(code => code.language === key));
+
+    if(Number.isInteger(codeSelected)) {
+      languages.push(codes[codeSelected!].language!)
+    }
+
+    return languages;
+  }
 </script>
 
 <style>
@@ -285,15 +289,16 @@
               class="test-case-add-btn"
               fullwidth
               on:click={() => {
-                formValue.runnerCode = [...(formValue.runnerCode ?? []), { language: Object.keys(languageParsers)[0] }];
-                formValue.starterCode = [
-                  ...(formValue.starterCode ?? []),
-                  { language: Object.keys(languageParsers)[0] }
-                ];
+                const notInitializedLanguages = findNotInitializedLanguages(formValue.codes, codeSelected);
+                if(Number.isInteger(codeSelected) && notInitializedLanguages.length <= 1 || !notInitializedLanguages.length) {
+                  return;
+                }
+
+                formValue.codes = [...(formValue.codes ?? []), { language: notInitializedLanguages[0] }];
               }}>
               <span style="font-size: 1.4em; font-weight:bold; line-height: 90%">+</span>
             </Button>
-            {#each formValue.runnerCode ?? [] as runnerCode, index}
+            {#each formValue.codes ?? [] as code, index}
               <Button
                 fullwidth
                 on:click={() => (codeSelected = index)}
@@ -301,7 +306,7 @@
                 style="position: relative;"
                 active={codeSelected === index}>
                 <div>
-                  {runnerCode.language ?? "No language"}
+                  {code.language ?? "No language"}
                 </div>
                 <!-- svelte-ignore a11y-interactive-supports-focus -->
                 <div
@@ -312,11 +317,8 @@
                     event.preventDefault();
                     event.stopPropagation();
                     codeSelected = undefined;
-                    formValue.runnerCode = [
-                      ...(formValue.runnerCode ?? []).filter((_, arrIndex) => arrIndex !== index)
-                    ];
-                    formValue.starterCode = [
-                      ...(formValue.runnerCode ?? []).filter((_, arrIndex) => arrIndex !== index)
+                    formValue.codes = [
+                      ...(formValue.codes ?? []).filter((_, arrIndex) => arrIndex !== index)
                     ];
                   }}>
                   ×
@@ -360,7 +362,7 @@
                   </Button>
                 {/each}
               </div>
-              {#if testCaseSelected != undefined && formValue.testCases?.length}
+              {#if Number.isInteger(testCaseSelected) && formValue.testCases.length}
                 <div class="input-container w-100 h-100">
                   <label for="testcase-input">INPUT:</label>
                   <textarea
@@ -369,7 +371,7 @@
                     name="testcase-input"
                     placeholder="INPUT"
                     style="resize: none; max-height: 20rem; min-height: 18rem;"
-                    bind:value={formValue.testCases[testCaseSelected]._in} />
+                    bind:value={formValue.testCases[nonNullAssert(testCaseSelected)]._in} />
                 </div>
                 <div class="input-container w-100 h-100">
                   <label for="testcase-output">OUTPUT:</label>
@@ -379,11 +381,11 @@
                     name="testcase-input"
                     placeholder="OUTPUT"
                     style="resize: none; max-height: 20rem; min-height: 18rem;"
-                    bind:value={formValue.testCases[testCaseSelected].out} />
+                    bind:value={formValue.testCases[nonNullAssert(testCaseSelected)].out} />
                 </div>
               {/if}
             </div>
-            {#if formValue.testCases?.length}
+            {#if formValue.testCases.length}
               <div class="column py-1 gap-0">
                 {#if runCodeMessage}
                   <MessageBox type="info" fullwidth>{runCodeMessage}</MessageBox>
@@ -396,16 +398,17 @@
       <hr />
       <div class="w-50 column">
         <section class="column gap-1 h-50">
-          {#if codeSelected != undefined}
+          {#if Number.isInteger(codeSelected)}
             {#if !previewEnabled}
               <select
                 id="language"
                 name="language"
                 placeholder="Language"
-                bind:value={formValue.starterCode[codeSelected].language}>
-                {#each Object.keys(languageParsers) as language}
+                bind:value={formValue.codes[Number(codeSelected)].language}>
+                {#each findNotInitializedLanguages(formValue.codes, codeSelected) as language}
                   <option value={language}>{language}</option>
-                {/each}</select>
+                {/each}
+              </select>
               <div class="tab-control">
                 <Button
                   fullWidth
@@ -421,23 +424,23 @@
                   style={"border-top-left-radius: 0; border-bottom-left-radius: 0;"}>Edit {"Runner code"}</Button>
               </div>
             {:else}
-              {formValue.starterCode[codeSelected].language}
+              {formValue.codes[Number(codeSelected)].language}
             {/if}
-            {#if formValue.starterCode[codeSelected].language && formValue.runnerCode[codeSelected].language}
+            {#if formValue.codes[Number(codeSelected)]?.language}
               {#if editCode === "starter-code" || previewEnabled}
                 <div style="background-color: white; height: 100%">
                   <CodeMirror
-                    bind:value={formValue.starterCode[codeSelected].code}
+                    bind:value={formValue.codes[Number(codeSelected)].starter}
                     readonly={previewEnabled}
                     placeholder="Starter code"
-                    lang={languageParsers[formValue.starterCode[codeSelected].language]} />
+                    lang={languageParsers[nonNullAssert(formValue.codes[Number(codeSelected)].language)]} />
                 </div>
               {:else}
                 <div style="background-color: white; height: 100%">
                   <CodeMirror
-                    bind:value={formValue.runnerCode[codeSelected].code}
+                    bind:value={formValue.codes[Number(codeSelected)].runner}
                     placeholder="Runner code"
-                    lang={languageParsers[formValue.runnerCode[codeSelected].language]} />
+                    lang={languageParsers[nonNullAssert(formValue.codes[Number(codeSelected)].language)]} />
                 </div>
               {/if}
             {/if}
