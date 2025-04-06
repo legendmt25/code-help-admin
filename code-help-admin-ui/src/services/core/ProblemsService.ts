@@ -5,8 +5,6 @@ import {
 } from "../../generated/admin-core-api";
 import { CATEGORY_API, CODE_RUNNER_API, PROBLEM_API } from "../api";
 
-const DEFAULT_CODE_LANGUAGE = "javascript";
-
 export const getAllProblems = (page?: number, size?: number, sortBy?: string[]) =>
   PROBLEM_API.getAllProblems({ page, size, sortBy });
 

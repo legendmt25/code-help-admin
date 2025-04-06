@@ -11,7 +11,6 @@
     Difficulty,
     type Category,
     type CategoryRequest,
-    type ProblemCode,
     type ProblemRequest,
     type TestCase, type ProblemCodeResponse
   } from "../../generated/admin-core-api";
