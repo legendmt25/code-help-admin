@@ -4,9 +4,10 @@
   import { createCategory, updateCategory } from "../../services/core/ProblemsService";
   import Button from "../../components/Button.svelte";
   import { createEventDispatcher } from "svelte";
+  import type {CategoryRequest} from "../../generated/admin-core-api";
 
   export let categoryId: number | undefined = undefined;
-  export let categoryNameValue: string | undefined = undefined;
+  export let formData: Partial<CategoryRequest> = {};
   export let dialog: HTMLDialogElement | undefined = undefined;
 
   const title = !categoryId ? "Create category" : `Update category - ${categoryId}`;
@@ -19,16 +20,20 @@
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
 
-    if (!categoryNameValue) {
+    if (!formData || !formData.name || !formData.description) {
       return;
     }
 
     let createEditCategoryPromise: Promise<void>;
+    const request = {
+      name: formData.name,
+      description: formData.description,
+    };
 
     if (!Number.isNaN(Number(categoryId))) {
-      createEditCategoryPromise = updateCategory(categoryId!, { categoryRequest: { name: categoryNameValue } });
+      createEditCategoryPromise = updateCategory(categoryId!, {categoryRequest: request });
     } else {
-      createEditCategoryPromise = createCategory({ categoryRequest: { name: categoryNameValue } }).then(() => {});
+      createEditCategoryPromise = createCategory({ categoryRequest: request }).then(() => {});
     }
 
     createEditCategoryPromise
@@ -69,7 +74,11 @@
   <form on:submit={handleFormSubmit} id="create-category-form" class="form p-1">
     <div class="input-container">
       <label for="name">Category name</label>
-      <input required id="name" name="name" bind:value={categoryNameValue} />
+      <input required id="name" name="name" bind:value={formData.name} />
+    </div>
+    <div class="input-container">
+      <label for="description">Category description</label>
+      <input required id="description" name="description" bind:value={formData.description} />
     </div>
   </form>
   <div slot="footer">

@@ -18,10 +18,25 @@
 
   export let params: { id?: string } = {};
 
-  let loading: boolean = false;
-  let value: Partial<ContestEditRequest> = {
-    problems: []
+  type ContestFormData = Omit<Partial<ContestEditRequest>, "startDate"> & {
+    startDate: Date;
   };
+
+  let loading: boolean = false;
+  let value: ContestFormData = {
+    problems: [],
+    startDate: new Date()
+  };
+
+  const convertToDateTimeLocalString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
 
   let contestEntry: ContestDetail | undefined = undefined;
 
@@ -35,7 +50,7 @@
             name: contest.name,
             description: contest.description,
             duration: contest.duration,
-            startsOn: contest.startsOn,
+            startDate: contest.startDate,
             status: contest.status,
             problems: contestEntry.problems
           };
@@ -43,10 +58,6 @@
         .finally(() => (loading = false));
     }
   });
-
-  const form = {
-
-  }
 
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -65,7 +76,7 @@
   };
 
   const handleDateChange: ChangeEventHandler<HTMLInputElement> = (event) => {
-    value.startsOn = new Date(event.currentTarget.value);
+    value.startDate = new Date(event.currentTarget.value);
   };
 
   const handleDeleteProblem = (id: number) => {
@@ -124,12 +135,12 @@
         <input id="duration" name="duration" bind:value={value.duration} />
       </div>
       <div class="input-container">
-        <label for="startsOn">Starts on</label>
+        <label for="startDate">Start date</label>
         <input
-          type="date"
-          id="startsOn"
-          name="startsOn"
-          value={value.startsOn?.toISOString().substring(0, 10)}
+          type="datetime-local"
+          id="startDate"
+          name="startDate"
+          value={convertToDateTimeLocalString(value.startDate)}
           on:change={handleDateChange} />
       </div>
       <div class="input-container">
@@ -157,7 +168,7 @@
           {#each contestEntry.problems as problem}
             <tr>
               <td>{problem.id}</td>
-              <td>{problem.title}</td>
+              <td>{problem.name}</td>
               <td>{problem.score}</td>
               <td>
                 <Button maxContent on:click={() => handleDeleteProblem(problem.id)}>

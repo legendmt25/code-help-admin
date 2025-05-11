@@ -75,10 +75,19 @@
             category: problem.category as CategoryRequest,
             difficulty: problem.difficulty,
             markdown: problem.markdown,
-            title: problem.title,
+            name: problem.name,
+            description: problem.description,
             codes: problem.codes,
             testCases: problem.testCases
           };
+
+          if(problem.codes.length > 0) {
+            codeSelected = 0;
+          }
+
+          if(problem.testCases.length > 0) {
+            testCaseSelected = 0;
+          }
         })
       );
     }
@@ -237,9 +246,16 @@
         <form id="edit-problem-form" class="form" on:submit={handleEditCreate}>
           <div class="input-container">
             {#if previewEnabled}
-              {formValue.title}
+              {formValue.name}
             {:else}
-              <input id="title" name="title" placeholder="Title" bind:value={formValue.title} />
+              <input id="name" name="name" placeholder="Name" bind:value={formValue.name} />
+            {/if}
+          </div>
+          <div class="input-container">
+            {#if previewEnabled}
+              {formValue.description}
+            {:else}
+              <input id="description" name="description" placeholder="Description" bind:value={formValue.description} />
             {/if}
           </div>
           <div class="row gap-1">

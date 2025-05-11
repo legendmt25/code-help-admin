@@ -5,7 +5,8 @@ info:
   version: 0.1.0
 
 servers:
-  - url: http://localhost:4000/admin/api/v1/forum
+  - url: http://localhost:3001/api/v1
+
 paths:
   /communities:
     get:
@@ -627,11 +628,13 @@ components:
                 type: string
     ShortPost:
       type: object
-      required: [ uid, title, created, user ]
+      required: [ uid, title, content, created, user ]
       properties:
         uid:
           type: string
         title:
+          type: string
+        content:
           type: string
         created:
           type: string
@@ -656,8 +659,6 @@ components:
         - type: object
           required: [ content, modified, comments ]
           properties:
-            content:
-              type: string
             comments:
               type: array
               items:
@@ -881,6 +882,7 @@ components:
       required: false
       schema:
         type: array
+        default: [ ]
         items:
           type: string
           example: "id=asc,title=desc"

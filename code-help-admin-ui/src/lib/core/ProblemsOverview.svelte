@@ -63,7 +63,8 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>Title</th>
+          <th>Name</th>
+          <th>Description</th>
           <th>Category</th>
           <th>Actions</th>
         </tr>
@@ -72,8 +73,9 @@
         {#each filter(problems) as problemEntry}
           <tr>
             <td>{problemEntry.id}</td>
-            <td>{problemEntry.title}</td>
-            <td>{problemEntry.category?.name}</td>
+            <td>{problemEntry.name}</td>
+            <td>{problemEntry.description}</td>
+            <td>{problemEntry.category.name}</td>
             <td>
               <Button
               maxContent

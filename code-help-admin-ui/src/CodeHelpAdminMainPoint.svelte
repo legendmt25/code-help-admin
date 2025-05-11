@@ -15,7 +15,6 @@
 
   let menuOpened: boolean = false;
   const keycloak = window.keycloak!;
-
   let loggedIn: boolean = isAuthenticated(keycloak);
 
   const openMenu = () => (menuOpened = true);
