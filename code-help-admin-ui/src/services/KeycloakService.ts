@@ -50,7 +50,7 @@ export const initKeycloak = async (): Promise<KeycloakType> => {
 
 export const getIdToken = () => localStorage.getItem(ID_TOKEN_KEY);
 
-export const isAuthenticated = (keycloak: KeycloakType) => !!keycloak.authenticated;
+export const isAuthenticated = (keycloak: KeycloakType) => true;
 
 export const getPrefferedUsername = (keycloak: KeycloakType): string | undefined => {
   const idTokenParsed: KeycloakTokenParsed = keycloak.idTokenParsed ?? {};

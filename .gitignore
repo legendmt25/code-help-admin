@@ -420,4 +420,4 @@ package
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,intellij+iml,intellij+all,visualstudiocode,go,node,svelte
 
-code-help-admin-backend/admin-api/cmd/cmd
+code-help-admin-proxy/proxy/cmd/cmd

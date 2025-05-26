@@ -5,8 +5,6 @@ import {
 } from "../../generated/admin-core-api";
 import { CATEGORY_API, CODE_RUNNER_API, PROBLEM_API } from "../api";
 
-const DEFAULT_CODE_LANGUAGE = "javascript";
-
 export const getAllProblems = (page?: number, size?: number, sortBy?: string[]) =>
   PROBLEM_API.getAllProblems({ page, size, sortBy });
 
@@ -36,14 +34,14 @@ export const createProblem = (body: ProblemRequest) => {
   return PROBLEM_API.createProblem({ problemRequest: body });
 };
 
-export const createContestProblem = (body: ProblemRequest, contestId: number) => {
-  return PROBLEM_API.createProblem({ problemRequest: body, contestId });
+export const createContestProblem = (body: ProblemRequest, contestId: number, score: number) => {
+  return PROBLEM_API.createProblem({ problemRequest: body, contestId, score });
 };
 
 export const updateProblem = (id: number, body: ProblemRequest) => {
   return PROBLEM_API.updateProblem({ id, problemRequest: body });
 };
 
-export const runCode = (body: Omit<CodeRunnerRequest, "language">) => {
-  return CODE_RUNNER_API.runCode({ codeRunnerRequest: { ...body, language: DEFAULT_CODE_LANGUAGE } });
+export const runCode = (body: CodeRunnerRequest) => {
+  return CODE_RUNNER_API.runCode({ codeRunnerRequest: { ...body } });
 };

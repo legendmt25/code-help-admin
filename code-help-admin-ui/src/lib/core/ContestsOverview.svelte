@@ -6,20 +6,31 @@
   import Spinner from "../../components/Spinner.svelte";
   import { Route } from "../../routes";
   import { deleteContest, getAllContests } from "../../services/core/ContestService";
-  import { filterContests } from "../../util";
+  import type {Contest} from "../../generated/admin-core-api";
 
-  const handleGetAllContests = () =>
-    getAllContests()
+  let search: string | undefined = undefined;
+  let timeout: ReturnType<typeof setTimeout>;
+
+  const handleGetAllContests = (search?: string) =>
+    getAllContests(0, 25, undefined, search)
       .then((data) => data.contests)
       .catch(() => []);
 
-  let getAllContestsPromise = handleGetAllContests();
+  let getAllContestsPromise: Promise<Contest[]> = handleGetAllContests();
 
   const handleDeleteContest = (contestId: number) =>
-    deleteContest(contestId).then(() => (getAllContestsPromise = handleGetAllContests()));
+    deleteContest(contestId).then(() => (getAllContestsPromise = handleGetAllContests(search)));
 
-  let search: string | undefined = undefined;
-  $: filter = filterContests.bind(undefined, search);
+  const debounced = (search?: string) => {
+    clearTimeout(timeout)
+    if (!search?.length) {
+      getAllContestsPromise = handleGetAllContests();
+    }
+
+    timeout = setTimeout(() => {
+      getAllContestsPromise = handleGetAllContests()
+    }, 1000);
+  }
 </script>
 
 <style>
@@ -41,21 +52,21 @@
   }
 </style>
 
-{#await getAllContestsPromise}
-  <Spinner />
-{:then contests}
-  <section>
-    <div class="page-heading">
-      <h2>Contests</h2>
-      <Button maxContent type="primary-outline" href={Route.contests_create}>
-        <Icon src={BiPlus} size="24" />
-        <span>Create</span>
-      </Button>
-    </div>
+<section>
+  <div class="page-heading">
+    <h2>Contests</h2>
+    <Button maxContent type="primary-outline" href={Route.contests_create}>
+      <Icon src={BiPlus} size="24" />
+      <span>Create</span>
+    </Button>
+  </div>
 
-    <div class="input-container">
-      <input id="search" placeholder="Search" name="search" bind:value={search} />
-    </div>
+  <div class="input-container">
+    <input type="search" id="search" placeholder="Search" name="search" bind:value={search} on:change={() => debounced(search)} />
+  </div>
+  {#await getAllContestsPromise}
+    <Spinner />
+  {:then contests}
     <table>
       <thead>
         <tr>
@@ -68,11 +79,11 @@
         </tr>
       </thead>
       <tbody>
-        {#each filter(contests) as contestEntry}
+        {#each contests as contestEntry}
           <tr>
             <td>{contestEntry.id}</td>
             <td>{contestEntry.name}</td>
-            <td>{contestEntry.startsOn.toLocaleString()}</td>
+            <td>{contestEntry.startDate.toLocaleString()}</td>
             <td>{contestEntry.duration}</td>
             <td>{contestEntry.status}</td>
             <td>
@@ -94,7 +105,8 @@
     {#if contests.length === 0}
       <AlertBox type="info" message="No entries!" />
     {/if}
-  </section>
-{:catch err}
-  <AlertBox type="error" message="An error occured! ({err})" />
-{/await}
+  {:catch err}
+    <AlertBox type="error" message="An error occured! ({err})" />
+  {/await}
+</section>
+

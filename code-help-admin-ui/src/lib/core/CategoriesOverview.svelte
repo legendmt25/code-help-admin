@@ -7,8 +7,9 @@
   import { deleteCategory, getAllCategories } from "../../services/core/ProblemsService";
   import { filterCategories } from "../../util";
   import CategoryEditCreateDialog from "./CategoryEditCreateDialog.svelte";
+  import type {Category, CategoryRequest} from "../../generated/admin-core-api";
 
-  let categoryValueToEdit: string | undefined = undefined;
+  let categoryValueToEdit: Partial<CategoryRequest> = {};
   let categoryIdToEdit: number | undefined = undefined;
   let createEditCategoryDialog: HTMLDialogElement | undefined = undefined;
 
@@ -26,9 +27,9 @@
     getAllCategoriesPromise = handleGetAllCategories();
   };
 
-  const handleEditCategory = (categoryId: number, categoryName: string) => {
+  const handleEditCategory = (categoryId: number, category: CategoryRequest) => {
     categoryIdToEdit = categoryId;
-    categoryValueToEdit = categoryName;
+    categoryValueToEdit = category;
     createEditCategoryDialog?.showModal();
   };
 
@@ -65,7 +66,7 @@
         maxContent
         type="primary-outline"
         on:click={() => {
-          categoryValueToEdit = undefined;
+          categoryValueToEdit = {};
           categoryIdToEdit = undefined;
           createEditCategoryDialog?.showModal();
         }}>
@@ -83,6 +84,7 @@
         <tr>
           <th>#</th>
           <th>Name</th>
+          <th>Description</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -91,8 +93,9 @@
           <tr>
             <td>{categoryEntry.id}</td>
             <td>{categoryEntry.name}</td>
+            <td>{categoryEntry.description}</td>
             <td>
-              <Button maxContent on:click={() => handleEditCategory(categoryEntry.id, categoryEntry.name)}>
+              <Button maxContent on:click={() => handleEditCategory(categoryEntry.id, categoryEntry)}>
                 <Icon src={BiEdit} size="24" />
                 <span>Edit</span>
               </Button>
@@ -114,7 +117,7 @@
 {/await}
 
 <CategoryEditCreateDialog
-  bind:categoryNameValue={categoryValueToEdit}
+  bind:formData={categoryValueToEdit}
   bind:categoryId={categoryIdToEdit}
   on:success={handleSaveCategorySuccess}
   bind:dialog={createEditCategoryDialog} />

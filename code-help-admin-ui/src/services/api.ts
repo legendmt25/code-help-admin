@@ -19,8 +19,8 @@ const createConfiguration = (basePath: string) => ({
   basePath: basePath,
 
   headers: {
-    "Access-Control-Allow-Origin": "http://localhost:30000",
-    "Access-Control-Allow-Methods": "POST,PUT,PATCH,OPTIONS,GET,DELETE",
+    // "Access-Control-Allow-Origin": "http://localhost:30000",
+    // "Access-Control-Allow-Methods": "POST,PUT,PATCH,OPTIONS,GET,DELETE",
   },
   middleware: [
     {

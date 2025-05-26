@@ -1,6 +1,9 @@
-import type { Category, Contest, ForumCategory, Problem, ShortCommunity, ShortPost, User } from "./generated/admin-api";
+import type { Category as ForumCategory, ShortCommunity, ShortPost, User } from "./generated/admin-forum-api";
+import type { Category, Contest, Problem } from "./generated/admin-core-api";
 
 type FilterFunction<T> = (search: string | undefined, items: T[]) => T[];
+
+export const nonNullAssert = <T>(value: T | undefined | null): T => value!;
 
 export const filterCategories: FilterFunction<Category> = (search, categories) => {
   const searchLowerCase = search?.toLowerCase();

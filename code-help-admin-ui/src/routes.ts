@@ -19,6 +19,7 @@ export const Route = {
   problems_overview: "/problems",
   problems_create: "/problems/create",
   problems_edit: "/problems/edit/:id",
+  contest_problems_edit: "/problems/edit/:id?contestId=:contestId",
   contest_problems_create: "/problems/create?contestId=:contestId",
 
   contests_overview: "/contests",
