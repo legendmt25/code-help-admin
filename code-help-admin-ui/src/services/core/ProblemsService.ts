@@ -34,8 +34,8 @@ export const createProblem = (body: ProblemRequest) => {
   return PROBLEM_API.createProblem({ problemRequest: body });
 };
 
-export const createContestProblem = (body: ProblemRequest, contestId: number) => {
-  return PROBLEM_API.createProblem({ problemRequest: body, contestId });
+export const createContestProblem = (body: ProblemRequest, contestId: number, score: number) => {
+  return PROBLEM_API.createProblem({ problemRequest: body, contestId, score });
 };
 
 export const updateProblem = (id: number, body: ProblemRequest) => {

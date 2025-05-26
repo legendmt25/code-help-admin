@@ -34,6 +34,7 @@
   type ProblemFormData = Omit<Partial<ProblemRequest>, "testCases" | "codes"> & {
     testCases: Partial<TestCase>[];
     codes: Partial<ProblemCodeResponse>[];
+    score?: string;
   };
 
   export let params: { id?: string; contestId?: string } = {
@@ -49,6 +50,7 @@
   let formValue: ProblemFormData = {
     testCases: [],
     codes: [],
+    score: "0",
   };
 
   const languageParsers: Record<string, ComponentProps<CodeMirror>['lang']> = {
@@ -110,7 +112,7 @@
     const contestId = Number(params.contestId);
 
     if (!Number.isNaN(contestId) && Number.isNaN(id)) {
-      editCreatePromise = createContestProblem(body, contestId).then(() => {});
+      editCreatePromise = createContestProblem(body, contestId, parseInt(formValue.score!)).then(() => {});
     } else if (!Number.isNaN(id)) {
       editCreatePromise = updateProblem(id, body).then(() => {});
     } else {
@@ -284,6 +286,16 @@
               {/if}
             </div>
           </div>
+          {#if params.contestId?.length ?? 0 > 0}
+            <div class="input-container">
+              {#if previewEnabled}
+                Score: {formValue.score}
+              {:else}
+                <label for="score">Score</label>
+                <input id="score" name="score" placeholder="Score" bind:value={formValue.score} />
+              {/if}
+            </div>
+          {/if}
         </form>
 
         <section class="h-100 w-100">

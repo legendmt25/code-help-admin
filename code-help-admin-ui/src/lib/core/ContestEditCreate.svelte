@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { link, push } from "svelte-spa-router";
+  import { push } from "svelte-spa-router";
   import type { ChangeEventHandler, FormEventHandler } from "svelte/elements";
   import Button from "../../components/Button.svelte";
   import Spinner from "../../components/Spinner.svelte";
@@ -14,7 +14,7 @@
   import { createContest, getContestById, updateContest } from "../../services/core/ContestService";
   import { deleteProblem } from "../../services/core/ProblemsService";
   import { Icon } from "svelte-icons-pack";
-  import { BiEdit, BiTrash } from "svelte-icons-pack/bi";
+  import { BiEdit, BiPlus, BiTrash } from "svelte-icons-pack/bi";
 
   export let params: { id?: string } = {};
 
@@ -36,11 +36,11 @@
     const minutes = date.getMinutes().toString().padStart(2, "0");
 
     return `${year}-${month}-${day}T${hours}:${minutes}`;
-  }
+  };
 
   let contestEntry: ContestDetail | undefined = undefined;
 
-  onMount(() => {
+  const init = () => {
     if (!Number.isNaN(Number(params.id))) {
       loading = true;
       getContestById(Number(params.id))
@@ -57,6 +57,10 @@
         })
         .finally(() => (loading = false));
     }
+  };
+
+  onMount(() => {
+    init();
   });
 
   const handleFormSubmit: FormEventHandler<HTMLFormElement> = (event) => {
@@ -80,7 +84,7 @@
   };
 
   const handleDeleteProblem = (id: number) => {
-    deleteProblem(id);
+    deleteProblem(id).then(() => init());
   };
 </script>
 
@@ -113,6 +117,12 @@
     flex-direction: column;
     padding-top: 2rem;
     gap: 4rem;
+  }
+
+  .add-contest-problem-container {
+    display: flex;
+    justify-content: end;
+    width: 100%;
   }
 </style>
 
@@ -155,6 +165,12 @@
     </form>
 
     {#if contestEntry}
+      <div class="add-contest-problem-container">
+        <Button maxContent href={Route.contest_problems_create.replace(":contestId", contestEntry.id.toString())}>
+          <Icon src={BiPlus} size="24" />
+          <span>Add new problem</span>
+        </Button>
+      </div>
       <table>
         <thead>
           <tr>
@@ -177,7 +193,7 @@
                 </Button>
                 <Button
                   maxContent
-                  href={problem.id ? Route.problems_edit.replace(":id", problem.id.toString()) : undefined}>
+                  href={problem.id ? Route.contest_problems_edit.replace(":id", problem.id.toString()).replace(":contestId", contestEntry.id.toString()) : undefined}>
                   <Icon src={BiEdit} size="24" />
                   <span>Edit</span>
                 </Button>
